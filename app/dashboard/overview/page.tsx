@@ -110,8 +110,6 @@ export default function DashboardOverview() {
     );
   }
 
-  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || "User";
-
   // Show pricing overlay if no subscription
   if (!subscription) {
     return (
@@ -364,6 +362,8 @@ export default function DashboardOverview() {
   }
 
   // Show dashboard if user has subscription
+  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || "User";
+
   return (
     <>
       <style>{`
