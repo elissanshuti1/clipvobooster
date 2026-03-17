@@ -3,7 +3,10 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret-change-in-production';
 
 export function signToken(payload: object, expiresIn?: string): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn || '30d' });
+  const options: jwt.SignOptions = {
+    expiresIn: expiresIn || '30d'
+  };
+  return jwt.sign(payload, JWT_SECRET, options);
 }
 
 export function verifyToken(token: string): any {
