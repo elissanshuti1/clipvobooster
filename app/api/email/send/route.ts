@@ -1,13 +1,7 @@
-import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import clientPromise from '@/lib/mongodb';
-
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
-);
 
 export async function POST(req: Request) {
   try {
@@ -15,39 +9,36 @@ export async function POST(req: Request) {
     const cookie = (req as any).headers.get('cookie') || '';
     const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('token='));
     const token = m ? m.split('=')[1] : null;
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     let payload;
     try {
       payload = jwt.verify(token, process.env.JWT_SECRET as string);
     } catch (jwtError) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
+
     const body = await req.json();
     const { to, subject, body: emailBody } = body;
-    
+
     if (!to || !subject || !emailBody) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
-    
-    // Get user's Gmail tokens from database
+
+    // Get user info from database
     const client = await clientPromise;
     const db = client.db('clipvobooster');
     const users = db.collection('users');
 
     const user = await users.findOne({ _id: new (require('mongodb').ObjectId)(payload.sub) });
 
-    if (!user || !user.gmailTokens) {
-      return NextResponse.json({
-        error: 'Gmail account not connected',
-        action: 'connect_gmail'
-      }, { status: 400 });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    
+
     // Generate tracking ID
     const trackingId = `trk_${Date.now()}_${Math.random().toString(36).substring(7)}`;
     // Use production URL for tracking (localhost won't work when email is opened elsewhere)
@@ -58,7 +49,7 @@ export async function POST(req: Request) {
     // Add promotion link with user's website from profile
     const senderName = user.profile?.projectName || user.name || user.email.split('@')[0];
     const senderWebsite = user.profile?.projectUrl;
-    
+
     const signatureHtml = senderWebsite
       ? `<div style="margin-top:24px;padding-top:20px;border-top:2px solid #e5e7eb">
            <p style="margin:0;font-size:14px;color:#1f2937"><strong>Best regards,</strong></p>
@@ -134,66 +125,41 @@ export async function POST(req: Request) {
 </html>
     `.trim();
 
-    // Set up Gmail API
-    oauth2Client.setCredentials(user.gmailTokens);
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+    // Create Brevo SMTP transporter
+    const transporter = nodemailer.createTransport({
+      host: process.env.BREVO_SMTP_HOST,
+      port: parseInt(process.env.BREVO_SMTP_PORT || '587'),
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: process.env.BREVO_SMTP_USER,
+        pass: process.env.BREVO_SMTP_PASS,
+      },
+    });
+
+    // Verify transporter configuration
+    await transporter.verify();
+    console.log('Brevo SMTP connection verified');
 
     console.log('Sending email to:', to);
     console.log('Subject:', subject);
 
-    // Create email message with proper MIME structure for HTML
-    const utf8Subject = `=?utf-8?B?${Buffer.from(subject).toString('base64')}?=`;
-    const boundary = `boundary_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    
-    // Create both plain text and HTML versions
-    const plainTextBody = emailBody
-      .replace(/<[^>]*>/g, '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .trim();
-    
-    const messageParts = [
-      'From: ' + user.email,
-      'To: ' + to,
-      'Subject: ' + utf8Subject,
-      'MIME-Version: 1.0',
-      'Content-Type: multipart/alternative; boundary="' + boundary + '"',
-      '',
-      '--' + boundary,
-      'Content-Type: text/plain; charset=UTF-8',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      plainTextBody,
-      '',
-      '--' + boundary,
-      'Content-Type: text/html; charset=UTF-8',
-      'Content-Transfer-Encoding: 7bit',
-      '',
-      fullBody,
-      '',
-      '--' + boundary + '--'
-    ];
-    
-    const message = messageParts.join('\r\n');
-    const encodedMessage = Buffer.from(message)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-    
-    console.log('Sending via Gmail API...');
-    
-    // Send email
-    const response = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedMessage,
-      },
+    // Get sender info from environment
+    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@clipvo.site';
+    const senderName = process.env.BREVO_SENDER_NAME || 'ClipVo';
+
+    // Send email via Brevo
+    const info = await transporter.sendMail({
+      from: `"${senderName}" <${senderEmail}>`,
+      to: to,
+      subject: subject,
+      html: fullBody,
+      headers: {
+        'X-Tracking-ID': trackingId,
+        'X-User-ID': String(user._id),
+      }
     });
-    
-    console.log('Gmail response:', response.data);
+
+    console.log('Email sent:', info.messageId);
     console.log('Tracking ID:', trackingId);
     console.log('User ID:', user._id);
     console.log('User ID type:', typeof user._id);
@@ -208,7 +174,7 @@ export async function POST(req: Request) {
       body: emailBody,
       fullBody: fullBody,
       trackingId,
-      messageId: response.data.id,
+      messageId: info.messageId,
       status: 'sent',
       opened: false,
       openCount: 0,
@@ -219,37 +185,36 @@ export async function POST(req: Request) {
     });
 
     console.log('Saved to DB with ID:', insertResult.insertedId);
-    
-    return NextResponse.json({ 
-      success: true, 
-      messageId: response.data.id,
+
+    return NextResponse.json({
+      success: true,
+      messageId: info.messageId,
       message: 'Email sent successfully!'
     });
-    
+
   } catch (err: any) {
     console.error('Send email error:', err.message);
     console.error('Error details:', err);
-    
-    // Handle token expiration
-    if (err.message?.includes('invalid_grant') || err.message?.includes('Token has been expired')) {
-      return NextResponse.json({ 
-        error: 'Gmail connection expired. Please reconnect.',
-        action: 'reconnect_gmail'
+
+    // Handle SMTP authentication errors
+    if (err.code === 'EAUTH') {
+      return NextResponse.json({
+        error: 'Email service authentication failed. Please check SMTP credentials.',
+        action: 'check_smtp_credentials'
       }, { status: 401 });
     }
-    
-    // Handle Gmail API not enabled
-    if (err.message?.includes('Gmail API') || err.code === 403) {
-      return NextResponse.json({ 
-        error: 'Gmail API not enabled. Please enable it in Google Cloud Console.',
-        action: 'enable_gmail_api',
-        details: err.message
-      }, { status: 403 });
+
+    // Handle connection errors
+    if (err.code === 'ECONNECTION' || err.code === 'ESOCKET') {
+      return NextResponse.json({
+        error: 'Could not connect to email service. Please try again.',
+        action: 'retry'
+      }, { status: 503 });
     }
-    
-    return NextResponse.json({ 
-      error: 'Failed to send email', 
-      details: err.message 
+
+    return NextResponse.json({
+      error: 'Failed to send email',
+      details: err.message
     }, { status: 500 });
   }
 }

@@ -223,7 +223,7 @@ export default function PricingPage() {
                   <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Gmail integration
+                  Professional email delivery
                 </li>
               </ul>
               <Link href="/api/auth/google" className="pricing-btn primary">

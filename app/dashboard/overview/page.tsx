@@ -102,20 +102,6 @@ export default function DashboardOverview() {
           margin-bottom: 24px;
         }
 
-        .gmail-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 6px;
-          padding: 6px 12px;
-          background: rgba(74, 222, 128, 0.1);
-          border: 1px solid rgba(74, 222, 128, 0.3);
-          border-radius: 100px;
-          font-size: 12px;
-          font-weight: 500;
-          color: #4ade80;
-          margin-bottom: 16px;
-        }
-
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -193,19 +179,11 @@ export default function DashboardOverview() {
       <div>
         {/* Welcome Card */}
         <div className="welcome-card">
-          <div className="gmail-badge">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-              <polyline points="22,6 12,13 2,6" />
-            </svg>
-            Gmail Connected
-          </div>
-          
           <h1 className="welcome-title">
             Welcome back, {firstName}! 👋
           </h1>
           <p className="welcome-subtitle">
-            AI-powered email marketing. Write and send personalized emails from your Gmail.
+            AI-powered email marketing. Write and send personalized emails instantly.
           </p>
 
           {/* Stats */}
@@ -276,7 +254,7 @@ export default function DashboardOverview() {
                 <div style={{ fontSize: 24 }}>3️⃣</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)', marginBottom: 4 }}>Send & Track</div>
-                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>Send emails from your Gmail and track responses</div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>Send emails and track opens and clicks</div>
                 </div>
               </div>
             </div>

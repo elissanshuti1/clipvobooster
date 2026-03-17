@@ -240,18 +240,18 @@ export default function FeaturesPage() {
               </ul>
             </div>
 
-            {/* Gmail Integration */}
+            {/* Professional Email Delivery */}
             <div className="feature-card">
               <div className="feature-icon">📧</div>
-              <h2 className="feature-title">Gmail Integration</h2>
+              <h2 className="feature-title">Professional Email Delivery</h2>
               <p className="feature-desc">
-                Send emails directly from your Gmail account. Secure, reliable, and all your sent emails in one place.
+                Send emails with professional delivery. High deliverability rates and reliable infrastructure.
               </p>
               <ul className="feature-list">
-                <li>Secure OAuth connection</li>
-                <li>Send from your address</li>
-                <li>All emails in Gmail</li>
-                <li>No third-party servers</li>
+                <li>Professional SMTP service</li>
+                <li>High deliverability</li>
+                <li>Reliable infrastructure</li>
+                <li>Fast delivery</li>
               </ul>
             </div>
 

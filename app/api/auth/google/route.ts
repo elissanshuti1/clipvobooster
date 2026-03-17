@@ -8,17 +8,17 @@ const oauth2Client = new google.auth.OAuth2(
 );
 
 export async function GET() {
+  // Only request non-sensitive scopes - NO verification required
   const scopes = [
-    'https://www.googleapis.com/auth/gmail.send',
-    'https://www.googleapis.com/auth/gmail.readonly',
     'https://www.googleapis.com/auth/userinfo.email',
     'https://www.googleapis.com/auth/userinfo.profile',
+    'openid',
   ];
 
   const url = oauth2Client.generateAuthUrl({
-    access_type: 'offline',
+    access_type: 'online',
     scope: scopes,
-    prompt: 'consent',
+    prompt: 'select_account',
   });
 
   return NextResponse.redirect(url);

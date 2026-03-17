@@ -21,7 +21,7 @@ export default function LoginPage() {
             </svg>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2">Welcome to ClipVo Email</h1>
-          <p className="text-slate-400 text-sm">AI-powered email marketing with your Gmail</p>
+          <p className="text-slate-400 text-sm">AI-powered email marketing platform</p>
         </div>
 
         {/* Google Sign In - ONLY OPTION */}
@@ -47,15 +47,15 @@ export default function LoginPage() {
               <div style={{ fontSize: 13, color: 'var(--muted)' }}>Personalized emails in seconds</div>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0e1018]/50 border border-white/5">
             <div style={{ fontSize: 20 }}>📧</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)' }}>Send from Your Gmail</div>
-              <div style={{ fontSize: 13, color: 'var(--muted)' }}>Uses your existing Gmail account</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)' }}>Send Emails Instantly</div>
+              <div style={{ fontSize: 13, color: 'var(--muted)' }}>Professional email delivery</div>
             </div>
           </div>
-          
+
           <div className="flex items-start gap-3 p-4 rounded-xl bg-[#0e1018]/50 border border-white/5">
             <div style={{ fontSize: 20 }}>📊</div>
             <div>
