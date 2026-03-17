@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // Force dynamic rendering - this page must be client-side only
 export const dynamic = 'force-dynamic';
 export const ssr = false;
 
-export default function PaymentSuccessPage() {
+function PaymentVerificationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isVerifying, setIsVerifying] = useState(true);
@@ -379,4 +379,36 @@ export default function PaymentSuccessPage() {
   }
 
   return null;
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div style={{
+        minHeight: '100vh',
+        background: '#08090d',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 50,
+            height: 50,
+            border: '4px solid rgba(255,255,255,0.1)',
+            borderTop: '4px solid #10b981',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 24px'
+          }} />
+          <p style={{ color: '#8b95a5', fontSize: 14 }}>Loading...</p>
+        </div>
+        <style>{`
+          @keyframes spin { to { transform: rotate(360deg); } }
+        `}</style>
+      </div>
+    }>
+      <PaymentVerificationContent />
+    </Suspense>
+  );
 }
