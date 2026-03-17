@@ -5,8 +5,8 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get('token');
 
-  // If user is logged in and trying to access login/signup/landing page, redirect to dashboard
-  if (token && (url.pathname === '/login' || url.pathname === '/signup' || url.pathname === '/')) {
+  // If user is logged in and trying to access login/signup, redirect to dashboard
+  if (token && (url.pathname === '/login' || url.pathname === '/signup')) {
     url.pathname = '/dashboard/overview';
     return NextResponse.redirect(url);
   }
@@ -21,5 +21,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup', '/'],
+  matcher: ['/dashboard/:path*', '/login', '/signup'],
 };

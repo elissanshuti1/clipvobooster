@@ -79,6 +79,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth" style={{ background: '#08090d' }}>
+      <head>
+        <link rel="icon" href="/favicon.png" sizes="any" />
+        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/favicon.png" sizes="180x180" />
+      </head>
       <body
         className={`${inter.variable} font-sans antialiased bg-[#08090d] text-[#dde1e9] min-h-screen flex flex-col`}
         style={{ background: '#08090d', color: '#dde1e9' }}

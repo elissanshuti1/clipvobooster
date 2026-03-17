@@ -85,11 +85,11 @@ export async function GET(req: Request) {
     );
     
     console.log('Created JWT token, redirecting to dashboard');
-    
-    // Redirect to dashboard with token in URL (for first login)
-    const redirectUrl = new URL('/dashboard', req.url);
+
+    // Redirect to dashboard overview with token in URL (for first login)
+    const redirectUrl = new URL('/dashboard/overview', req.url);
     redirectUrl.searchParams.set('token', appToken);
-    
+
     const response = NextResponse.redirect(redirectUrl);
     
     // Set HTTP-only cookie
