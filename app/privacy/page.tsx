@@ -181,7 +181,7 @@ export default function PrivacyPage() {
                 <li>Enforce our agreements</li>
               </ul>
               <p className="legal-text">
-                You can request deletion of your account and data at any time by contacting support@clipvo.site.
+                You can request deletion of your account and data at any time by contacting trivora00@gmail.com.
               </p>
             </div>
 
@@ -216,7 +216,7 @@ export default function PrivacyPage() {
                 <li>Withdraw consent for data processing</li>
               </ul>
               <p className="legal-text">
-                To exercise these rights, contact us at support@clipvo.site.
+                To exercise these rights, contact us at trivora00@gmail.com.
               </p>
             </div>
 
@@ -320,7 +320,7 @@ export default function PrivacyPage() {
                 For questions about this Privacy Policy or our data practices, contact us at:
               </p>
               <p className="legal-text">
-                Email: support@clipvo.site
+                Email: trivora00@gmail.com
               </p>
             </div>
           </div>

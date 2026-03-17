@@ -185,7 +185,7 @@ export default function RefundPage() {
                 To request a refund, follow these steps:
               </p>
               <ol style={{ paddingLeft: 24, color: 'var(--text)', lineHeight: 1.8 }}>
-                <li>Email us at support@clipvo.site</li>
+                <li>Email us at trivora00@gmail.com</li>
                 <li>Include your account email and order details</li>
                 <li>Explain the reason for your refund request</li>
                 <li>Our team will respond within 2-3 business days</li>
@@ -215,7 +215,7 @@ export default function RefundPage() {
                 You can delete your account at any time:
               </p>
               <ul className="legal-list">
-                <li>Contact support@clipvo.site</li>
+                <li>Contact trivora00@gmail.com</li>
                 <li>We will delete your data within 30 days</li>
                 <li>Cancellation is immediate and irreversible</li>
                 <li>No refunds for deleted accounts (subject to refund policy above)</li>
@@ -271,7 +271,7 @@ export default function RefundPage() {
                 If you have a billing dispute:
               </p>
               <ul className="legal-list">
-                <li>Contact us first at support@clipvo.site</li>
+                <li>Contact us first at trivora00@gmail.com</li>
                 <li>We will investigate and respond within 5 business days</li>
                 <li>If unresolved, you may contact your payment provider</li>
               </ul>
@@ -295,7 +295,7 @@ export default function RefundPage() {
                 For questions about refunds, cancellations, or billing, contact us at:
               </p>
               <p className="legal-text">
-                Email: support@clipvo.site
+                Email: trivora00@gmail.com
               </p>
               <p className="legal-text">
                 We respond to all refund requests within 2-3 business days.

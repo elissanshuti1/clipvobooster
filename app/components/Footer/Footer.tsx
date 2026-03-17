@@ -98,7 +98,7 @@ export default function Footer() {
             <p>© 2026 Clipvobooster, Inc. All rights reserved.</p>
             <div className="foot-soc">
               <a href="https://twitter.com/clipvobooster" target="_blank" rel="noopener noreferrer">Twitter</a>
-              <a href="mailto:support@clipvo.site">Support</a>
+              <a href="mailto:trivora00@gmail.com">Support</a>
             </div>
           </div>
         </div>

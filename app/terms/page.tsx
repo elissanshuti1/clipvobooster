@@ -238,7 +238,7 @@ export default function TermsPage() {
                 For questions about these Terms of Service, please contact us at:
               </p>
               <p className="legal-text">
-                Email: support@clipvo.site
+                Email: trivora00@gmail.com
               </p>
             </div>
           </div>

@@ -25,7 +25,7 @@ export default function AboutPage() {
             <h2 className="font-semibold text-white text-2xl mb-3">Contact</h2>
             <p className="text-slate-400 leading-7">
               For billing or Paddle verification please contact our billing team at
-              <a href="mailto:billing@clipvobooster.com" className="text-white underline ml-1">billing@clipvobooster.com</a>.
+              <a href="mailto:trivora00@gmail.com" className="text-white underline ml-1">trivora00@gmail.com</a>.
             </p>
           </section>
         </div>
