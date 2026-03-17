@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <>
@@ -86,9 +88,9 @@ export default function Footer() {
             <div className="foot-col">
               <h4>Legal</h4>
               <ul>
-                <li><a href="/privacy">Privacy Policy</a></li>
-                <li><a href="/terms">Terms of Service</a></li>
-                <li><a href="/refund">Refund Policy</a></li>
+                <li><Link href="/terms" style={{ color: 'var(--muted)' }} className="hover:text-slate-100">Terms of Service</Link></li>
+                <li><Link href="/privacy" style={{ color: 'var(--muted)' }} className="hover:text-slate-100">Privacy Policy</Link></li>
+                <li><Link href="/refund" style={{ color: 'var(--muted)' }} className="hover:text-slate-100">Refund Policy</Link></li>
               </ul>
             </div>
           </div>

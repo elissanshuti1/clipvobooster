@@ -18,7 +18,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
-  const [credits, setCredits] = useState(1240);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -473,18 +472,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {NAV_ITEMS.find(n => n.id === currentTab)?.label}
             </span>
             <div className="topbar-right">
-              <div className="credit-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                {credits.toLocaleString()} credits
-              </div>
-              <button className="new-boost-btn" onClick={() => window.dispatchEvent(new CustomEvent('open-new-boost'))}>
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                New Boost
-              </button>
+              <NotificationBell />
             </div>
           </div>
 

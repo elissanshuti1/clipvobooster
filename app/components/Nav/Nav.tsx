@@ -39,8 +39,10 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
           <ul style={{ display: "flex", gap: "1.5rem", alignItems: "center", whiteSpace: "nowrap", marginRight: 24 }}>
             <li><Link href="/" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Home</Link></li>
             <li><Link href="/pricing" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Pricing</Link></li>
-            <li><Link href="/#features" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Features</Link></li>
             <li><Link href="/about" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">About</Link></li>
+            <li><Link href="/terms" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Terms</Link></li>
+            <li><Link href="/privacy" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Privacy</Link></li>
+            <li><Link href="/refund" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Refund</Link></li>
           </ul>
         )}
 
