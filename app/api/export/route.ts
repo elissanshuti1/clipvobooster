@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { verifyToken } from '@/lib/jwt';
 
 // GET - Export leads as CSV
 export async function GET(req: Request) {
@@ -9,35 +9,33 @@ export async function GET(req: Request) {
     const cookie = (req as any).headers.get('cookie') || '';
     const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('token='));
     const token = m ? m.split('=')[1] : null;
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
-    let payload;
-    try {
-      payload = jwt.verify(token, process.env.JWT_SECRET as string);
-    } catch (jwtError) {
+
+    const payload: any = verifyToken(token);
+    if (!payload) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
+
     const url = new URL(req.url);
     const productId = url.searchParams.get('productId');
-    
+
     const client = await clientPromise;
     const db = client.db('clipvobooster');
     const leads = db.collection('leads');
-    
+
     const query: any = { userId: String(payload.sub) };
     if (productId) {
       query.productId = new ObjectId(productId);
     }
-    
+
     const userLeads = await leads.find(query).sort({ createdAt: -1 }).toArray();
-    
+
     // Convert to CSV
-    const csvRows = [];
-    
+    const csvRows: string[] = [];
+
     // Header
     csvRows.push('Name,Email,Company,Role,Source,Location,Post URL,Status,Created At,Need');
     
