@@ -21,12 +21,25 @@ export async function POST(req: Request) {
     // Set token expiration based on remember me
     const expiresIn = rememberMe ? '30d' : (process.env.JWT_EXPIRES_IN || '3d');
     const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 3 * 24 * 60 * 60;
-    
+
     const token = jwt.sign({ sub: String(user._id), email: user.email }, process.env.JWT_SECRET as string, { expiresIn });
 
-    const resp = NextResponse.json({ ok: true, user: { _id: user._id, email: user.email, name: user.name, avatar: user.avatar } });
+    // Check if user has subscription
+    const hasSubscription = !!user.subscription;
+
+    const resp = NextResponse.json({ 
+      ok: true, 
+      user: { _id: user._id, email: user.email, name: user.name, avatar: user.avatar },
+      hasSubscription
+    });
     const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+    
+    // Set token cookie
     resp.headers.set('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`);
+    
+    // Set subscription status cookie for middleware
+    resp.headers.append('Set-Cookie', `has_subscription=${hasSubscription}; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`);
+    
     return resp;
   } catch (err: any) {
     console.error('Login error:', err);

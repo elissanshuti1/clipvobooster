@@ -18,44 +18,43 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [subscription, setSubscription] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then((res) => {
+    Promise.all([
+      fetch("/api/auth/me").then(res => {
         if (!res.ok) {
           router.push("/login");
           return null;
         }
         return res.json();
-      })
-      .then((data) => {
-        if (data) setUser(data);
-        setIsLoading(false);
-      })
-      .catch(() => {
-        router.push("/login");
-      });
+      }),
+      fetch("/api/payment/subscription").then(res => res.ok ? res.json() : null)
+    ]).then(([userData, subData]) => {
+      if (userData) setUser(userData);
+      if (subData && subData.hasSubscription) setSubscription(subData.subscription);
+      setIsLoading(false);
+    }).catch(() => {
+      router.push("/login");
+    });
   }, [router]);
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { 
+      await fetch('/api/auth/logout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-      // Force reload to clear all client-side state
       window.location.href = '/login';
     } catch (err) {
       console.error('Logout failed:', err);
-      // Fallback: redirect anyway
       window.location.href = '/login';
     }
   };
 
   const getInitials = (name?: string, email?: string) => {
     if (name) {
-      // Return first letter of first name only, uppercase
       const firstName = name.split(' ')[0];
       return firstName.charAt(0).toUpperCase();
     }
@@ -63,6 +62,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return email.charAt(0).toUpperCase();
     }
     return 'U';
+  };
+
+  const getPlanColor = (plan?: string) => {
+    switch (plan) {
+      case 'starter': return '#3b82f6';
+      case 'professional': return '#8b5cf6';
+      case 'lifetime': return '#f59e0b';
+      default: return '#6366f1';
+    }
   };
 
   const currentTab = pathname?.split('/').pop() || 'overview';
@@ -79,18 +87,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           @keyframes spin { to { transform: rotate(360deg); } }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         `}</style>
-        <div style={{ 
-          minHeight: '100vh', 
+        <div style={{
+          minHeight: '100vh',
           background: 'var(--bg)',
-          display: 'flex', 
-          alignItems: 'center', 
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'center',
           flexDirection: 'column',
           gap: 20
         }}>
-          <div style={{ 
-            width: 50, 
-            height: 50, 
+          <div style={{
+            width: 50,
+            height: 50,
             border: '4px solid rgba(255,255,255,0.1)',
             borderTop: '4px solid #6366f1',
             borderRadius: '50%',
@@ -113,7 +121,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           --text: #dde1e9; --muted: #5a6373; --dim: #8b95a5; --white: #ffffff;
         }
         .dashboard-shell { display: flex; min-height: 100vh; background: var(--bg); }
-        
+
         /* Sidebar */
         .dashboard-sidebar {
           width: 260px;
@@ -129,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           z-index: 50;
         }
         .dashboard-sidebar.collapsed { width: 72px; }
-        
+
         /* Sidebar Header */
         .sidebar-header {
           height: 64px;
@@ -161,7 +169,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           width: 0;
           overflow: hidden;
         }
-        
+
         /* Sidebar Nav */
         .sidebar-nav {
           flex: 1;
@@ -209,7 +217,61 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           width: 0;
           overflow: hidden;
         }
-        
+
+        /* Plan Badge in Sidebar */
+        .sidebar-plan-badge {
+          margin: 12px;
+          padding: 10px 14px;
+          border-radius: 10px;
+          background: rgba(99, 102, 241, 0.1);
+          border: 1px solid rgba(99, 102, 241, 0.3);
+          transition: all 0.2s;
+          opacity: 1;
+          overflow: hidden;
+        }
+        .dashboard-sidebar.collapsed .sidebar-plan-badge {
+          padding: 10px;
+          background: rgba(99, 102, 241, 0.15);
+        }
+        .plan-badge-content {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+        .plan-icon {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          flex-shrink: 0;
+        }
+        .plan-info {
+          flex: 1;
+          min-width: 0;
+          transition: opacity 0.2s;
+        }
+        .dashboard-sidebar.collapsed .plan-info {
+          opacity: 0;
+          width: 0;
+          overflow: hidden;
+        }
+        .plan-label {
+          font-size: 10px;
+          color: rgba(255, 255, 255, 0.6);
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          font-weight: 600;
+        }
+        .plan-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--white);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
         /* Sidebar Footer - User Profile */
         .sidebar-footer {
           padding: 16px;
@@ -291,7 +353,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .dashboard-sidebar.collapsed .logout-btn {
           display: none;
         }
-        
+
         /* Main Content */
         .dashboard-main {
           flex: 1;
@@ -303,7 +365,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .dashboard-sidebar.collapsed ~ .dashboard-main {
           margin-left: 72px;
         }
-        
+
         /* Topbar */
         .dashboard-topbar {
           height: 64px;
@@ -346,6 +408,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           align-items: center;
           gap: 12px;
         }
+        
+        /* Plan Badge in Topbar */
+        .topbar-plan-badge {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 6px 12px;
+          border-radius: 8px;
+          background: rgba(99, 102, 241, 0.1);
+          border: 1px solid rgba(99, 102, 241, 0.3);
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--white);
+        }
+        .topbar-plan-icon {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+        }
+        
         .credit-badge {
           display: flex;
           align-items: center;
@@ -381,7 +465,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         .new-boost-btn:hover {
           opacity: 0.88;
         }
-        
+
         /* Content Area */
         .dashboard-content {
           flex: 1;
@@ -395,7 +479,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           background: var(--line2);
           border-radius: 3px;
         }
-        
+
         @media (max-width: 768px) {
           .dashboard-sidebar {
             transform: translateX(-100%);
@@ -421,6 +505,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </div>
             <span className="sidebar-brand">ClipVoBooster</span>
           </div>
+
+          {/* Plan Badge */}
+          {subscription && (
+            <div className="sidebar-plan-badge">
+              <div className="plan-badge-content">
+                <div 
+                  className="plan-icon" 
+                  style={{ 
+                    background: getPlanColor(subscription.plan),
+                    color: 'white'
+                  }}
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                </div>
+                <div className="plan-info">
+                  <div className="plan-label">Your Plan</div>
+                  <div className="plan-name">{subscription.planName}</div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Navigation */}
           <nav className="sidebar-nav">
@@ -472,6 +579,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {NAV_ITEMS.find(n => n.id === currentTab)?.label}
             </span>
             <div className="topbar-right">
+              {/* Plan Badge in Topbar */}
+              {subscription && (
+                <div className="topbar-plan-badge">
+                  <div 
+                    className="topbar-plan-icon"
+                    style={{ background: getPlanColor(subscription.plan) }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                  </div>
+                  {subscription.planName}
+                </div>
+              )}
               <NotificationBell />
             </div>
           </div>
@@ -483,7 +604,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
       {/* Hidden element to pass user data to children via custom event */}
-      <div id="user-data" data-user-name={user?.name || ''} data-user-email={user?.email || ''} style={{ display: 'none' }} />
+      <div id="user-data" data-user-name={user?.name || ''} data-user-email={user?.email || ''} data-subscription={JSON.stringify(subscription)} style={{ display: 'none' }} />
     </>
   );
 }

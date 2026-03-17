@@ -28,7 +28,13 @@ export async function POST(req: Request) {
     // set httpOnly cookie (only set Secure in production)
     const maxAge = 60 * 60 * 24 * 7; // 7 days
     const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
+    
+    // Set token cookie
     response.headers.set('Set-Cookie', `token=${token}; HttpOnly; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`);
+    
+    // Set subscription status cookie for middleware (new users don't have subscription)
+    response.headers.append('Set-Cookie', `has_subscription=false; Path=/; Max-Age=${maxAge}; SameSite=Lax${secure}`);
+    
     return response;
   } catch (err: any) {
     console.error('Signup error:', err);
