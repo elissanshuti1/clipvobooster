@@ -1,0 +1,590 @@
+"use client";
+
+import { useState, useEffect } from "react";
+
+export default function Body() {
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [count, setCount] = useState({ views: 0, creators: 0, products: 0 });
+
+  useEffect(() => {
+    const targets = { views: 4820000, creators: 12400, products: 3870 };
+    const duration = 2400;
+    const steps = 90;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      const p = step / steps;
+      const e = 1 - Math.pow(1 - p, 4);
+      setCount({
+        views: Math.round(targets.views * e),
+        creators: Math.round(targets.creators * e),
+        products: Math.round(targets.products * e),
+      });
+      if (step >= steps) clearInterval(timer);
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, []);
+
+  const fmt = (n: number) =>
+    n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + "M" :
+    n >= 1_000 ? (n / 1_000).toFixed(1) + "K" : String(n);
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap');
+      `}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap');
+
+        /* Scope all landing styles so they don't leak into global layout */
+        .landing-root *, .landing-root *::before, .landing-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        .landing-root {
+          --bg:    #08090d;
+          --bg1:   #0e1018;
+          --bg2:   #12151f;
+          --bg3:   #181c27;
+          --line:  rgba(255,255,255,0.07);
+          --line2: rgba(255,255,255,0.13);
+          --text:  #dde1e9;
+          --muted: #5a6373;
+          --dim:   #8b95a5;
+          --white: #ffffff;
+          background: var(--bg);
+          color: var(--text);
+          font-family: 'DM Sans', system-ui, sans-serif;
+          font-weight: 300;
+          -webkit-font-smoothing: antialiased;
+          line-height: 1.6;
+          overflow-x: hidden;
+        }
+
+        /* ── Animations ── */
+        @keyframes rise {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes breathe {
+          0%,100% { opacity:.35; } 50% { opacity:.9; }
+        }
+
+        .landing-root .rise { opacity:0; animation: rise .85s cubic-bezier(.16,1,.3,1) forwards; }
+        .landing-root .d1{animation-delay:.04s} .landing-root .d2{animation-delay:.16s}
+        .landing-root .d3{animation-delay:.28s} .landing-root .d4{animation-delay:.40s}
+        .landing-root .d5{animation-delay:.52s}
+
+        /* ── Hero ── */
+        .landing-root .hero {
+          min-height:100vh; display:grid; place-items:center;
+          padding:130px 52px 90px; position:relative;
+        }
+        .landing-root .hero-grid {
+          position:absolute; inset:0; pointer-events:none;
+          background-image:
+            linear-gradient(var(--line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--line) 1px, transparent 1px);
+          background-size:64px 64px;
+          mask-image:radial-gradient(ellipse 75% 55% at 50% 38%, black 20%, transparent 100%);
+          -webkit-mask-image:radial-gradient(ellipse 75% 55% at 50% 38%, black 20%, transparent 100%);
+        }
+        .landing-root .hero-inner {
+          max-width:820px; width:100%;
+          text-align:center; position:relative; z-index:1;
+        }
+        .landing-root .hero-badge {
+          display:inline-flex; align-items:center; gap:8px;
+          font-family:'DM Mono', monospace; font-size:11px; font-weight:400;
+          letter-spacing:.11em; text-transform:uppercase; color:var(--muted);
+          border:1px solid var(--line2); padding:6px 16px; border-radius:100px;
+          margin-bottom:44px;
+        }
+        .landing-root .hero-badge-dot {
+          width:5px; height:5px; border-radius:50%; background:var(--dim);
+          animation:breathe 2.4s ease-in-out infinite;
+        }
+        .landing-root h1 {
+          font-family:'Instrument Serif', serif;
+          font-size:clamp(54px, 8.5vw, 100px);
+          font-weight:400; line-height:1.0;
+          letter-spacing:-.035em; color:var(--white);
+          margin-bottom:30px;
+        }
+        .landing-root h1 em { font-style:italic; color:var(--dim); }
+        .landing-root .hero-p {
+          font-size:17px; font-weight:300; color:var(--muted);
+          max-width:500px; margin:0 auto 52px; line-height:1.75;
+        }
+        .landing-root .hero-btns {
+          display:flex; align-items:center; justify-content:center;
+          gap:12px; flex-wrap:wrap; margin-bottom:84px;
+        }
+        .landing-root .btn-w {
+          font-family:'DM Sans',sans-serif; font-size:14px; font-weight:500;
+          background:var(--white); color:var(--bg);
+          padding:13px 30px; border-radius:8px;
+          text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+          transition:all .2s;
+        }
+        .landing-root .btn-w:hover { opacity:.91; box-shadow:0 0 0 4px rgba(255,255,255,.1); }
+        .landing-root .btn-g {
+          font-family:'DM Sans',sans-serif; font-size:14px; font-weight:400;
+          color:var(--muted); border:1px solid var(--line2);
+          padding:13px 24px; border-radius:8px;
+          text-decoration:none; transition:all .2s;
+        }
+        .landing-root .btn-g:hover { color:var(--dim); border-color:rgba(255,255,255,.18); }
+
+        /* Numbers */
+        .landing-root .nums {
+          display:grid; grid-template-columns:repeat(3,1fr);
+          border:1px solid var(--line); border-radius:14px;
+          overflow:hidden; max-width:560px; margin:0 auto;
+          background:var(--bg1);
+        }
+        .landing-root .num-c { padding:28px 28px; border-right:1px solid var(--line); text-align:center; }
+        .landing-root .num-c:last-child { border-right:none; }
+        .landing-root .num-val {
+          font-family:'Instrument Serif',serif; font-size:36px; font-weight:400;
+          color:var(--white); letter-spacing:-.04em; line-height:1;
+        }
+        .landing-root .num-val sup { font-size:.5em; color:var(--dim); vertical-align:super; }
+        .landing-root .num-lbl {
+          font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.09em;
+          text-transform:uppercase; color:var(--muted); margin-top:6px;
+        }
+
+        /* ── Common ── */
+        .landing-root .wrap { max-width:1120px; margin:0 auto; padding:0 52px; }
+        .landing-root .sec { padding:104px 0; }
+        .landing-root .eye {
+          font-family:'DM Mono',monospace; font-size:10.5px; font-weight:400;
+          letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+          display:block; margin-bottom:20px;
+        }
+        .landing-root .sec-h {
+          font-family:'Instrument Serif',serif;
+          font-size:clamp(36px,4.5vw,58px); font-weight:400;
+          line-height:1.06; letter-spacing:-.035em; color:var(--white);
+        }
+        .landing-root .sec-p {
+          font-size:15px; font-weight:300; color:var(--muted);
+          max-width:420px; line-height:1.8; margin-top:16px;
+        }
+
+        /* ── Process ── */
+        .landing-root .steps-list { border-top:1px solid var(--line); margin-top:64px; }
+        .landing-root .step {
+          display:grid; grid-template-columns:72px 1fr 1fr;
+          border-bottom:1px solid var(--line); padding:52px 0;
+          transition:background .25s;
+        }
+        .landing-root .step:hover { background:rgba(255,255,255,.016); }
+        .landing-root .step-n {
+          font-family:'DM Mono',monospace; font-size:11.5px; color:var(--muted);
+          letter-spacing:.05em; padding-top:3px;
+        }
+        .landing-root .step-t {
+          font-family:'Instrument Serif',serif; font-size:26px; color:var(--white);
+          letter-spacing:-.02em; padding-right:52px; line-height:1.2;
+        }
+        .landing-root .step-b {
+          font-size:14.5px; font-weight:300; color:var(--muted);
+          line-height:1.8; max-width:360px;
+        }
+
+        /* ── Live ── */
+        .landing-root .live-sec { background:var(--bg1); }
+        .landing-root .live-top {
+          display:flex; align-items:flex-end; justify-content:space-between;
+          margin-bottom:56px;
+        }
+        .landing-root .live-link {
+          font-family:'DM Mono',monospace; font-size:10.5px; color:var(--muted);
+          text-decoration:none; letter-spacing:.1em; text-transform:uppercase;
+          transition:color .2s;
+        }
+        .landing-root .live-link:hover { color:var(--dim); }
+        .landing-root .cards { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .landing-root .card {
+          background:var(--bg2); border:1px solid var(--line);
+          border-radius:16px; padding:40px;
+          transition:border-color .25s, transform .3s;
+        }
+        .landing-root .card:hover { border-color:var(--line2); transform:translateY(-3px); }
+        .landing-root .ctag {
+          display:inline-flex; align-items:center; gap:7px;
+          font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.1em;
+          text-transform:uppercase; color:var(--muted);
+          border:1px solid var(--line); padding:5px 13px; border-radius:100px;
+          margin-bottom:30px;
+        }
+        .landing-root .ctag-dot { width:5px; height:5px; border-radius:50%; background:var(--dim); }
+        .landing-root .card-head { display:flex; align-items:center; gap:16px; margin-bottom:18px; }
+        .landing-root .card-ico {
+          width:52px; height:52px; border-radius:12px;
+          background:var(--bg3); border:1px solid var(--line);
+          display:grid; place-items:center; font-size:21px; flex-shrink:0;
+        }
+        .landing-root .card-name {
+          font-family:'Instrument Serif',serif; font-size:21px; color:var(--white);
+          letter-spacing:-.02em; line-height:1.2;
+        }
+        .landing-root .card-sub { font-size:13px; color:var(--muted); margin-top:3px; }
+        .landing-root .card-desc {
+          font-size:14px; font-weight:300; color:var(--muted);
+          line-height:1.78; margin-bottom:30px;
+        }
+        .landing-root .cstats { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-bottom:30px; }
+        .landing-root .cstat {
+          background:var(--bg3); border:1px solid var(--line);
+          border-radius:10px; padding:15px 10px; text-align:center;
+        }
+        .landing-root .cstat-v {
+          font-family:'Instrument Serif',serif; font-size:21px; color:var(--white);
+          letter-spacing:-.03em; line-height:1;
+        }
+        .landing-root .cstat-l {
+          font-family:'DM Mono',monospace; font-size:9.5px; letter-spacing:.09em;
+          text-transform:uppercase; color:var(--muted); margin-top:5px;
+        }
+        .landing-root .card-act {
+          display:inline-flex; align-items:center; gap:7px;
+          font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+          color:var(--text); border:1px solid var(--line2);
+          padding:10px 20px; border-radius:8px; text-decoration:none;
+          transition:all .2s;
+        }
+        .landing-root .card-act:hover { background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.2); }
+        .landing-root .vthumb {
+          width:100%; aspect-ratio:16/9; background:var(--bg3);
+          border:1px solid var(--line); border-radius:12px;
+          display:grid; place-items:center; position:relative;
+          margin-bottom:24px; cursor:pointer; overflow:hidden;
+        }
+        .landing-root .vplay {
+          width:46px; height:46px; border-radius:50%;
+          background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2);
+          display:grid; place-items:center; transition:all .2s;
+        }
+        .landing-root .vthumb:hover .vplay { background:var(--white); border-color:var(--white); }
+        .landing-root .vthumb:hover .vplay svg path { fill:var(--bg); }
+        .landing-root .vtime {
+          position:absolute; bottom:10px; right:12px;
+          font-family:'DM Mono',monospace; font-size:10px; color:var(--dim);
+          background:rgba(0,0,0,.6); padding:3px 7px; border-radius:4px;
+        }
+
+        /* ── Stats ── */
+        .landing-root .stats-band {
+          display:grid; grid-template-columns:repeat(3,1fr);
+          border:1px solid var(--line); border-radius:16px;
+          overflow:hidden; background:var(--bg1);
+        }
+        .landing-root .stat-c {
+          padding:58px 52px; border-right:1px solid var(--line);
+        }
+        .landing-root .stat-c:last-child { border-right:none; }
+        .landing-root .stat-eye {
+          font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.12em;
+          text-transform:uppercase; color:var(--muted); margin-bottom:14px; display:block;
+        }
+        .landing-root .stat-n {
+          font-family:'Instrument Serif',serif;
+          font-size:clamp(50px,5vw,70px); font-weight:400;
+          color:var(--white); letter-spacing:-.05em; line-height:1;
+        }
+        .landing-root .stat-suf { color:var(--dim); }
+
+        /* ── Features ── */
+        .landing-root .feat-grid {
+          display:grid; grid-template-columns:1fr 1fr; gap:12px;
+          margin-top:64px;
+        }
+        .landing-root .feat {
+          background:var(--bg1); border:1px solid var(--line);
+          border-radius:16px; padding:44px;
+          transition:border-color .25s, background .25s;
+        }
+        .landing-root .feat:hover { border-color:var(--line2); background:var(--bg2); }
+        .landing-root .feat-wide { grid-column:span 2; }
+        .landing-root .feat-ico {
+          width:40px; height:40px; border-radius:10px;
+          border:1px solid var(--line); display:grid; place-items:center;
+          margin-bottom:28px;
+        }
+        .landing-root .feat h3 {
+          font-family:'Instrument Serif',serif; font-size:23px; font-weight:400;
+          color:var(--white); letter-spacing:-.025em; margin-bottom:12px;
+        }
+        .landing-root .feat p {
+          font-size:14.5px; font-weight:300; color:var(--muted); line-height:1.8;
+        }
+        .landing-root .chips { display:flex; gap:8px; flex-wrap:wrap; margin-top:24px; }
+        .landing-root .chip {
+          font-family:'DM Mono',monospace; font-size:10.5px; letter-spacing:.06em;
+          color:var(--dim); border:1px solid var(--line);
+          padding:5px 14px; border-radius:100px;
+        }
+
+        /* ── Newsletter CTA ── */
+        .landing-root .nl {
+          background:var(--white); border-radius:20px; padding:76px 80px;
+          display:flex; align-items:center; justify-content:space-between; gap:56px;
+        }
+        .landing-root .nl-text h2 {
+          font-family:'Instrument Serif',serif;
+          font-size:clamp(34px,3.8vw,50px); font-weight:400;
+          color:var(--bg); letter-spacing:-.04em; line-height:1.05;
+          margin-bottom:12px;
+        }
+        .landing-root .nl-text p { font-size:15px; font-weight:300; color:#4b5563; line-height:1.7; }
+        .landing-root .nl-form { display:flex; gap:10px; flex-shrink:0; }
+        .landing-root .nl-input {
+          font-family:'DM Sans',sans-serif; font-size:14px; font-weight:300;
+          background:#f1f5f9; border:1px solid #e2e8f0;
+          color:var(--bg); padding:13px 18px; border-radius:8px;
+          width:250px; outline:none; transition:border-color .2s;
+        }
+        .landing-root .nl-input::placeholder { color:#9ca3af; }
+        .landing-root .nl-input:focus { border-color:#94a3b8; }
+        .landing-root .nl-btn {
+          font-family:'DM Sans',sans-serif; font-size:13.5px; font-weight:500;
+          background:var(--bg); color:var(--white);
+          padding:13px 24px; border-radius:8px;
+          border:none; cursor:pointer; white-space:nowrap; transition:opacity .2s;
+        }
+        .landing-root .nl-btn:hover { opacity:.82; }
+
+        /* ── Responsive ── */
+        @media (max-width:920px) {
+          .landing-root .wrap { padding:0 24px; }
+          .landing-root .hero { padding:108px 24px 72px; }
+          .landing-root .nums { grid-template-columns:1fr; max-width:280px; }
+          .landing-root .num-c { border-right:none; border-bottom:1px solid var(--line); }
+          .landing-root .num-c:last-child { border-bottom:none; }
+          .landing-root .step { grid-template-columns:1fr; gap:14px; padding:40px 0; }
+          .landing-root .step-n { display:none; }
+          .landing-root .step-t { padding-right:0; }
+          .landing-root .cards { grid-template-columns:1fr; }
+          .landing-root .stats-band { grid-template-columns:1fr; }
+          .landing-root .stat-c { border-right:none; border-bottom:1px solid var(--line); padding:40px 32px; }
+          .landing-root .stat-c:last-child { border-bottom:none; }
+          .landing-root .feat-grid { grid-template-columns:1fr; }
+          .landing-root .feat-wide { grid-column:span 1; }
+          .landing-root .nl { flex-direction:column; padding:48px 36px; gap:36px; }
+          .landing-root .nl-form { flex-direction:column; width:100%; }
+          .landing-root .nl-input { width:100%; }
+        }
+      `}</style>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-grid" />
+        <div className="hero-inner">
+          <div className="rise d1">
+            <span className="hero-badge">
+              <span className="hero-badge-dot" />
+              AI-Powered Lead Generation
+            </span>
+          </div>
+
+          <h1 className="rise d2">
+            Find customers who<br /><em>actually need you.</em>
+          </h1>
+
+          <p className="hero-p rise d3">
+            ClipVo searches Reddit in real-time to find people actively asking for solutions like yours. 
+            Real people, real questions, real customers — no fake leads, no wasted time.
+          </p>
+
+          <div className="hero-btns rise d4">
+            <a href="/api/auth/google" className="btn-w">
+              Find Customers Free
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </a>
+            <a href="#process" className="btn-g">How it works</a>
+          </div>
+
+          <div className="nums rise d5">
+            {[
+              { val: fmt(count.views), label: "Posts Analyzed" },
+              { val: fmt(count.creators), label: "Leads Found" },
+              { val: fmt(count.products), label: "Products Promoted" },
+            ].map((n, i) => (
+              <div key={i} className="num-c">
+                <div className="num-val">{n.val}<sup>+</sup></div>
+                <div className="num-lbl">{n.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PROCESS */}
+      <section className="sec" id="process">
+        <div className="wrap">
+          <span className="eye">How it Works</span>
+          <h2 className="sec-h">Three steps.<br />Real customers.</h2>
+          <p className="sec-p">
+            AI-powered search finds people actively asking for solutions like yours — then helps you reach out authentically.
+          </p>
+          <div className="steps-list">
+            {[
+              { n: "01", t: "Describe your product", b: "Tell us what your product does and who it's for. Our AI analyzes your description to understand exactly what kind of customers you're looking for." },
+              { n: "02", t: "AI finds relevant leads", b: "We search Reddit's editing, creator, and tech communities for people asking questions that match your product. Only real posts from real people." },
+              { n: "03", t: "Message and convert", b: "Click to open their Reddit post. Reply genuinely with helpful advice and mention your product as a solution. Build relationships, not just sales." },
+            ].map((s) => (
+              <div key={s.n} className="step">
+                <span className="step-n">{s.n}</span>
+                <h3 className="step-t">{s.t}</h3>
+                <p className="step-b">{s.b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LIVE LEADS */}
+      <section className="sec live-sec" id="live">
+        <div className="wrap">
+          <div className="live-top">
+            <div>
+              <span className="eye">Live Now</span>
+              <h2 className="sec-h">Recent Leads Found</h2>
+            </div>
+            <a href="#" className="live-link">View all →</a>
+          </div>
+          <div className="cards">
+            {/* Editing Software Lead */}
+            <div className="card">
+              <div className="ctag"><span className="ctag-dot" />Video Editing</div>
+              <div className="card-head">
+                <div className="card-ico">🎬</div>
+                <div>
+                  <div className="card-name">u/AspiringYouTuber</div>
+                  <div className="card-sub">Posted in r/VideoEditing • 2 hours ago</div>
+                </div>
+              </div>
+              <p className="card-desc">
+                "What editing software do you recommend for YouTube videos? I'm a beginner and need something easy to use but powerful enough for storytelling."
+              </p>
+              <div className="cstats">
+                {[{ v: "24", l: "Upvotes" }, { v: "18", l: "Comments" }, { v: "New", l: "Lead" }].map((s, i) => (
+                  <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
+                ))}
+              </div>
+              <a href="#" className="card-act">
+                Message on Reddit
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </div>
+
+            {/* Photo Editing Lead */}
+            <div className="card">
+              <div className="ctag"><span className="ctag-dot" />Photo Editing</div>
+              <div className="card-head">
+                <div className="card-ico">📸</div>
+                <div>
+                  <div className="card-name">u/PhotoNewbie2026</div>
+                  <div className="card-sub">Posted in r/photoediting • 5 hours ago</div>
+                </div>
+              </div>
+              <p className="card-desc">
+                "Looking for a simple photo editor that can handle batch editing. I run an Instagram account and need to process 50+ photos daily. Any recommendations?"
+              </p>
+              <div className="cstats">
+                {[{ v: "31", l: "Upvotes" }, { v: "27", l: "Comments" }, { v: "New", l: "Lead" }].map((s, i) => (
+                  <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
+                ))}
+              </div>
+              <a href="#" className="card-act">
+                Message on Reddit
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STATS */}
+      <section className="sec">
+        <div className="wrap">
+          <div className="stats-band">
+            {[
+              { n: fmt(count.views), s: "+", l: "Reddit Posts Analyzed" },
+              { n: fmt(count.creators), s: "+", l: "Leads Discovered" },
+              { n: fmt(count.products), s: "+", l: "Products Promoted" },
+            ].map((s, i) => (
+              <div key={i} className="stat-c">
+                <span className="stat-eye">{s.l}</span>
+                <div className="stat-n">{s.n}<span className="stat-suf">{s.s}</span></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="sec" id="features" style={{ paddingTop: 0 }}>
+        <div className="wrap">
+          <span className="eye">Why ClipVo</span>
+          <h2 className="sec-h">Built for real growth.</h2>
+          <div className="feat-grid">
+            <div className="feat feat-wide">
+              <div className="feat-ico">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <h3>Real people, real questions</h3>
+              <p>Every lead is a real person who posted a real question on Reddit about tools like yours. No fake emails, no decision-maker databases — just genuine people asking for help.</p>
+              <div className="chips">
+                {["Real Reddit posts", "Active discussions", "Direct messaging", "No fake leads"].map((c) => <span key={c} className="chip">{c}</span>)}
+              </div>
+            </div>
+            <div className="feat">
+              <div className="feat-ico">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+              </div>
+              <h3>AI-powered matching</h3>
+              <p>Our AI analyzes your product description and searches for posts that match what you offer. Only relevant leads — no marketing fluff, no partnership requests.</p>
+            </div>
+            <div className="feat">
+              <div className="feat-ico">
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2z" /></svg>
+              </div>
+              <h3>Direct outreach</h3>
+              <p>Click to open their Reddit post. Reply with genuine advice and mention your product. Build authentic relationships that convert to real customers.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* NEWSLETTER */}
+      <section className="sec" style={{ paddingTop: 0 }}>
+        <div className="wrap">
+          <div className="nl">
+            <div className="nl-text">
+              <h2>Lead generation tips, every week.</h2>
+              <p>Strategies for finding and converting customers from Reddit — delivered to your inbox. No noise, just what works.</p>
+            </div>
+            <div className="nl-form">
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="nl-input"
+              />
+              <button onClick={() => { setSubscribed(true); setEmail(""); }} className="nl-btn">
+                {subscribed ? "✓ Subscribed" : "Subscribe"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
