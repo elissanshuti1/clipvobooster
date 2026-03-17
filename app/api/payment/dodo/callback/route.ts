@@ -5,8 +5,46 @@ import clientPromise from '@/lib/mongodb';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const checkoutId = searchParams.get('client_reference_id');
+    
+    // Dodo may pass different parameters - handle both formats
+    let checkoutId = searchParams.get('client_reference_id') || searchParams.get('checkout_id');
     const status = searchParams.get('status');
+    const subscriptionId = searchParams.get('subscription_id');
+    const email = searchParams.get('email');
+
+    console.log('Dodo callback received:', { checkoutId, status, subscriptionId, email });
+
+    // If we have subscription_id and status=active, payment was successful
+    if (subscriptionId && status === 'active') {
+      // Dodo redirected directly - find checkout by subscription or email
+      const client = await clientPromise;
+      const db = client.db('clipvobooster');
+      const users = db.collection('users');
+      const checkouts = db.collection('checkouts');
+
+      // Find user by email
+      if (email) {
+        const user = await users.findOne({ email });
+        if (user) {
+          // Find recent checkout for this user
+          const checkout = await checkouts.findOne(
+            { userId: String(user._id), status: 'pending' },
+            { sort: { createdAt: -1 } }
+          );
+
+          if (checkout) {
+            checkoutId = checkout.checkoutId;
+          }
+        }
+      }
+
+      // Redirect to success page
+      const redirectUrl = checkoutId 
+        ? `/payment/success?checkout_id=${checkoutId}&plan=${checkout.plan || 'lifetime'}`
+        : '/payment/success?status=success';
+      
+      return NextResponse.redirect(new URL(redirectUrl, process.env.NEXT_PUBLIC_PROD_URL));
+    }
 
     if (!checkoutId) {
       return NextResponse.redirect(new URL('/pricing?error=invalid_checkout', process.env.NEXT_PUBLIC_PROD_URL));
@@ -41,8 +79,8 @@ export async function GET(req: Request) {
       // Update user's subscription
       await users.updateOne(
         { _id: new (require('mongodb').ObjectId)(checkout.userId) },
-        { 
-          $set: { 
+        {
+          $set: {
             subscription: {
               plan: checkout.plan,
               planName: checkout.planDetails.name,
@@ -53,11 +91,11 @@ export async function GET(req: Request) {
               checkoutId: checkoutId
             },
             updatedAt: new Date()
-          } 
+          }
         }
       );
 
-      // Redirect to success page with token
+      // Redirect to success page
       const successUrl = `/payment/success?checkout_id=${checkoutId}&plan=${checkout.plan}`;
       return NextResponse.redirect(new URL(successUrl, process.env.NEXT_PUBLIC_PROD_URL));
     } else {

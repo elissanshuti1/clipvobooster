@@ -87,6 +87,15 @@ function PaymentVerificationContent() {
       try {
         const checkoutId = searchParams.get('checkout_id');
         const plan = searchParams.get('plan');
+        const status = searchParams.get('status');
+
+        // If Dodo redirected with status=success but no checkout_id
+        if (status === 'success' && !checkoutId) {
+          setIsValid(true);
+          setPlanInfo({ planName: 'Active', interval: 'active', status: 'active' });
+          setIsVerifying(false);
+          return;
+        }
 
         if (!checkoutId || !plan) {
           setError('Invalid payment information');
