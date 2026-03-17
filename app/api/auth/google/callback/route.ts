@@ -79,11 +79,16 @@ export async function GET(req: Request) {
       { expiresIn: '30d' }
     );
 
-    console.log('Created JWT token, redirecting to dashboard');
+    console.log('Created JWT token, redirecting to pricing');
 
-    // Redirect to dashboard overview with token in URL (for first login)
-    const redirectUrl = new URL('/dashboard/overview', req.url);
-    redirectUrl.searchParams.set('token', appToken);
+    // Check if user has subscription
+    const hasSubscription = !!user.subscription;
+    
+    // Redirect to pricing for new users, dashboard for existing paid users
+    // Use clean URL without any query parameters to avoid loops
+    const redirectPath = hasSubscription ? '/dashboard/overview' : '/pricing';
+    const redirectUrl = new URL(redirectPath, req.url);
+    redirectUrl.search = ''; // Clear any existing query params
 
     const response = NextResponse.redirect(redirectUrl);
 
@@ -93,6 +98,15 @@ export async function GET(req: Request) {
 
     response.cookies.set('token', appToken, {
       httpOnly: true,
+      secure: secure,
+      path: '/',
+      maxAge: maxAge,
+      sameSite: 'lax'
+    });
+    
+    // Set subscription status cookie
+    response.cookies.set('has_subscription', String(hasSubscription), {
+      httpOnly: false,
       secure: secure,
       path: '/',
       maxAge: maxAge,
