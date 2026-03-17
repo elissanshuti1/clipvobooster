@@ -41,10 +41,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/login');
+      await fetch('/api/auth/logout', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      // Force reload to clear all client-side state
+      window.location.href = '/login';
     } catch (err) {
       console.error('Logout failed:', err);
+      // Fallback: redirect anyway
+      window.location.href = '/login';
     }
   };
 
