@@ -364,8 +364,6 @@ export default function DashboardOverview() {
   }
 
   // Show dashboard if user has subscription
-  const firstName = user?.name?.split(' ')[0] || user?.email?.split('@')[0] || "User";
-
   return (
     <>
       <style>{`
