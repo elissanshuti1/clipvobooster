@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { signToken } from '@/lib/jwt';
 
 export async function POST(req: Request) {
   try {
@@ -19,10 +19,10 @@ export async function POST(req: Request) {
     if (!valid) return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
 
     // Set token expiration based on remember me
-    const expiresIn = rememberMe ? '30d' : (process.env.JWT_EXPIRES_IN || '3d');
+    const expiresIn = rememberMe ? '30d' : '3d';
     const maxAge = rememberMe ? 30 * 24 * 60 * 60 : 3 * 24 * 60 * 60;
 
-    const token = jwt.sign({ sub: String(user._id), email: user.email }, process.env.JWT_SECRET as string, { expiresIn });
+    const token = signToken({ sub: String(user._id), email: user.email }, expiresIn);
 
     // Check if user has subscription
     const hasSubscription = !!user.subscription;

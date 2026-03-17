@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import clientPromise from '@/lib/mongodb';
+import { verifyToken } from '@/lib/jwt';
 
 export async function GET(req: Request) {
   try {
@@ -8,7 +8,10 @@ export async function GET(req: Request) {
     const m = cookie.split(';').map(s=>s.trim()).find(s=>s.startsWith('token='));
     const token = m ? m.split('=')[1] : null;
     if (!token) return NextResponse.json(null, { status: 401, headers: { 'Cache-Control': 'no-store' } });
-    const payload: any = jwt.verify(token, process.env.JWT_SECRET as string);
+    
+    const payload: any = verifyToken(token);
+    if (!payload) return NextResponse.json(null, { status: 401, headers: { 'Cache-Control': 'no-store' } });
+    
     const client = await clientPromise;
     const user = await client.db().collection('users').findOne({ _id: new (require('mongodb').ObjectId)(payload.sub) }, { projection: { password: 0, subscription: 1 } });
     if (!user) return NextResponse.json(null, { status: 401, headers: { 'Cache-Control': 'no-store' } });

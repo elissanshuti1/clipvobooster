@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { signToken } from '@/lib/jwt';
 
 export async function POST(req: Request) {
   try {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     const res = await users.insertOne({ name: name || '', email, password: hash, avatar: avatar || null, createdAt: new Date() });
     const user = await users.findOne({ _id: res.insertedId }, { projection: { password: 0 } });
 
-    const token = jwt.sign({ sub: String(res.insertedId), email }, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRES_IN || '7d' });
+    const token = signToken({ sub: String(res.insertedId), email });
 
     const response = NextResponse.json({ ok: true, user });
     // set httpOnly cookie (only set Secure in production)
