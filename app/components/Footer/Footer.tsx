@@ -61,30 +61,42 @@ export default function Footer() {
           <div className="foot-grid">
             <div>
               <a href="#" className="foot-brand">
-                <div className="nav-mark">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#08090d" strokeWidth="2.5" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
-                </div>
-                Clipvobooster
+                <img src="/favicon.png" alt="ClipVoBooster" style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0 }} className="nav-mark" />
+                ClipVoBooster
               </a>
-              <p className="foot-desc">AI-powered lead generation for creators and founders. Find real customers who need your product.</p>
+              <p className="foot-desc">AI-powered email marketing with real-time tracking. Send professional emails that get opened, read, and clicked.</p>
             </div>
             <div className="foot-col">
               <h4>Platform</h4>
-              <ul>{["Find Leads", "Products", "Dashboard", "Pricing"].map(l => <li key={l}><a href="#">{l}</a></li>)}</ul>
+              <ul>
+                <li><a href="/dashboard/compose">Compose Email</a></li>
+                <li><a href="/dashboard/analytics">Analytics</a></li>
+                <li><a href="/dashboard/contacts">Contacts</a></li>
+                <li><a href="/features">Features</a></li>
+                <li><a href="/pricing">Pricing</a></li>
+              </ul>
             </div>
             <div className="foot-col">
               <h4>Company</h4>
-              <ul>{["About", "Blog", "Changelog", "Careers"].map(l => <li key={l}><a href="#">{l}</a></li>)}</ul>
+              <ul>
+                <li><a href="/about">About</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+              </ul>
             </div>
             <div className="foot-col">
               <h4>Legal</h4>
-              <ul>{["Privacy Policy", "Terms of Service", "Cookie Policy"].map(l => <li key={l}><a href="#">{l}</a></li>)}</ul>
+              <ul>
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Service</a></li>
+                <li><a href="/refund">Refund Policy</a></li>
+              </ul>
             </div>
           </div>
           <div className="foot-bottom">
             <p>© 2026 Clipvobooster, Inc. All rights reserved.</p>
             <div className="foot-soc">
-              {["Twitter", "Discord", "YouTube"].map(s => <a key={s} href="#">{s}</a>)}
+              <a href="https://twitter.com/clipvobooster" target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href="mailto:support@clipvo.site">Support</a>
             </div>
           </div>
         </div>

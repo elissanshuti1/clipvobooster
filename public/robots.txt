@@ -1,0 +1,52 @@
+# robots.txt for ClipVoBooster
+# https://clipvo.site
+
+User-agent: *
+Allow: /
+
+# Allow all crawlers
+Allow: /
+Allow: /about
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+
+# Disallow dashboard and private areas
+Disallow: /dashboard
+Disallow: /login
+Disallow: /signup
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Disallow API endpoints
+Disallow: /api
+
+# Sitemap
+Sitemap: https://clipvo.site/sitemap.xml
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1
+
+# Google specific
+User-agent: Googlebot
+Allow: /
+Disallow: /dashboard
+Disallow: /api
+
+# Bing specific
+User-agent: Bingbot
+Allow: /
+Disallow: /dashboard
+Disallow: /api
+
+# Twitter bot for card preview
+User-agent: Twitterbot
+Allow: /
+
+# Facebook crawler
+User-agent: facebookexternalhit
+Allow: /
+
+# LinkedIn crawler
+User-agent: LinkedInBot
+Allow: /

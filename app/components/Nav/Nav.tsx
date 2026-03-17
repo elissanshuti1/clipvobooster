@@ -30,22 +30,17 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
       className="h-16">
       <div style={{ width: '100%', maxWidth: 1152, margin: '0 auto', display: 'flex', alignItems: 'center', padding: '0 16px' }}>
         <Link href="/" className="flex items-center gap-3 mr-auto text-white no-underline">
-          <span style={{ width: 28, height: 28 }} className="w-7 h-7 rounded-md bg-white grid place-items-center flex-shrink-0">
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#08090d" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="block">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-          </span>
-          <span style={{ color: '#ffffff', fontFamily: 'Instrument Serif, serif' }} className="font-serif text-base">Clipvobooster</span>
+          <img src="/favicon.png" alt="ClipVoBooster" style={{ width: 32, height: 32, borderRadius: 8, flexShrink: 0 }} className="w-8 h-8 rounded-md flex-shrink-0" />
+          <span style={{ color: '#ffffff', fontFamily: 'Instrument Serif, serif', fontSize: '18px' }} className="font-serif text-base">ClipVoBooster</span>
         </Link>
 
         {/* Desktop links - rendered only when viewport is wide */}
         {isWide && (
           <ul style={{ display: "flex", gap: "1.5rem", alignItems: "center", whiteSpace: "nowrap", marginRight: 24 }}>
             <li><Link href="/" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Home</Link></li>
+            <li><Link href="/pricing" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Pricing</Link></li>
+            <li><Link href="/#features" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Features</Link></li>
             <li><Link href="/about" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">About</Link></li>
-            <li><Link href="/refund" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Refund</Link></li>
-            <li><Link href="/privacy" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Privacy</Link></li>
-            <li><Link href="/terms" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Terms</Link></li>
           </ul>
         )}
 

@@ -297,6 +297,127 @@ export default function Body() {
         }
         .landing-root .stat-suf { color:var(--dim); }
 
+        /* ── Pricing ── */
+        .landing-root .pricing-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 24px;
+          margin-top: 64px;
+        }
+        .landing-root .pricing-card {
+          background: var(--bg2);
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          padding: 40px;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+        .landing-root .pricing-card:hover {
+          border-color: var(--line2);
+          transform: translateY(-4px);
+        }
+        .landing-root .pricing-card.featured {
+          border-color: rgba(99, 102, 241, 0.3);
+          background: linear-gradient(135deg, var(--bg2), rgba(99, 102, 241, 0.05));
+          border-width: 2px;
+        }
+        .landing-root .pricing-badge {
+          position: absolute;
+          top: -12px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          color: white;
+          padding: 4px 16px;
+          border-radius: 100px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .landing-root .pricing-name {
+          font-family: 'Instrument Serif', serif;
+          font-size: 28px;
+          font-weight: 400;
+          color: var(--white);
+          margin-bottom: 8px;
+        }
+        .landing-root .pricing-price {
+          font-size: 48px;
+          font-weight: 700;
+          color: var(--white);
+          margin: 24px 0;
+          display: flex;
+          align-items: baseline;
+          gap: 4px;
+        }
+        .landing-root .pricing-price span {
+          font-size: 16px;
+          font-weight: 400;
+          color: var(--muted);
+        }
+        .landing-root .pricing-desc {
+          font-size: 14px;
+          color: var(--muted);
+          line-height: 1.7;
+          margin-bottom: 32px;
+        }
+        .landing-root .pricing-features {
+          list-style: none;
+          padding: 0;
+          margin: 0 0 32px 0;
+        }
+        .landing-root .pricing-features li {
+          font-size: 14px;
+          color: var(--text);
+          padding: 12px 0;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border-bottom: 1px solid var(--line);
+        }
+        .landing-root .pricing-features li:last-child {
+          border-bottom: none;
+        }
+        .landing-root .check-icon {
+          flex-shrink: 0;
+        }
+        .landing-root .pricing-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          width: 100%;
+          padding: 16px;
+          border-radius: 12px;
+          font-size: 15px;
+          font-weight: 600;
+          text-decoration: none;
+          transition: all 0.2s;
+          border: none;
+          cursor: pointer;
+          font-family: 'DM Sans', sans-serif;
+        }
+        .landing-root .pricing-btn.primary {
+          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          color: white;
+        }
+        .landing-root .pricing-btn.primary:hover {
+          opacity: 0.9;
+          transform: scale(1.02);
+          box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
+        }
+        .landing-root .pricing-btn.secondary {
+          background: var(--bg3);
+          color: var(--text);
+          border: 1px solid var(--line);
+        }
+        .landing-root .pricing-btn.secondary:hover {
+          background: var(--bg2);
+          border-color: var(--line2);
+        }
+
         /* ── Features ── */
         .landing-root .feat-grid {
           display:grid; grid-template-columns:1fr 1fr; gap:12px;
@@ -386,34 +507,34 @@ export default function Body() {
           <div className="rise d1">
             <span className="hero-badge">
               <span className="hero-badge-dot" />
-              AI-Powered Lead Generation
+              Unlimited AI Email Marketing
             </span>
           </div>
 
           <h1 className="rise d2">
-            Find customers who<br /><em>actually need you.</em>
+            Turn Strangers into<br /><em>Paying Customers on Autopilot.</em>
           </h1>
 
           <p className="hero-p rise d3">
-            ClipVo searches Reddit in real-time to find people actively asking for solutions like yours. 
-            Real people, real questions, real customers — no fake leads, no wasted time.
+            The AI-powered email platform that writes, sends, and tracks professional emails for you. 
+            Watch your inbox fill with replies while our AI handles everything — from first contact to closed deal.
           </p>
 
           <div className="hero-btns rise d4">
             <a href="/api/auth/google" className="btn-w">
-              Find Customers Free
+              Start Converting Customers Free
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
-            <a href="#process" className="btn-g">How it works</a>
+            <a href="#process" className="btn-g">See How It Works</a>
           </div>
 
           <div className="nums rise d5">
             {[
-              { val: fmt(count.views), label: "Posts Analyzed" },
-              { val: fmt(count.creators), label: "Leads Found" },
-              { val: fmt(count.products), label: "Products Promoted" },
+              { val: fmt(count.views), label: "Emails Sent" },
+              { val: fmt(count.creators), label: "Customers Won" },
+              { val: fmt(count.products), label: "Revenue Generated" },
             ].map((n, i) => (
               <div key={i} className="num-c">
                 <div className="num-val">{n.val}<sup>+</sup></div>
@@ -428,15 +549,15 @@ export default function Body() {
       <section className="sec" id="process">
         <div className="wrap">
           <span className="eye">How it Works</span>
-          <h2 className="sec-h">Three steps.<br />Real customers.</h2>
+          <h2 className="sec-h">Your Personal Sales Team,<br />Working 24/7.</h2>
           <p className="sec-p">
-            AI-powered search finds people actively asking for solutions like yours — then helps you reach out authentically.
+            While you sleep, our AI is writing perfect emails, sending them to the right people, and tracking every interaction. Wake up to new customers.
           </p>
           <div className="steps-list">
             {[
-              { n: "01", t: "Describe your product", b: "Tell us what your product does and who it's for. Our AI analyzes your description to understand exactly what kind of customers you're looking for." },
-              { n: "02", t: "AI finds relevant leads", b: "We search Reddit's editing, creator, and tech communities for people asking questions that match your product. Only real posts from real people." },
-              { n: "03", t: "Message and convert", b: "Click to open their Reddit post. Reply genuinely with helpful advice and mention your product as a solution. Build relationships, not just sales." },
+              { n: "01", t: "Connect Gmail in 30 seconds", b: "One click to connect your Gmail. We use Google's secure API — your emails send from YOUR address, building trust with every message. No sketchy third-party servers." },
+              { n: "02", t: "AI writes emails that convert", b: "Tell us about your product. Our AI crafts personalized, professional emails that sound human — not robotic. Each email includes your website link and branded signature automatically." },
+              { n: "03", t: "Watch replies pour in", b: "Get instant notifications when someone opens or clicks. See exactly who's interested. Follow up at the perfect moment. Close deals while you focus on what matters." },
             ].map((s) => (
               <div key={s.n} className="step">
                 <span className="step-n">{s.n}</span>
@@ -448,61 +569,176 @@ export default function Body() {
         </div>
       </section>
 
+      {/* PRICING */}
+      <section className="sec" id="pricing" style={{ background: 'var(--bg1)' }}>
+        <div className="wrap">
+          <h2 className="sec-h" style={{ textAlign: 'center', marginBottom: 16 }}>Invest in Growth,<br />Not Features.</h2>
+          <p className="sec-p" style={{ maxWidth: 500, marginBottom: 64, textAlign: 'center', margin: '0 auto 64px' }}>
+            Choose the plan that fits your business. All plans include unlimited AI generation and real-time tracking.
+          </p>
+          <div className="pricing-grid">
+            {/* Starter Plan */}
+            <div className="pricing-card">
+              <div className="pricing-name">Starter</div>
+              <div className="pricing-price">
+                $15<span>/month</span>
+              </div>
+              <p className="pricing-desc">Perfect for solopreneurs just getting started with email marketing.</p>
+              <ul className="pricing-features">
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  100 emails/month
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Unlimited AI generation
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Open & click tracking
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Basic analytics
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Gmail integration
+                </li>
+              </ul>
+              <a href="/api/auth/google" className="pricing-btn primary">Get Started</a>
+            </div>
+
+            {/* Pro Plan */}
+            <div className="pricing-card featured">
+              <div className="pricing-name">Professional</div>
+              <div className="pricing-price">
+                $29<span>/month</span>
+              </div>
+              <p className="pricing-desc">For growing businesses that need more emails and advanced features.</p>
+              <ul className="pricing-features">
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  500 emails/month
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Everything in Starter
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Advanced analytics
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Custom templates
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Priority support
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Remove branding
+                </li>
+              </ul>
+              <a href="/api/auth/google" className="pricing-btn primary">Get Started</a>
+            </div>
+
+            {/* Lifetime Plan */}
+            <div className="pricing-card">
+              <div className="pricing-name">Lifetime</div>
+              <div className="pricing-price">
+                $60<span style={{ fontSize: 16, color: 'var(--muted)' }}>/one-time</span>
+              </div>
+              <p className="pricing-desc">Pay once, use forever. All features, unlimited access. No monthly fees.</p>
+              <ul className="pricing-features">
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Unlimited emails
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  All Pro features
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Lifetime access
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Early adopter perks
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  VIP support
+                </li>
+                <li>
+                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  Pay once, own forever
+                </li>
+              </ul>
+              <a href="/api/auth/google" className="pricing-btn primary">Get Started</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* LIVE LEADS */}
       <section className="sec live-sec" id="live">
         <div className="wrap">
           <div className="live-top">
             <div>
-              <span className="eye">Live Now</span>
-              <h2 className="sec-h">Recent Leads Found</h2>
+              <span className="eye">Real-time Intelligence</span>
+              <h2 className="sec-h">Know the Moment<br />Someone's Interested</h2>
             </div>
-            <a href="#" className="live-link">View all →</a>
+            <a href="/dashboard/analytics" className="live-link">See your analytics →</a>
           </div>
           <div className="cards">
-            {/* Editing Software Lead */}
+            {/* Email Opened Card */}
             <div className="card">
-              <div className="ctag"><span className="ctag-dot" />Video Editing</div>
+              <div className="ctag"><span className="ctag-dot" />Email Opened</div>
               <div className="card-head">
-                <div className="card-ico">🎬</div>
+                <div className="card-ico">📩</div>
                 <div>
-                  <div className="card-name">u/AspiringYouTuber</div>
-                  <div className="card-sub">Posted in r/VideoEditing • 2 hours ago</div>
+                  <div className="card-name">john@company.com</div>
+                  <div className="card-sub">Opened "Quick question about your workflow"</div>
                 </div>
               </div>
               <p className="card-desc">
-                "What editing software do you recommend for YouTube videos? I'm a beginner and need something easy to use but powerful enough for storytelling."
+                John opened your email 2 times and spent 45 seconds reading. He's interested — perfect time to follow up with a demo offer or case study.
               </p>
               <div className="cstats">
-                {[{ v: "24", l: "Upvotes" }, { v: "18", l: "Comments" }, { v: "New", l: "Lead" }].map((s, i) => (
+                {[{ v: "2", l: "Opens" }, { v: "1", l: "Clicks" }, { v: "Today", l: "Activity" }].map((s, i) => (
                   <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
                 ))}
               </div>
-              <a href="#" className="card-act">
-                Message on Reddit
+              <a href="/dashboard/analytics" className="card-act">
+                View Full Details
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
             </div>
 
-            {/* Photo Editing Lead */}
+            {/* Link Clicked Card */}
             <div className="card">
-              <div className="ctag"><span className="ctag-dot" />Photo Editing</div>
+              <div className="ctag"><span className="ctag-dot" />Link Clicked 🔥</div>
               <div className="card-head">
-                <div className="card-ico">📸</div>
+                <div className="card-ico">🔗</div>
                 <div>
-                  <div className="card-name">u/PhotoNewbie2026</div>
-                  <div className="card-sub">Posted in r/photoediting • 5 hours ago</div>
+                  <div className="card-name">sarah@startup.io</div>
+                  <div className="card-sub">Clicked your website link</div>
                 </div>
               </div>
               <p className="card-desc">
-                "Looking for a simple photo editor that can handle batch editing. I run an Instagram account and need to process 50+ photos daily. Any recommendations?"
+                Sarah clicked through to your pricing page! This is a HOT lead — she's seriously considering your product. Send a personalized follow-up now.
               </p>
               <div className="cstats">
-                {[{ v: "31", l: "Upvotes" }, { v: "27", l: "Comments" }, { v: "New", l: "Lead" }].map((s, i) => (
+                {[{ v: "3", l: "Opens" }, { v: "2", l: "Clicks" }, { v: "Hot", l: "Lead" }].map((s, i) => (
                   <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
                 ))}
               </div>
-              <a href="#" className="card-act">
-                Message on Reddit
+              <a href="/dashboard/analytics" className="card-act">
+                View Full Details
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
               </a>
             </div>
@@ -515,9 +751,9 @@ export default function Body() {
         <div className="wrap">
           <div className="stats-band">
             {[
-              { n: fmt(count.views), s: "+", l: "Reddit Posts Analyzed" },
-              { n: fmt(count.creators), s: "+", l: "Leads Discovered" },
-              { n: fmt(count.products), s: "+", l: "Products Promoted" },
+              { n: fmt(count.views), s: "+", l: "Emails Sent" },
+              { n: fmt(count.creators), s: "+", l: "Leads Engaged" },
+              { n: fmt(count.products), s: "+", l: "Businesses Growing" },
             ].map((s, i) => (
               <div key={i} className="stat-c">
                 <span className="stat-eye">{s.l}</span>
@@ -531,32 +767,32 @@ export default function Body() {
       {/* FEATURES */}
       <section className="sec" id="features" style={{ paddingTop: 0 }}>
         <div className="wrap">
-          <span className="eye">Why ClipVo</span>
-          <h2 className="sec-h">Built for real growth.</h2>
+          <span className="eye">Why ClipVoBooster</span>
+          <h2 className="sec-h">Everything You Need to<br />Dominate Your Market.</h2>
           <div className="feat-grid">
             <div className="feat feat-wide">
               <div className="feat-ico">
                 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
-              <h3>Real people, real questions</h3>
-              <p>Every lead is a real person who posted a real question on Reddit about tools like yours. No fake emails, no decision-maker databases — just genuine people asking for help.</p>
+              <h3>AI That Writes Like Your Best Copywriter</h3>
+              <p>Our AI doesn't write generic templates. It crafts 200+ word professional business letters that get read, remembered, and replied to. Each email includes your website link and sounds authentically human.</p>
               <div className="chips">
-                {["Real Reddit posts", "Active discussions", "Direct messaging", "No fake leads"].map((c) => <span key={c} className="chip">{c}</span>)}
+                {["200+ word emails", "Professional tone", "Auto website link", "Beautiful HTML design"].map((c) => <span key={c} className="chip">{c}</span>)}
               </div>
             </div>
             <div className="feat">
               <div className="feat-ico">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
+                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
               </div>
-              <h3>AI-powered matching</h3>
-              <p>Our AI analyzes your product description and searches for posts that match what you offer. Only relevant leads — no marketing fluff, no partnership requests.</p>
+              <h3>Stalker-Level Tracking (The Good Kind)</h3>
+              <p>Know the exact moment someone opens your email or clicks your link. Get instant notifications. See who's hot. Follow up at the perfect moment. Close more deals.</p>
             </div>
             <div className="feat">
               <div className="feat-ico">
                 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2z" /></svg>
               </div>
-              <h3>Direct outreach</h3>
-              <p>Click to open their Reddit post. Reply with genuine advice and mention your product. Build authentic relationships that convert to real customers.</p>
+              <h3>Emails That Look Like They Cost $1000</h3>
+              <p>Professional gradient headers, beautiful typography, prominent CTA buttons, and your branded signature. Every email looks like it was designed by a pro agency.</p>
             </div>
           </div>
         </div>
@@ -567,20 +803,13 @@ export default function Body() {
         <div className="wrap">
           <div className="nl">
             <div className="nl-text">
-              <h2>Lead generation tips, every week.</h2>
-              <p>Strategies for finding and converting customers from Reddit — delivered to your inbox. No noise, just what works.</p>
+              <h2>Ready to Watch Your Revenue Soar?</h2>
+              <p>Join thousands of businesses using ClipVoBooster to convert strangers into loyal customers. Start sending professional emails today.</p>
             </div>
             <div className="nl-form">
-              <input
-                type="email"
-                placeholder="your@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="nl-input"
-              />
-              <button onClick={() => { setSubscribed(true); setEmail(""); }} className="nl-btn">
-                {subscribed ? "✓ Subscribed" : "Subscribe"}
-              </button>
+              <a href="/api/auth/google" className="nl-btn" style={{ textDecoration: 'none' }}>
+                Get Started
+              </a>
             </div>
           </div>
         </div>
