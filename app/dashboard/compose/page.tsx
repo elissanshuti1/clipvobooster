@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ComposePage() {
+// Main content component that uses searchParams
+function ComposeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState<'loading' | 'select' | 'preview'>('loading');
@@ -378,5 +379,18 @@ export default function ComposePage() {
         </div>
       </div>
     </>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function ComposePage() {
+  return (
+    <Suspense fallback={
+      <div style={{ padding: 32, color: 'var(--muted)', textAlign: 'center' }}>
+        Loading...
+      </div>
+    }>
+      <ComposeContent />
+    </Suspense>
   );
 }

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useSearchParams, useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function ResetPasswordPage() {
+// Main content component that uses searchParams
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [password, setPassword] = useState('');
@@ -12,39 +14,39 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  
+
   const token = searchParams.get('token');
 
   const submit = async (e: any) => {
     e.preventDefault();
     setError('');
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (password.length < 8) {
       setError('Password must be at least 8 characters');
       return;
     }
-    
+
     if (!token) {
       setError('Invalid reset link');
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
       const res = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, password }),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         setSuccess(true);
         setTimeout(() => {
@@ -188,5 +190,20 @@ export default function ResetPasswordPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen flex items-center justify-center bg-[#08090d] text-[#dde1e9]">
+        <div className="text-center">
+          <div className="animate-pulse text-lg">Loading...</div>
+        </div>
+      </main>
+    }>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface Lead {
@@ -18,7 +18,8 @@ interface Lead {
   createdAt: string;
 }
 
-export default function DashboardLeads() {
+// Main content component that uses searchParams
+function DashboardLeadsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -564,5 +565,18 @@ export default function DashboardLeads() {
         )}
       </div>
     </>
+  );
+}
+
+// Main page component with Suspense boundary
+export default function DashboardLeads() {
+  return (
+    <Suspense fallback={
+      <div style={{ padding: 32, color: 'var(--muted)', textAlign: 'center' }}>
+        Loading...
+      </div>
+    }>
+      <DashboardLeadsContent />
+    </Suspense>
   );
 }
