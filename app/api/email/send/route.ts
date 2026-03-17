@@ -144,12 +144,12 @@ export async function POST(req: Request) {
     console.log('Subject:', subject);
 
     // Get sender info from environment
-    const senderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@clipvo.site';
-    const senderName = process.env.BREVO_SENDER_NAME || 'ClipVo';
+    const smtpSenderEmail = process.env.BREVO_SENDER_EMAIL || 'noreply@clipvo.site';
+    const smtpSenderName = process.env.BREVO_SENDER_NAME || 'ClipVo';
 
     // Send email via Brevo
     const info = await transporter.sendMail({
-      from: `"${senderName}" <${senderEmail}>`,
+      from: `"${smtpSenderName}" <${smtpSenderEmail}>`,
       to: to,
       subject: subject,
       html: fullBody,
