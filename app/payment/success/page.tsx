@@ -3,6 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+// Force dynamic rendering - this page must be client-side only
+export const dynamic = 'force-dynamic';
+export const ssr = false;
+
 export default function PaymentSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -21,17 +25,6 @@ export default function PaymentSuccessPage() {
       const widthThreshold = window.outerWidth - window.innerWidth > 160;
       const heightThreshold = window.outerHeight - window.innerHeight > 160;
       if (widthThreshold || heightThreshold) {
-        tamperDetected = true;
-      }
-    };
-
-    // Detect debugger
-    const detectDebugger = () => {
-      const start = Date.now();
-      // eslint-disable-next-line no-debugger
-      debugger;
-      const end = Date.now();
-      if (end - start > 100) {
         tamperDetected = true;
       }
     };
@@ -67,7 +60,6 @@ export default function PaymentSuccessPage() {
     // Periodic checks
     const interval = setInterval(() => {
       checkDevTools();
-      detectDebugger();
       
       // Check if security element is hidden
       const secEl = document.getElementById('security-check');
