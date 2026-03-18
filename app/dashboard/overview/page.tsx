@@ -37,21 +37,36 @@ export default function DashboardOverview() {
       if (subData && subData.hasSubscription) {
         setSubscription(subData.subscription);
       }
+      return subData?.hasSubscription || false;
     } catch (err) {
       console.error('Failed to load stats:', err);
+      return false;
     }
   };
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
-      loadStats()
-    ]).then(([userData]) => {
-      if (userData) setUser(userData);
-      setIsLoading(false);
-    }).catch(() => {
-      router.push("/login");
-    });
+    const initData = async () => {
+      try {
+        const [userData, hasSub] = await Promise.all([
+          fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
+          loadStats()
+        ]);
+        
+        if (userData) {
+          setUser(userData);
+          // Priority: use subscription from auth endpoint if stats didn't have it
+          if (!hasSub && userData.subscription) {
+            setSubscription(userData.subscription);
+          }
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Init error:', err);
+        router.push("/login");
+      }
+    };
+    
+    initData();
 
     const interval = setInterval(loadStats, 5000);
     return () => clearInterval(interval);
