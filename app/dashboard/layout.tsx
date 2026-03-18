@@ -22,22 +22,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/auth/me").then(res => {
-        if (!res.ok) {
+    const initDashboard = async () => {
+      try {
+        // Fetch user data first - includes subscription
+        const userRes = await fetch("/api/auth/me");
+        if (!userRes.ok) {
           router.push("/login");
-          return null;
+          return;
         }
-        return res.json();
-      }),
-      fetch("/api/payment/subscription").then(res => res.ok ? res.json() : null)
-    ]).then(([userData, subData]) => {
-      if (userData) setUser(userData);
-      if (subData && subData.hasSubscription) setSubscription(subData.subscription);
-      setIsLoading(false);
-    }).catch(() => {
-      router.push("/login");
-    });
+        const userData = await userRes.json();
+        
+        setUser(userData);
+        
+        // CRITICAL: Use subscription from auth endpoint
+        if (userData.subscription) {
+          setSubscription(userData.subscription);
+          console.log('✅ Dashboard layout: Subscription loaded from /api/auth/me:', userData.subscription);
+        } else {
+          console.log('⚠️ Dashboard layout: No subscription in /api/auth/me');
+          // Try subscription API as fallback
+          try {
+            const subRes = await fetch("/api/payment/subscription");
+            if (subRes.ok) {
+              const subData = await subRes.json();
+              if (subData.hasSubscription) {
+                setSubscription(subData.subscription);
+                console.log('✅ Dashboard layout: Subscription loaded from /api/payment/subscription');
+              }
+            }
+          } catch (subErr) {
+            console.error('Dashboard layout: Failed to load subscription:', subErr);
+          }
+        }
+        
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Dashboard layout init error:', err);
+        router.push("/login");
+      }
+    };
+    
+    initDashboard();
   }, [router]);
 
   const handleLogout = async () => {

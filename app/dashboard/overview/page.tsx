@@ -47,18 +47,42 @@ export default function DashboardOverview() {
   useEffect(() => {
     const initData = async () => {
       try {
-        const [userData, hasSub] = await Promise.all([
-          fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
-          loadStats()
-        ]);
+        // Fetch user data FIRST - this includes subscription
+        const userRes = await fetch("/api/auth/me");
+        const userData = userRes.ok ? await userRes.json() : null;
         
-        if (userData) {
-          setUser(userData);
-          // Priority: use subscription from auth endpoint if stats didn't have it
-          if (!hasSub && userData.subscription) {
-            setSubscription(userData.subscription);
+        if (!userData) {
+          router.push("/login");
+          return;
+        }
+        
+        setUser(userData);
+        
+        // CRITICAL: Use subscription from auth endpoint directly
+        // This is more reliable than separate subscription API call
+        if (userData.subscription) {
+          setSubscription(userData.subscription);
+          console.log('✅ Subscription loaded from /api/auth/me:', userData.subscription);
+        } else {
+          console.log('⚠️ No subscription in /api/auth/me response');
+          // Fallback: try subscription API
+          try {
+            const subRes = await fetch("/api/payment/subscription");
+            if (subRes.ok) {
+              const subData = await subRes.json();
+              if (subData.hasSubscription) {
+                setSubscription(subData.subscription);
+                console.log('✅ Subscription loaded from /api/payment/subscription');
+              }
+            }
+          } catch (subErr) {
+            console.error('Failed to load from subscription API:', subErr);
           }
         }
+        
+        // Load stats in parallel
+        await loadStats();
+        
         setIsLoading(false);
       } catch (err) {
         console.error('Init error:', err);
