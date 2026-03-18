@@ -18,7 +18,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -68,15 +67,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       return email.charAt(0).toUpperCase();
     }
     return 'U';
-  };
-
-  const getPlanColor = (plan?: string) => {
-    switch (plan) {
-      case 'starter': return '#3b82f6';
-      case 'professional': return '#8b5cf6';
-      case 'lifetime': return '#f59e0b';
-      default: return '#6366f1';
-    }
   };
 
   const currentTab = pathname?.split('/').pop() || 'overview';
@@ -224,60 +214,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           overflow: hidden;
         }
 
-        /* Plan Badge in Sidebar */
-        .sidebar-plan-badge {
-          margin: 12px;
-          padding: 10px 14px;
-          border-radius: 10px;
-          background: rgba(99, 102, 241, 0.1);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          transition: all 0.2s;
-          opacity: 1;
-          overflow: hidden;
-        }
-        .dashboard-sidebar.collapsed .sidebar-plan-badge {
-          padding: 10px;
-          background: rgba(99, 102, 241, 0.15);
-        }
-        .plan-badge-content {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .plan-icon {
-          width: 28px;
-          height: 28px;
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-          flex-shrink: 0;
-        }
-        .plan-info {
-          flex: 1;
-          min-width: 0;
-          transition: opacity 0.2s;
-        }
-        .dashboard-sidebar.collapsed .plan-info {
-          opacity: 0;
-          width: 0;
-          overflow: hidden;
-        }
-        .plan-label {
-          font-size: 10px;
-          color: rgba(255, 255, 255, 0.6);
-          text-transform: uppercase;
-          letter-spacing: 0.05em;
-          font-weight: 600;
-        }
-        .plan-name {
-          font-size: 13px;
-          font-weight: 600;
-          color: var(--white);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
         /* Sidebar Footer - User Profile */
         .sidebar-footer {
           padding: 16px;
@@ -414,28 +350,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           align-items: center;
           gap: 12px;
         }
-        
-        /* Plan Badge in Topbar */
-        .topbar-plan-badge {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 6px 12px;
-          border-radius: 8px;
-          background: rgba(99, 102, 241, 0.1);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          font-size: 12px;
-          font-weight: 600;
-          color: var(--white);
-        }
-        .topbar-plan-icon {
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          display: grid;
-          place-items: center;
-        }
-        
+
         .credit-badge {
           display: flex;
           align-items: center;
@@ -512,29 +427,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="sidebar-brand">ClipVoBooster</span>
           </div>
 
-          {/* Plan Badge */}
-          {subscription && (
-            <div className="sidebar-plan-badge">
-              <div className="plan-badge-content">
-                <div 
-                  className="plan-icon" 
-                  style={{ 
-                    background: getPlanColor(subscription.plan),
-                    color: 'white'
-                  }}
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                  </svg>
-                </div>
-                <div className="plan-info">
-                  <div className="plan-label">Your Plan</div>
-                  <div className="plan-name">{subscription.planName}</div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Navigation */}
           <nav className="sidebar-nav">
             {NAV_ITEMS.map((item) => (
@@ -585,20 +477,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               {NAV_ITEMS.find(n => n.id === currentTab)?.label}
             </span>
             <div className="topbar-right">
-              {/* Plan Badge in Topbar */}
-              {subscription && (
-                <div className="topbar-plan-badge">
-                  <div 
-                    className="topbar-plan-icon"
-                    style={{ background: getPlanColor(subscription.plan) }}
-                  >
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                  </div>
-                  {subscription.planName}
-                </div>
-              )}
               <NotificationBell />
             </div>
           </div>
@@ -609,8 +487,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </div>
-      {/* Hidden element to pass user data to children via custom event */}
-      <div id="user-data" data-user-name={user?.name || ''} data-user-email={user?.email || ''} data-subscription={JSON.stringify(subscription)} style={{ display: 'none' }} />
+      {/* Hidden element to pass user data to children */}
+      <div id="user-data" data-user-name={user?.name || ''} data-user-email={user?.email || ''} style={{ display: 'none' }} />
     </>
   );
 }
