@@ -606,7 +606,7 @@ export default function Body() {
                   Gmail integration
                 </li>
               </ul>
-              <a href="/api/auth/get-started" className="pricing-btn primary">Get Started</a>
+              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
             </div>
 
             {/* Pro Plan */}
@@ -642,7 +642,7 @@ export default function Body() {
                   Remove branding
                 </li>
               </ul>
-              <a href="/api/auth/get-started" className="pricing-btn primary">Get Started</a>
+              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
             </div>
 
             {/* Lifetime Plan */}
@@ -678,7 +678,7 @@ export default function Body() {
                   Pay once, own forever
                 </li>
               </ul>
-              <a href="/api/auth/get-started" className="pricing-btn primary">Get Started</a>
+              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
             </div>
           </div>
         </div>
