@@ -103,37 +103,26 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">2. Free Plan</h2>
-              <p className="legal-text">
-                Our Free Plan is available at no cost and includes:
-              </p>
-              <ul className="legal-list">
-                <li>Unlimited AI email generation</li>
-                <li>Basic email sending features</li>
-                <li>Open and click tracking</li>
-                <li>Basic analytics</li>
-              </ul>
-              <p className="legal-text">
-                No payment is required for the Free Plan, and no refunds are applicable.
-              </p>
-            </div>
+              <h2 className="legal-heading">2. Paid Subscription Plans</h2>
 
-            <div className="legal-section">
-              <h2 className="legal-heading">3. Paid Subscription Plans</h2>
-              
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>3.1 Professional Plan ($29/month)</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.1 Starter Plan ($15/month)</h3>
               <p className="legal-text">
-                The Professional Plan is billed monthly. You can cancel at any time, and your subscription will remain active until the end of the current billing period.
+                The Starter Plan is billed monthly and includes 100 emails per month. You can cancel at any time, and your subscription will remain active until the end of the current billing period.
               </p>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>3.2 Lifetime Plan ($60 one-time)</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.2 Professional Plan ($29/month)</h3>
+              <p className="legal-text">
+                The Professional Plan is billed monthly and includes 500 emails per month. You can cancel at any time, and your subscription will remain active until the end of the current billing period.
+              </p>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.3 Lifetime Plan ($60 one-time)</h3>
               <p className="legal-text">
                 The Lifetime Plan is a one-time payment for unlimited access to all features. This is a non-recurring charge.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">4. Refund Eligibility</h2>
+              <h2 className="legal-heading">3. Refund Eligibility</h2>
               <p className="legal-text">
                 We offer refunds under the following conditions:
               </p>
@@ -165,7 +154,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">5. Non-Refundable Situations</h2>
+              <h2 className="legal-heading">4. Non-Refundable Situations</h2>
               <p className="legal-text">
                 Refunds will not be provided in the following cases:
               </p>
@@ -180,7 +169,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">6. How to Request a Refund</h2>
+              <h2 className="legal-heading">5. How to Request a Refund</h2>
               <p className="legal-text">
                 To request a refund, follow these steps:
               </p>
@@ -215,9 +204,9 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">7. Cancellation Policy</h2>
+              <h2 className="legal-heading">6. Cancellation Policy</h2>
               
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.1 Professional Plan Cancellation</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>6.1 Professional Plan Cancellation</h3>
               <p className="legal-text">
                 You can cancel your Professional Plan subscription at any time:
               </p>
@@ -229,7 +218,7 @@ export default function RefundPage() {
                 <li>No partial refunds for unused days</li>
               </ul>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.2 Account Deletion</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>6.2 Account Deletion</h3>
               <p className="legal-text">
                 You can delete your account at any time:
               </p>
@@ -240,14 +229,14 @@ export default function RefundPage() {
                 <li>No refunds for deleted accounts (subject to refund policy above)</li>
               </ul>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.3 Lifetime Plan</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>6.3 Lifetime Plan</h3>
               <p className="legal-text">
                 The Lifetime Plan does not require cancellation as it is a one-time purchase with no recurring charges.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">8. Billing Information</h2>
+              <h2 className="legal-heading">7. Billing Information</h2>
               <p className="legal-text">
                 All payments are processed securely through our payment processor. We accept:
               </p>
@@ -266,7 +255,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">9. Price Changes</h2>
+              <h2 className="legal-heading">8. Price Changes</h2>
               <p className="legal-text">
                 We reserve the right to change our pricing at any time. Price changes will:
               </p>
@@ -278,14 +267,14 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">10. Taxes</h2>
+              <h2 className="legal-heading">9. Taxes</h2>
               <p className="legal-text">
                 Prices may not include applicable taxes (VAT, GST, sales tax). Taxes will be calculated and added at checkout based on your location.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">11. Disputes</h2>
+              <h2 className="legal-heading">10. Disputes</h2>
               <p className="legal-text">
                 If you have a billing dispute:
               </p>
@@ -297,7 +286,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">12. Modifications to This Policy</h2>
+              <h2 className="legal-heading">11. Modifications to This Policy</h2>
               <p className="legal-text">
                 We may update this Refund & Cancellation Policy at any time. Changes will be:
               </p>
@@ -309,7 +298,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">13. Contact Information</h2>
+              <h2 className="legal-heading">12. Contact Information</h2>
               <p className="legal-text">
                 For questions about refunds, cancellations, or billing, contact us at:
               </p>
@@ -333,7 +322,7 @@ export default function RefundPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">14. Legal Requirements</h2>
+              <h2 className="legal-heading">13. Legal Requirements</h2>
               <p className="legal-text">
                 This policy complies with:
               </p>

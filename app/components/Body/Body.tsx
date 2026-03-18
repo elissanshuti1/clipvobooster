@@ -5,30 +5,6 @@ import { useState, useEffect } from "react";
 export default function Body() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
-  const [count, setCount] = useState({ views: 0, creators: 0, products: 0 });
-
-  useEffect(() => {
-    const targets = { views: 4820000, creators: 12400, products: 3870 };
-    const duration = 2400;
-    const steps = 90;
-    let step = 0;
-    const timer = setInterval(() => {
-      step++;
-      const p = step / steps;
-      const e = 1 - Math.pow(1 - p, 4);
-      setCount({
-        views: Math.round(targets.views * e),
-        creators: Math.round(targets.creators * e),
-        products: Math.round(targets.products * e),
-      });
-      if (step >= steps) clearInterval(timer);
-    }, duration / steps);
-    return () => clearInterval(timer);
-  }, []);
-
-  const fmt = (n: number) =>
-    n >= 1_000_000 ? (n / 1_000_000).toFixed(1) + "M" :
-    n >= 1_000 ? (n / 1_000).toFixed(1) + "K" : String(n);
 
   return (
     <>
@@ -512,17 +488,17 @@ export default function Body() {
           </div>
 
           <h1 className="rise d2">
-            Turn Strangers into<br /><em>Paying Customers on Autopilot.</em>
+            Turn Strangers into<br /><em>Paying Customers with Smart Email.</em>
           </h1>
 
           <p className="hero-p rise d3">
-            The AI-powered email platform that writes, sends, and tracks professional emails for you. 
-            Watch your inbox fill with replies while our AI handles everything — from first contact to closed deal.
+            Get more replies with AI-powered email that writes, sends, and tracks for you.
+            Create professional campaigns that connect with your audience and grow your business.
           </p>
 
           <div className="hero-btns rise d4">
             <a href="/api/auth/google" className="btn-w">
-              Start Converting Customers Free
+              Get Started
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
@@ -531,16 +507,9 @@ export default function Body() {
           </div>
 
           <div className="nums rise d5">
-            {[
-              { val: fmt(count.views), label: "Emails Sent" },
-              { val: fmt(count.creators), label: "Customers Won" },
-              { val: fmt(count.products), label: "Revenue Generated" },
-            ].map((n, i) => (
-              <div key={i} className="num-c">
-                <div className="num-val">{n.val}<sup>+</sup></div>
-                <div className="num-lbl">{n.label}</div>
-              </div>
-            ))}
+            <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '14px' }}>
+              Trusted by creators and businesses worldwide
+            </div>
           </div>
         </div>
       </section>
@@ -549,15 +518,16 @@ export default function Body() {
       <section className="sec" id="process">
         <div className="wrap">
           <span className="eye">How it Works</span>
-          <h2 className="sec-h">Your Personal Sales Team,<br />Working 24/7.</h2>
+          <h2 className="sec-h">Your Email Marketing Partner</h2>
           <p className="sec-p">
-            While you sleep, our AI is writing perfect emails, sending them to the right people, and tracking every interaction. Wake up to new customers.
+            Our AI crafts personalized emails that connect with your audience.
+            Track engagement and follow up at the right moment to grow your business.
           </p>
           <div className="steps-list">
             {[
-              { n: "01", t: "Connect Gmail in 30 seconds", b: "One click to connect your Gmail. We use Google's secure API — your emails send from YOUR address, building trust with every message. No sketchy third-party servers." },
-              { n: "02", t: "AI writes emails that convert", b: "Tell us about your product. Our AI crafts personalized, professional emails that sound human — not robotic. Each email includes your website link and branded signature automatically." },
-              { n: "03", t: "Watch replies pour in", b: "Get instant notifications when someone opens or clicks. See exactly who's interested. Follow up at the perfect moment. Close deals while you focus on what matters." },
+              { n: "01", t: "Connect Gmail in 30 seconds", b: "One click to connect your Gmail. We use Google's secure API — your emails send from YOUR address, building trust with every message." },
+              { n: "02", t: "AI writes emails that connect", b: "Tell us about your product. Our AI crafts personalized, professional emails with a natural, conversational tone. Each email includes your website link and branded signature." },
+              { n: "03", t: "Track engagement and grow", b: "Get notifications when someone opens or clicks. See who's interested and follow up at the perfect moment. Focus on closing deals while we handle the emails." },
             ].map((s) => (
               <div key={s.n} className="step">
                 <span className="step-n">{s.n}</span>
@@ -606,7 +576,12 @@ export default function Body() {
                   Gmail integration
                 </li>
               </ul>
-              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
+              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+                Get Started
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
             </div>
 
             {/* Pro Plan */}
@@ -642,7 +617,12 @@ export default function Body() {
                   Remove branding
                 </li>
               </ul>
-              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
+              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+                Get Started
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
             </div>
 
             {/* Lifetime Plan */}
@@ -678,7 +658,12 @@ export default function Body() {
                   Pay once, own forever
                 </li>
               </ul>
-              <div className="pricing-btn primary" style={{ opacity: 0.5, cursor: 'not-allowed' }}>Coming Soon</div>
+              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+                Get Started
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
             </div>
           </div>
         </div>
@@ -690,7 +675,7 @@ export default function Body() {
           <div className="live-top">
             <div>
               <span className="eye">Real-time Intelligence</span>
-              <h2 className="sec-h">Know the Moment<br />Someone's Interested</h2>
+              <h2 className="sec-h">See When Someone Engages</h2>
             </div>
             <a href="/dashboard/analytics" className="live-link">See your analytics →</a>
           </div>
@@ -706,7 +691,7 @@ export default function Body() {
                 </div>
               </div>
               <p className="card-desc">
-                John opened your email 2 times and spent 45 seconds reading. He's interested — perfect time to follow up with a demo offer or case study.
+                John opened your email 2 times and spent 45 seconds reading. Perfect time to follow up with a demo offer or case study.
               </p>
               <div className="cstats">
                 {[{ v: "2", l: "Opens" }, { v: "1", l: "Clicks" }, { v: "Today", l: "Activity" }].map((s, i) => (
@@ -730,7 +715,7 @@ export default function Body() {
                 </div>
               </div>
               <p className="card-desc">
-                Sarah clicked through to your pricing page! This is a HOT lead — she's seriously considering your product. Send a personalized follow-up now.
+                Sarah clicked through to your pricing page! This lead is showing strong interest. Send a personalized follow-up now.
               </p>
               <div className="cstats">
                 {[{ v: "3", l: "Opens" }, { v: "2", l: "Clicks" }, { v: "Hot", l: "Lead" }].map((s, i) => (
@@ -749,17 +734,10 @@ export default function Body() {
       {/* STATS */}
       <section className="sec">
         <div className="wrap">
-          <div className="stats-band">
-            {[
-              { n: fmt(count.views), s: "+", l: "Emails Sent" },
-              { n: fmt(count.creators), s: "+", l: "Leads Engaged" },
-              { n: fmt(count.products), s: "+", l: "Businesses Growing" },
-            ].map((s, i) => (
-              <div key={i} className="stat-c">
-                <span className="stat-eye">{s.l}</span>
-                <div className="stat-n">{s.n}<span className="stat-suf">{s.s}</span></div>
-              </div>
-            ))}
+          <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted)' }}>
+            <p style={{ fontSize: '15px', lineHeight: 1.7 }}>
+              Trusted by creators, solopreneurs, and small businesses worldwide.
+            </p>
           </div>
         </div>
       </section>
@@ -768,31 +746,31 @@ export default function Body() {
       <section className="sec" id="features" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <span className="eye">Why ClipVoBooster</span>
-          <h2 className="sec-h">Everything You Need to<br />Dominate Your Market.</h2>
+          <h2 className="sec-h">Everything You Need to<br />Grow Your Business.</h2>
           <div className="feat-grid">
             <div className="feat feat-wide">
               <div className="feat-ico">
                 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
               </div>
-              <h3>AI That Writes Like Your Best Copywriter</h3>
-              <p>Our AI doesn't write generic templates. It crafts 200+ word professional business letters that get read, remembered, and replied to. Each email includes your website link and sounds authentically human.</p>
+              <h3>AI-Powered Email Writing</h3>
+              <p>Our AI crafts professional emails that get read, remembered, and replied to. Each email includes your website link and sounds natural and conversational.</p>
               <div className="chips">
-                {["200+ word emails", "Professional tone", "Auto website link", "Beautiful HTML design"].map((c) => <span key={c} className="chip">{c}</span>)}
+                {["Professional emails", "Natural tone", "Auto website link", "Beautiful HTML design"].map((c) => <span key={c} className="chip">{c}</span>)}
               </div>
             </div>
             <div className="feat">
               <div className="feat-ico">
                 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
               </div>
-              <h3>Stalker-Level Tracking (The Good Kind)</h3>
-              <p>Know the exact moment someone opens your email or clicks your link. Get instant notifications. See who's hot. Follow up at the perfect moment. Close more deals.</p>
+              <h3>Real-Time Email Tracking</h3>
+              <p>Know when someone opens your email or clicks your link. Get notifications. See who's interested. Follow up at the perfect moment. Close more deals.</p>
             </div>
             <div className="feat">
               <div className="feat-ico">
                 <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2z" /></svg>
               </div>
-              <h3>Emails That Look Like They Cost $1000</h3>
-              <p>Professional gradient headers, beautiful typography, prominent CTA buttons, and your branded signature. Every email looks like it was designed by a pro agency.</p>
+              <h3>Professional Email Design</h3>
+              <p>Beautiful gradient headers, clean typography, prominent CTA buttons, and your branded signature. Every email looks professional and trustworthy.</p>
             </div>
           </div>
         </div>
@@ -803,8 +781,8 @@ export default function Body() {
         <div className="wrap">
           <div className="nl">
             <div className="nl-text">
-              <h2>Ready to Watch Your Revenue Soar?</h2>
-              <p>Join thousands of businesses using ClipVoBooster to convert strangers into loyal customers. Start sending professional emails today.</p>
+              <h2>Ready to Grow Your Business?</h2>
+              <p>Join businesses and creators using ClipVoBooster to convert strangers into loyal customers. Start sending professional emails today.</p>
             </div>
             <div className="nl-form">
               <a href="/api/auth/google" className="nl-btn" style={{ textDecoration: 'none' }}>
@@ -813,6 +791,15 @@ export default function Body() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* COMPLIANCE FOOTER */}
+      <section style={{ padding: '40px 52px', textAlign: 'center' }}>
+        <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '700px', margin: '0 auto' }}>
+          ClipVoBooster helps you create and send professional email campaigns. 
+          We support CAN-SPAM and GDPR compliance. You are responsible for obtaining 
+          proper consent from your email recipients.
+        </p>
       </section>
     </>
   );
