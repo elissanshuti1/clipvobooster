@@ -81,6 +81,7 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
             <li><Link href="/" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Home</Link></li>
             <li><Link href="/pricing" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Pricing</Link></li>
             <li><Link href="/about" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">About</Link></li>
+            <li><Link href="/support" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Support</Link></li>
             <li><Link href="/terms" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Terms</Link></li>
             <li><Link href="/privacy" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Privacy</Link></li>
             <li><Link href="/refund" style={{ color: '#cbd5e1' }} className="hover:text-slate-100">Refund</Link></li>
@@ -136,7 +137,9 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
           <div style={{ position: 'absolute', right: 16, top: 64, zIndex: 500 }} className="w-48 bg-black/95 rounded-md shadow-lg">
             <ul className="flex flex-col p-3 gap-2 text-slate-300">
               <li><Link href="/" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Home</Link></li>
+              <li><Link href="/pricing" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Pricing</Link></li>
               <li><Link href="/about" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>About</Link></li>
+              <li><Link href="/support" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Support</Link></li>
               <li><Link href="/refund" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Refund</Link></li>
               <li><Link href="/privacy" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Privacy</Link></li>
               <li><Link href="/terms" className="block px-2 py-2 hover:text-white" onClick={() => setOpen(false)}>Terms</Link></li>

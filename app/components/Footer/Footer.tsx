@@ -82,6 +82,7 @@ export default function Footer() {
               <h4>Company</h4>
               <ul>
                 <li><a href="/about">About</a></li>
+                <li><a href="/support">Support</a></li>
                 <li><a href="/dashboard">Dashboard</a></li>
               </ul>
             </div>
@@ -95,10 +96,11 @@ export default function Footer() {
             </div>
           </div>
           <div className="foot-bottom">
-            <p>© 2026 Clipvobooster, Inc. All rights reserved.</p>
+            <p>© 2026 ClipVoBooster, Inc. All rights reserved.</p>
             <div className="foot-soc">
+              <a href="mailto:trivora00@gmail.com">trivora00@gmail.com</a>
+              <a href="/support">Support Center</a>
               <a href="https://twitter.com/clipvobooster" target="_blank" rel="noopener noreferrer">Twitter</a>
-              <a href="mailto:trivora00@gmail.com">Support</a>
             </div>
           </div>
         </div>

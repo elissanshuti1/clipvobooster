@@ -103,9 +103,30 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">2. Information We Collect</h2>
-              
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.1 Personal Information</h3>
+              <h2 className="legal-heading">2. Data Controller</h2>
+              <p className="legal-text">
+                For purposes of applicable data protection laws (including the GDPR), the data controller is:
+              </p>
+              <div style={{ background: 'var(--bg2)', padding: '20px', borderRadius: '12px', margin: '16px 0' }}>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Company:</strong> ClipVoBooster
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Data Controller:</strong> ClipVoBooster Team
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a>
+                </p>
+                <p className="legal-text" style={{ marginBottom: 0 }}>
+                  <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
+                </p>
+              </div>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">3. Information We Collect</h2>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>3.1 Personal Information</h3>
               <p className="legal-text">
                 When you create an account, we collect:
               </p>
@@ -116,7 +137,7 @@ export default function PrivacyPage() {
                 <li>Contact information for your email recipients</li>
               </ul>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.2 Usage Information</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>3.2 Usage Information</h3>
               <p className="legal-text">
                 We automatically collect:
               </p>
@@ -128,7 +149,7 @@ export default function PrivacyPage() {
                 <li>IP address and access timestamps</li>
               </ul>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.3 Gmail API Information</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>3.3 Gmail API Information</h3>
               <p className="legal-text">
                 When you connect your Gmail account, we access:
               </p>
@@ -140,7 +161,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">3. How We Use Your Information</h2>
+              <h2 className="legal-heading">4. How We Use Your Information</h2>
               <p className="legal-text">
                 We use the information we collect to:
               </p>
@@ -157,7 +178,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">4. Information Sharing</h2>
+              <h2 className="legal-heading">5. Information Sharing</h2>
               <p className="legal-text">
                 We do not sell, trade, or rent your personal information to third parties. We may share information in the following situations:
               </p>
@@ -170,7 +191,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">5. Data Retention</h2>
+              <h2 className="legal-heading">6. Data Retention</h2>
               <p className="legal-text">
                 We retain your personal information for as long as necessary to:
               </p>
@@ -186,7 +207,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">6. Data Security</h2>
+              <h2 className="legal-heading">7. Data Security</h2>
               <p className="legal-text">
                 We implement appropriate technical and organizational measures to protect your information:
               </p>
@@ -203,7 +224,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">7. Your Rights</h2>
+              <h2 className="legal-heading">8. Your Rights</h2>
               <p className="legal-text">
                 Depending on your location, you may have the following rights:
               </p>
@@ -221,7 +242,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">8. Cookies and Tracking</h2>
+              <h2 className="legal-heading">9. Cookies and Tracking</h2>
               <p className="legal-text">
                 We use cookies and similar technologies to:
               </p>
@@ -237,7 +258,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">9. Third-Party Services</h2>
+              <h2 className="legal-heading">10. Third-Party Services</h2>
               <p className="legal-text">
                 The Service integrates with third-party services that have their own privacy policies:
               </p>
@@ -253,21 +274,21 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">10. International Data Transfers</h2>
+              <h2 className="legal-heading">11. International Data Transfers</h2>
               <p className="legal-text">
                 Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place, such as Standard Contractual Clauses, to protect your data.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">11. Children's Privacy</h2>
+              <h2 className="legal-heading">12. Children's Privacy</h2>
               <p className="legal-text">
                 The Service is not intended for children under 18 years of age. We do not knowingly collect personal information from children. If we discover that we have collected information from a child, we will delete it immediately.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">12. Changes to This Policy</h2>
+              <h2 className="legal-heading">13. Changes to This Policy</h2>
               <p className="legal-text">
                 We may update this Privacy Policy from time to time. We will notify you of material changes by:
               </p>
@@ -282,7 +303,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">13. GDPR Compliance (EU Users)</h2>
+              <h2 className="legal-heading">14. GDPR Compliance (EU Users)</h2>
               <p className="legal-text">
                 For users in the European Economic Area, we process your data based on:
               </p>
@@ -298,7 +319,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">14. CCPA Compliance (California Users)</h2>
+              <h2 className="legal-heading">15. CCPA Compliance (California Users)</h2>
               <p className="legal-text">
                 California residents have the right to:
               </p>
@@ -315,13 +336,24 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">15. Contact Us</h2>
+              <h2 className="legal-heading">16. Contact Us</h2>
               <p className="legal-text">
                 For questions about this Privacy Policy or our data practices, contact us at:
               </p>
-              <p className="legal-text">
-                Email: trivora00@gmail.com
-              </p>
+              <div style={{ background: 'var(--bg2)', padding: '20px', borderRadius: '12px', margin: '16px 0' }}>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Company:</strong> ClipVoBooster
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a>
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
+                </p>
+                <p className="legal-text" style={{ marginBottom: 0 }}>
+                  <strong>Data Protection Officer:</strong> ClipVoBooster Team
+                </p>
+              </div>
             </div>
           </div>
         </div>

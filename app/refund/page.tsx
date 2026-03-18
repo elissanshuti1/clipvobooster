@@ -184,14 +184,33 @@ export default function RefundPage() {
               <p className="legal-text">
                 To request a refund, follow these steps:
               </p>
-              <ol style={{ paddingLeft: 24, color: 'var(--text)', lineHeight: 1.8 }}>
-                <li>Email us at trivora00@gmail.com</li>
-                <li>Include your account email and order details</li>
-                <li>Explain the reason for your refund request</li>
-                <li>Our team will respond within 2-3 business days</li>
-              </ol>
+              <div style={{ background: 'var(--bg2)', padding: '24px', borderRadius: '12px', margin: '16px 0' }}>
+                <h3 style={{ fontSize: 16, color: 'var(--white)', marginTop: 0, marginBottom: 16 }}>Step-by-Step Refund Process:</h3>
+                <ol style={{ paddingLeft: 24, color: 'var(--text)', lineHeight: 2, margin: 0 }}>
+                  <li>Send an email to <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a></li>
+                  <li>Include the following information:
+                    <ul style={{ paddingLeft: 24, marginTop: 8 }}>
+                      <li>Your account email address</li>
+                      <li>Order/transaction ID (from your confirmation email)</li>
+                      <li>Date of purchase</li>
+                      <li>Reason for refund request</li>
+                    </ul>
+                  </li>
+                  <li>Our billing team will acknowledge receipt within 24 hours</li>
+                  <li>We will review your request and respond within 2-3 business days</li>
+                  <li>If approved, refund will be processed within 5-10 business days</li>
+                </ol>
+              </div>
               <p className="legal-text">
-                Approved refunds will be processed to your original payment method within 5-10 business days.
+                <strong>Processing Timeline:</strong>
+              </p>
+              <ul className="legal-list">
+                <li><strong>Review Time:</strong> 2-3 business days</li>
+                <li><strong>Refund Processing:</strong> 5-10 business days to appear in your account</li>
+                <li><strong>Total Time:</strong> 7-13 business days from request to refund</li>
+              </ul>
+              <p className="legal-text">
+                Refunds will be issued to the original payment method. If the original payment method is no longer valid, we will work with you to arrange an alternative refund method.
               </p>
             </div>
 
@@ -294,9 +313,20 @@ export default function RefundPage() {
               <p className="legal-text">
                 For questions about refunds, cancellations, or billing, contact us at:
               </p>
-              <p className="legal-text">
-                Email: trivora00@gmail.com
-              </p>
+              <div style={{ background: 'var(--bg2)', padding: '20px', borderRadius: '12px', margin: '16px 0' }}>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Company:</strong> ClipVoBooster
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a>
+                </p>
+                <p className="legal-text" style={{ marginBottom: '8px' }}>
+                  <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
+                </p>
+                <p className="legal-text" style={{ marginBottom: 0 }}>
+                  <strong>Billing Hours:</strong> Monday - Friday, 9AM - 6PM EAT
+                </p>
+              </div>
               <p className="legal-text">
                 We respond to all refund requests within 2-3 business days.
               </p>

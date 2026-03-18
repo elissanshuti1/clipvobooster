@@ -226,9 +226,41 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">12. Governing Law</h2>
+              <h2 className="legal-heading">12. Governing Law and Jurisdiction</h2>
               <p className="legal-text">
-                These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where ClipVoBooster operates, without regard to conflict of law provisions.
+                These Terms shall be governed by and construed in accordance with the laws of the Republic of Rwanda, without regard to conflict of law provisions.
+              </p>
+              <p className="legal-text">
+                Any disputes arising out of or relating to these Terms or the Service shall be subject to the exclusive jurisdiction of the courts located in Kigali, Rwanda.
+              </p>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">13. Dispute Resolution</h2>
+              <p className="legal-text">
+                Before filing any legal action, you agree to first attempt to resolve disputes by contacting us at trivora00@gmail.com. We will attempt to resolve the dispute informally within 30 days of receiving notice.
+              </p>
+              <p className="legal-text">
+                If informal resolution fails, disputes shall be resolved through binding arbitration in accordance with the arbitration rules of the Rwanda Arbitration Center. The arbitration shall be conducted in English, and the decision shall be final and binding.
+              </p>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">14. Class Action Waiver</h2>
+              <p className="legal-text">
+                You agree to resolve any dispute on an individual basis and waive any right to participate in class actions, class arbitrations, or representative actions against ClipVoBooster.
+              </p>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">15. Contact Information</h2>
+              <p className="legal-text">
+                For questions about these Terms of Service, please contact us at:
+              </p>
+              <p className="legal-text">
+                <strong>Company:</strong> ClipVoBooster<br />
+                <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a><br />
+                <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
               </p>
             </div>
 
