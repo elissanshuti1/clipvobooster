@@ -60,10 +60,38 @@ function PaymentVerificationContent() {
   // Effect 2: Auto-redirect after verification (MUST be before conditional return)
   useEffect(() => {
     if (isVerified) {
-      const timer = setTimeout(() => {
-        router.push('/dashboard/overview');
-      }, 2000);
-      return () => clearTimeout(timer);
+      // Wait and check if subscription is saved before redirecting
+      const checkSubscription = async () => {
+        console.log('🔄 Payment Success: Checking if subscription is saved...');
+        
+        // Try up to 5 times with 1 second delay
+        for (let i = 0; i < 5; i++) {
+          try {
+            const res = await fetch('/api/payment/subscription');
+            if (res.ok) {
+              const data = await res.json();
+              if (data.hasSubscription) {
+                console.log('✅ Payment Success: Subscription confirmed!');
+                setTimeout(() => {
+                  router.push('/dashboard/overview');
+                }, 500);
+                return;
+              }
+            }
+          } catch (err) {
+            console.log('⚠️ Payment Success: Subscription not ready yet, retrying...');
+          }
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
+        // If still no subscription after 5 tries, redirect anyway
+        console.log('⚠️ Payment Success: Redirecting to dashboard without confirmed subscription');
+        setTimeout(() => {
+          router.push('/dashboard/overview');
+        }, 500);
+      };
+      
+      checkSubscription();
     }
   }, [router, isVerified]);
 

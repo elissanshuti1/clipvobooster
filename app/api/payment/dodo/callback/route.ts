@@ -69,10 +69,20 @@ export async function GET(req: Request) {
             );
 
             console.log(`Subscription activated for user ${user._id}, plan: ${checkout.plan}`);
+            console.log('Subscription data saved:', {
+              plan: checkout.plan,
+              planName: checkout.planDetails.name,
+              status: 'active',
+              checkoutId: checkout.checkoutId
+            });
 
-            // Redirect to success page with checkout info
-            const redirectUrl = `/payment/success?checkout_id=${checkout.checkoutId}&plan=${checkout.plan}&status=success`;
-            return NextResponse.redirect(new URL(redirectUrl, process.env.NEXT_PUBLIC_PROD_URL));
+            // Redirect to success page - use localhost in development
+            const baseUrl = process.env.NODE_ENV === 'production' 
+              ? process.env.NEXT_PUBLIC_PROD_URL 
+              : 'http://localhost:3000';
+            const redirectUrl = `${baseUrl}/payment/success?checkout_id=${checkout.checkoutId}&plan=${checkout.plan}&status=success`;
+            console.log('Redirecting to:', redirectUrl);
+            return NextResponse.redirect(new URL(redirectUrl));
           } else {
             // No checkout found, but we have a valid subscription from Dodo
             // Create a default subscription based on what Dodo sent

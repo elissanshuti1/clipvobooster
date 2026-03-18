@@ -81,6 +81,9 @@ export async function GET(req: Request) {
 
     console.log('Created JWT token, checking subscription');
     console.log('User subscription:', user.subscription);
+    
+    // Check if user has subscription
+    const hasSubscription = !!user.subscription;
     console.log('Has subscription:', hasSubscription);
 
     // Redirect based on subscription status

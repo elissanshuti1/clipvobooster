@@ -49,8 +49,10 @@ export default function DashboardOverview() {
       try {
         console.log('🔄 Dashboard: Initializing...');
         
-        // Fetch user data FIRST - this includes subscription
-        const userRes = await fetch("/api/auth/me");
+        // Fetch user data with cache-busting to get latest subscription
+        const userRes = await fetch("/api/auth/me?t=" + Date.now(), {
+          cache: 'no-store'
+        });
         console.log('📡 Dashboard: /api/auth/me response:', userRes.status);
         
         const userData = userRes.ok ? await userRes.json() : null;
@@ -63,6 +65,8 @@ export default function DashboardOverview() {
 
         setUser(userData);
         console.log('✅ Dashboard: User loaded:', userData.name, userData.email);
+        console.log('✅ Dashboard: Subscription data:', userData.subscription);
+        console.log('✅ Dashboard: Has subscription?', !!userData.subscription);
 
         // CRITICAL: Use subscription from auth endpoint directly
         if (userData.subscription) {
@@ -71,9 +75,13 @@ export default function DashboardOverview() {
           setIsLoading(false);
           console.log('✅ Dashboard: Loading complete, showing dashboard');
         } else {
-          console.log('⚠️ Dashboard: No subscription, redirecting to pricing');
+          console.log('⚠️ Dashboard: No subscription found in user data');
+          console.log('⚠️ Dashboard: User object keys:', Object.keys(userData));
+          console.log('⚠️ Dashboard: Redirecting to pricing');
           // NO SUBSCRIPTION - Redirect to pricing page
-          router.push('/pricing');
+          setTimeout(() => {
+            router.push('/pricing');
+          }, 500);
           return;
         }
 
