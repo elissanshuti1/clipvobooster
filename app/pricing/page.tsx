@@ -15,13 +15,9 @@ export default function PricingPage() {
       try {
         console.log('🔄 Pricing page: Initializing...');
         
-        const [userData, subData] = await Promise.all([
+        const [userData] = await Promise.all([
           fetch("/api/auth/me").then(r => {
             console.log('📡 /api/auth/me response:', r.status);
-            return r.ok ? r.json() : null;
-          }),
-          fetch("/api/payment/subscription").then(r => {
-            console.log('📡 /api/payment/subscription response:', r.status);
             return r.ok ? r.json() : null;
           })
         ]);
@@ -33,17 +29,7 @@ export default function PricingPage() {
           console.log('⚠️ Pricing page: No user data (not logged in)');
         }
         
-        if (subData && subData.hasSubscription) {
-          setSubscription(subData.subscription);
-          console.log('✅ Pricing page: Subscription found, redirecting to dashboard');
-          // If user has subscription, redirect to dashboard
-          setTimeout(() => {
-            router.push('/dashboard/overview');
-          }, 1000);
-        } else {
-          console.log('ℹ️ Pricing page: No subscription, showing pricing');
-        }
-        
+        // No subscription check - pricing page is just informational
         setIsLoading(false);
         console.log('✅ Pricing page: Loading complete');
       } catch (err) {
@@ -430,7 +416,7 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Current Subscription Alert */}
+          {/* Current Subscription Alert - Just informational, no redirect */}
           {subscription && (
             <div className="alert-box">
               <div className="alert-box-title">✅ You have an active {subscription.planName} plan</div>
@@ -439,19 +425,6 @@ export default function PricingPage() {
                   ? 'Lifetime access'
                   : `$${subscription.price}/${subscription.interval}`}
                 {subscription.startDate && ` • Started ${new Date(subscription.startDate).toLocaleDateString()}`}
-              </div>
-              <div style={{ marginTop: 16 }}>
-                <button
-                  onClick={() => router.push('/dashboard/overview')}
-                  className="pricing-btn primary"
-                  style={{ maxWidth: 200 }}
-                >
-                  Go to Dashboard
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                    <polyline points="12 5 19 12 12 19" />
-                  </svg>
-                </button>
               </div>
             </div>
           )}

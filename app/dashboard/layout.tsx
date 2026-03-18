@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     const initDashboard = async () => {
       try {
-        // Fetch user data first - includes subscription
+        // Fetch user data
         const userRes = await fetch("/api/auth/me");
         if (!userRes.ok) {
           router.push("/login");
@@ -33,18 +33,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         const userData = await userRes.json();
         
         setUser(userData);
+        console.log('✅ Dashboard layout: User loaded:', userData.name);
         
-        // CRITICAL: Check subscription and redirect to pricing if none
-        if (userData.subscription) {
-          setSubscription(userData.subscription);
-          console.log('✅ Dashboard layout: Subscription loaded from /api/auth/me:', userData.subscription);
-          setIsLoading(false);
-        } else {
-          console.log('⚠️ Dashboard layout: No subscription, redirecting to pricing');
-          // NO SUBSCRIPTION - Redirect to pricing
-          router.push('/pricing');
-          return;
-        }
+        // No subscription check - users can use the app freely
+        setIsLoading(false);
       } catch (err) {
         console.error('Dashboard layout init error:', err);
         router.push("/login");
