@@ -50,39 +50,29 @@ export default function DashboardOverview() {
         // Fetch user data FIRST - this includes subscription
         const userRes = await fetch("/api/auth/me");
         const userData = userRes.ok ? await userRes.json() : null;
-        
+
         if (!userData) {
           router.push("/login");
           return;
         }
-        
+
         setUser(userData);
-        
+
         // CRITICAL: Use subscription from auth endpoint directly
         // This is more reliable than separate subscription API call
         if (userData.subscription) {
           setSubscription(userData.subscription);
           console.log('✅ Subscription loaded from /api/auth/me:', userData.subscription);
+          setIsLoading(false);
         } else {
-          console.log('⚠️ No subscription in /api/auth/me response');
-          // Fallback: try subscription API
-          try {
-            const subRes = await fetch("/api/payment/subscription");
-            if (subRes.ok) {
-              const subData = await subRes.json();
-              if (subData.hasSubscription) {
-                setSubscription(subData.subscription);
-                console.log('✅ Subscription loaded from /api/payment/subscription');
-              }
-            }
-          } catch (subErr) {
-            console.error('Failed to load from subscription API:', subErr);
-          }
+          console.log('⚠️ No subscription in /api/auth/me response, redirecting to pricing');
+          // NO SUBSCRIPTION - Redirect to pricing page
+          router.push('/pricing');
         }
-        
-        // Load stats in parallel
+
+        // Load stats in parallel (only if has subscription)
         await loadStats();
-        
+
         setIsLoading(false);
       } catch (err) {
         console.error('Init error:', err);

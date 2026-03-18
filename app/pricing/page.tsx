@@ -11,17 +11,30 @@ export default function PricingPage() {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
-      fetch("/api/payment/subscription").then(r => r.ok ? r.json() : null)
-    ]).then(([userData, subData]) => {
-      if (userData) setUser(userData);
-      if (subData && subData.hasSubscription) setSubscription(subData.subscription);
-      setIsLoading(false);
-    }).catch(() => {
-      setIsLoading(false);
-    });
-  }, []);
+    const initPricing = async () => {
+      try {
+        const [userData, subData] = await Promise.all([
+          fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
+          fetch("/api/payment/subscription").then(r => r.ok ? r.json() : null)
+        ]);
+        
+        if (userData) setUser(userData);
+        if (subData && subData.hasSubscription) {
+          setSubscription(subData.subscription);
+          // If user has subscription, redirect to dashboard
+          setTimeout(() => {
+            router.push('/dashboard/overview');
+          }, 1000);
+        }
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Pricing init error:', err);
+        setIsLoading(false);
+      }
+    };
+    
+    initPricing();
+  }, [router]);
 
   const handleLogout = async () => {
     try {
@@ -105,19 +118,20 @@ export default function PricingPage() {
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        
+
         .pricing-page {
           min-height: 100vh;
           background: var(--bg);
           color: var(--text);
-          padding: 80px 24px 80px;
           position: relative;
         }
-        .pricing-wrap {
-          max-width: 1120px;
-          margin: 0 auto;
-        }
         
+        .pricing-wrap {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 120px 24px 80px;
+        }
+
         /* Back Button */
         .back-btn {
           position: fixed;
@@ -143,12 +157,11 @@ export default function PricingPage() {
           color: #f87171;
           background: rgba(248, 113, 113, 0.1);
         }
-        
+
         /* Header */
         .pricing-header {
           text-align: center;
           margin-bottom: 64px;
-          padding-top: 40px;
         }
         .pricing-title {
           font-family: 'Instrument Serif', serif;
@@ -167,14 +180,13 @@ export default function PricingPage() {
           margin: 0 auto;
           line-height: 1.75;
         }
-        
+
         /* Pricing Cards */
-        .pricing-cards {
+        .pricing-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
           gap: 24px;
-          max-width: 1120px;
-          margin: 0 auto 80px;
+          margin-top: 64px;
         }
         .pricing-card {
           background: var(--bg2);
@@ -183,14 +195,6 @@ export default function PricingPage() {
           padding: 40px;
           transition: all 0.3s ease;
           position: relative;
-          opacity: 0.4;
-          filter: blur(1px);
-          pointer-events: none;
-        }
-        .pricing-card.active {
-          opacity: 1;
-          filter: blur(0);
-          pointer-events: auto;
         }
         .pricing-card:hover {
           border-color: var(--line2);
@@ -201,7 +205,7 @@ export default function PricingPage() {
           background: linear-gradient(135deg, var(--bg2), rgba(99, 102, 241, 0.05));
           border-width: 2px;
         }
-        .pricing-card-badge {
+        .pricing-badge {
           position: absolute;
           top: -12px;
           left: 50%;
@@ -278,8 +282,6 @@ export default function PricingPage() {
           border: none;
           cursor: pointer;
           font-family: 'DM Sans', sans-serif;
-          position: relative;
-          overflow: hidden;
         }
         .pricing-btn.primary {
           background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -304,7 +306,7 @@ export default function PricingPage() {
           background: var(--bg2);
           border-color: var(--line2);
         }
-        
+
         /* Current Plan Badge */
         .current-plan-badge {
           background: linear-gradient(135deg, #10b981, #059669);
@@ -318,7 +320,7 @@ export default function PricingPage() {
           margin-top: 16px;
           display: inline-block;
         }
-        
+
         /* Alert Box */
         .alert-box {
           background: var(--bg2);
@@ -338,13 +340,13 @@ export default function PricingPage() {
           font-size: 14px;
           color: var(--muted);
         }
-        
+
         @media (max-width: 920px) {
-          .pricing-cards {
+          .pricing-grid {
             grid-template-columns: 1fr;
           }
-          .pricing-page {
-            padding: 60px 16px 60px;
+          .pricing-wrap {
+            padding: 100px 16px 60px;
           }
           .back-btn {
             top: 16px;
@@ -378,18 +380,31 @@ export default function PricingPage() {
             <div className="alert-box">
               <div className="alert-box-title">✅ You have an active {subscription.planName} plan</div>
               <div className="alert-box-desc">
-                {subscription.interval === 'one-time' 
-                  ? 'Lifetime access' 
+                {subscription.interval === 'one-time'
+                  ? 'Lifetime access'
                   : `$${subscription.price}/${subscription.interval}`}
                 {subscription.startDate && ` • Started ${new Date(subscription.startDate).toLocaleDateString()}`}
+              </div>
+              <div style={{ marginTop: 16 }}>
+                <button
+                  onClick={() => router.push('/dashboard/overview')}
+                  className="pricing-btn primary"
+                  style={{ maxWidth: 200 }}
+                >
+                  Go to Dashboard
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </button>
               </div>
             </div>
           )}
 
           {/* Pricing Cards */}
-          <div className="pricing-cards">
+          <div className="pricing-grid">
             {/* Starter Plan */}
-            <div className={`pricing-card ${subscription ? '' : 'active'}`}>
+            <div className="pricing-card">
               <h3 className="pricing-name">Starter</h3>
               <div className="pricing-price">
                 $15
@@ -454,7 +469,7 @@ export default function PricingPage() {
                         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                         <line x1="1" y1="10" x2="23" y2="10" />
                       </svg>
-                      {subscription ? 'Already Subscribed' : 'Get Started'}
+                      Get Started
                     </>
                   )}
                 </button>
@@ -462,7 +477,8 @@ export default function PricingPage() {
             </div>
 
             {/* Pro Plan */}
-            <div className={`pricing-card featured ${subscription ? '' : 'active'}`}>
+            <div className="pricing-card featured">
+              <div className="pricing-badge">Most Popular</div>
               <h3 className="pricing-name">Professional</h3>
               <div className="pricing-price">
                 $29
@@ -533,7 +549,7 @@ export default function PricingPage() {
                         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                         <line x1="1" y1="10" x2="23" y2="10" />
                       </svg>
-                      {subscription ? 'Already Subscribed' : 'Get Started'}
+                      Get Started
                     </>
                   )}
                 </button>
@@ -541,11 +557,11 @@ export default function PricingPage() {
             </div>
 
             {/* Lifetime Plan */}
-            <div className={`pricing-card ${subscription ? '' : 'active'}`}>
+            <div className="pricing-card">
               <h3 className="pricing-name">Lifetime</h3>
               <div className="pricing-price">
                 $60
-                <span style={{ fontSize: 16, color: 'var(--muted)' }}>/one-time</span>
+                <span>/one-time</span>
               </div>
               <p className="pricing-desc">Pay once, use forever. All features, unlimited access. No monthly fees.</p>
               <ul className="pricing-features">
@@ -612,7 +628,7 @@ export default function PricingPage() {
                         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                         <line x1="1" y1="10" x2="23" y2="10" />
                       </svg>
-                      {subscription ? 'Already Subscribed' : 'Get Lifetime Access'}
+                      Get Lifetime Access
                     </>
                   )}
                 </button>

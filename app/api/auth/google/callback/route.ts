@@ -79,10 +79,14 @@ export async function GET(req: Request) {
       { expiresIn: '30d' }
     );
 
-    console.log('Created JWT token, redirecting to dashboard');
+    console.log('Created JWT token, checking subscription');
 
-    // Always redirect to dashboard - pricing overlay will show if no subscription
-    const redirectUrl = new URL('/dashboard/overview', req.url);
+    // Check if user has subscription
+    const hasSubscription = !!user.subscription;
+    
+    // Redirect based on subscription status
+    const redirectPath = hasSubscription ? '/dashboard/overview' : '/pricing';
+    const redirectUrl = new URL(redirectPath, req.url);
     redirectUrl.search = ''; // Clear any existing query params
 
     const response = NextResponse.redirect(redirectUrl);
@@ -98,9 +102,8 @@ export async function GET(req: Request) {
       maxAge: maxAge,
       sameSite: 'lax'
     });
-    
+
     // Set subscription status cookie (will be updated after payment)
-    const hasSubscription = !!user.subscription;
     response.cookies.set('has_subscription', String(hasSubscription), {
       httpOnly: false,
       secure: secure,

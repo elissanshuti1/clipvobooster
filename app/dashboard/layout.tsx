@@ -34,28 +34,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         
         setUser(userData);
         
-        // CRITICAL: Use subscription from auth endpoint
+        // CRITICAL: Check subscription and redirect to pricing if none
         if (userData.subscription) {
           setSubscription(userData.subscription);
           console.log('✅ Dashboard layout: Subscription loaded from /api/auth/me:', userData.subscription);
+          setIsLoading(false);
         } else {
-          console.log('⚠️ Dashboard layout: No subscription in /api/auth/me');
-          // Try subscription API as fallback
-          try {
-            const subRes = await fetch("/api/payment/subscription");
-            if (subRes.ok) {
-              const subData = await subRes.json();
-              if (subData.hasSubscription) {
-                setSubscription(subData.subscription);
-                console.log('✅ Dashboard layout: Subscription loaded from /api/payment/subscription');
-              }
-            }
-          } catch (subErr) {
-            console.error('Dashboard layout: Failed to load subscription:', subErr);
-          }
+          console.log('⚠️ Dashboard layout: No subscription, redirecting to pricing');
+          // NO SUBSCRIPTION - Redirect to pricing
+          router.push('/pricing');
+          return;
         }
-        
-        setIsLoading(false);
       } catch (err) {
         console.error('Dashboard layout init error:', err);
         router.push("/login");
