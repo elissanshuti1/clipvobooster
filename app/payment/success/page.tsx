@@ -10,15 +10,14 @@ function PaymentVerificationContent() {
   const [planName, setPlanName] = useState("Premium");
   const [isVerified, setIsVerified] = useState(false);
 
+  // Effect 1: Verify payment and extract plan info
   useEffect(() => {
-    // Check if payment was successful
     const status = searchParams.get('status');
     const subscriptionId = searchParams.get('subscription_id');
     const email = searchParams.get('email');
     const checkoutId = searchParams.get('checkout_id');
     const plan = searchParams.get('plan');
 
-    // Map plan IDs to readable names
     const planNames: Record<string, string> = {
       'starter': 'Starter',
       'professional': 'Professional',
@@ -26,18 +25,15 @@ function PaymentVerificationContent() {
       'Premium': 'Premium'
     };
 
-    // Payment is successful if we have active status and subscription_id OR checkout_id
-    const isPaymentSuccessful = 
-      (status === 'active' && subscriptionId) || 
+    const isPaymentSuccessful =
+      (status === 'active' && subscriptionId) ||
       (status === 'success' && checkoutId) ||
       (status === 'success');
 
     if (isPaymentSuccessful) {
-      // Set plan name from URL parameter or default
       if (plan && planNames[plan]) {
         setPlanName(planNames[plan]);
       } else if (subscriptionId) {
-        // Try to fetch subscription details from backend (non-blocking)
         fetch('/api/payment/subscription')
           .then(res => {
             if (res.ok) return res.json();
@@ -48,24 +44,28 @@ function PaymentVerificationContent() {
               setPlanName(data.subscription.planName);
             }
           })
-          .catch(() => {
-            // Silently fail - we already have payment confirmation from URL
-          });
+          .catch(() => {});
       }
 
-      // Update cookie to reflect subscription status
       document.cookie = 'has_subscription=true; path=/; max-age=2592000';
-
-      // Mark as verified and stop loading
       setIsVerified(true);
       setIsLoading(false);
     } else {
-      // No valid payment - redirect to pricing
       setTimeout(() => {
         router.push('/pricing?error=payment_not_verified');
       }, 1000);
     }
   }, [searchParams, router]);
+
+  // Effect 2: Auto-redirect after verification (MUST be before conditional return)
+  useEffect(() => {
+    if (isVerified) {
+      const timer = setTimeout(() => {
+        router.push('/dashboard/overview');
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [router, isVerified]);
 
   if (isLoading) {
     return (
@@ -94,16 +94,6 @@ function PaymentVerificationContent() {
       </div>
     );
   }
-
-  // Auto-redirect to dashboard after 2 seconds
-  useEffect(() => {
-    if (isVerified) {
-      const timer = setTimeout(() => {
-        router.push('/dashboard/overview');
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [router, isVerified]);
 
   return (
     <div style={{
