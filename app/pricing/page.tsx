@@ -18,13 +18,19 @@ export default function PricingPage() {
           fetch("/api/payment/subscription").then(r => r.ok ? r.json() : null)
         ]);
         
-        if (userData) setUser(userData);
+        if (userData) {
+          setUser(userData);
+          console.log('✅ Pricing page: User loaded:', userData);
+        }
         if (subData && subData.hasSubscription) {
           setSubscription(subData.subscription);
+          console.log('✅ Pricing page: Subscription found, redirecting to dashboard');
           // If user has subscription, redirect to dashboard
           setTimeout(() => {
             router.push('/dashboard/overview');
           }, 1000);
+        } else {
+          console.log('ℹ️ Pricing page: No subscription, showing pricing');
         }
         setIsLoading(false);
       } catch (err) {
@@ -42,11 +48,22 @@ export default function PricingPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
-      window.location.href = '/login';
+      window.location.href = '/';
     } catch (err) {
       console.error('Logout failed:', err);
-      window.location.href = '/login';
+      window.location.href = '/';
     }
+  };
+
+  const getInitials = (name?: string, email?: string) => {
+    if (name) {
+      const firstName = name.split(' ')[0];
+      return firstName.charAt(0).toUpperCase();
+    }
+    if (email) {
+      return email.charAt(0).toUpperCase();
+    }
+    return 'U';
   };
 
   const handlePurchase = async (plan: string) => {
@@ -357,13 +374,38 @@ export default function PricingPage() {
 
       <div className="pricing-page">
         <div className="pricing-wrap">
-          {/* Back Button - Logout */}
-          <button className="back-btn" onClick={handleLogout}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            Back (Logout)
-          </button>
+          {/* Top Bar - User Profile or Back Button */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 14px', background: 'rgba(255,255,255,0.08)', borderRadius: 10, border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'grid', placeItems: 'center', fontSize: 14, fontWeight: 600, color: 'white' }}>
+                    {getInitials(user.name, user.email)}
+                  </div>
+                  <div>
+                    <div style={{ color: '#ffffff', fontSize: 14, fontWeight: 600 }}>{user.name || user.email?.split('@')[0]}</div>
+                    <div style={{ color: 'var(--muted)', fontSize: 12 }}>{user.email}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent', color: '#cbd5e1', cursor: 'pointer', fontSize: 13, fontWeight: 500 }}
+                  className="hover:text-white hover:border-white/40"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div />
+            )}
+            
+            <button className="back-btn" onClick={handleLogout}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              {user ? 'Logout' : 'Back'}
+            </button>
+          </div>
 
           {/* Header */}
           <div className="pricing-header">
