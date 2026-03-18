@@ -96,14 +96,13 @@ export async function GET(req: Request) {
     // Set HTTP-only cookie - WORKS IN BOTH DEV AND PROD
     const maxAge = 30 * 24 * 60 * 60; // 30 days
     
-    // Set cookie with proper flags for localhost and production
+    // Set cookie without domain restriction for localhost
     response.cookies.set('token', appToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: maxAge,
-      sameSite: 'lax',
-      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+      sameSite: 'lax'
     });
 
     // Set subscription status cookie
@@ -112,11 +111,11 @@ export async function GET(req: Request) {
       secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: maxAge,
-      sameSite: 'lax',
-      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
+      sameSite: 'lax'
     });
 
-    console.log('Cookies set, redirecting to:', redirectPath);
+    console.log('Cookies set successfully');
+    console.log('Redirecting to:', redirectPath);
 
     return response;
 
