@@ -80,10 +80,9 @@ export async function GET(req: Request) {
     );
 
     console.log('Created JWT token, checking subscription');
+    console.log('User subscription:', user.subscription);
+    console.log('Has subscription:', hasSubscription);
 
-    // Check if user has subscription
-    const hasSubscription = !!user.subscription;
-    
     // Redirect based on subscription status
     const redirectPath = hasSubscription ? '/dashboard/overview' : '/pricing';
     const redirectUrl = new URL(redirectPath, req.url);
@@ -91,26 +90,30 @@ export async function GET(req: Request) {
 
     const response = NextResponse.redirect(redirectUrl);
 
-    // Set HTTP-only cookie
+    // Set HTTP-only cookie - WORKS IN BOTH DEV AND PROD
     const maxAge = 30 * 24 * 60 * 60; // 30 days
-    const secure = process.env.NODE_ENV === 'production';
-
+    
+    // Set cookie with proper flags for localhost and production
     response.cookies.set('token', appToken, {
       httpOnly: true,
-      secure: secure,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: maxAge,
-      sameSite: 'lax'
+      sameSite: 'lax',
+      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
     });
 
-    // Set subscription status cookie (will be updated after payment)
+    // Set subscription status cookie
     response.cookies.set('has_subscription', String(hasSubscription), {
       httpOnly: false,
-      secure: secure,
+      secure: process.env.NODE_ENV === 'production',
       path: '/',
       maxAge: maxAge,
-      sameSite: 'lax'
+      sameSite: 'lax',
+      domain: process.env.NODE_ENV === 'production' ? undefined : 'localhost'
     });
+
+    console.log('Cookies set, redirecting to:', redirectPath);
 
     return response;
 

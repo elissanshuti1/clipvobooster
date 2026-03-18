@@ -13,15 +13,26 @@ export default function PricingPage() {
   useEffect(() => {
     const initPricing = async () => {
       try {
+        console.log('🔄 Pricing page: Initializing...');
+        
         const [userData, subData] = await Promise.all([
-          fetch("/api/auth/me").then(r => r.ok ? r.json() : null),
-          fetch("/api/payment/subscription").then(r => r.ok ? r.json() : null)
+          fetch("/api/auth/me").then(r => {
+            console.log('📡 /api/auth/me response:', r.status);
+            return r.ok ? r.json() : null;
+          }),
+          fetch("/api/payment/subscription").then(r => {
+            console.log('📡 /api/payment/subscription response:', r.status);
+            return r.ok ? r.json() : null;
+          })
         ]);
         
         if (userData) {
           setUser(userData);
-          console.log('✅ Pricing page: User loaded:', userData);
+          console.log('✅ Pricing page: User loaded:', userData.name, userData.email);
+        } else {
+          console.log('⚠️ Pricing page: No user data (not logged in)');
         }
+        
         if (subData && subData.hasSubscription) {
           setSubscription(subData.subscription);
           console.log('✅ Pricing page: Subscription found, redirecting to dashboard');
@@ -32,9 +43,11 @@ export default function PricingPage() {
         } else {
           console.log('ℹ️ Pricing page: No subscription, showing pricing');
         }
+        
         setIsLoading(false);
+        console.log('✅ Pricing page: Loading complete');
       } catch (err) {
-        console.error('Pricing init error:', err);
+        console.error('❌ Pricing init error:', err);
         setIsLoading(false);
       }
     };

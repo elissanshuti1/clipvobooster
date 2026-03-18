@@ -47,35 +47,41 @@ export default function DashboardOverview() {
   useEffect(() => {
     const initData = async () => {
       try {
+        console.log('🔄 Dashboard: Initializing...');
+        
         // Fetch user data FIRST - this includes subscription
         const userRes = await fetch("/api/auth/me");
+        console.log('📡 Dashboard: /api/auth/me response:', userRes.status);
+        
         const userData = userRes.ok ? await userRes.json() : null;
 
         if (!userData) {
+          console.log('❌ Dashboard: No user data, redirecting to login');
           router.push("/login");
           return;
         }
 
         setUser(userData);
+        console.log('✅ Dashboard: User loaded:', userData.name, userData.email);
 
         // CRITICAL: Use subscription from auth endpoint directly
-        // This is more reliable than separate subscription API call
         if (userData.subscription) {
           setSubscription(userData.subscription);
-          console.log('✅ Subscription loaded from /api/auth/me:', userData.subscription);
+          console.log('✅ Dashboard: Subscription loaded:', userData.subscription.planName);
           setIsLoading(false);
+          console.log('✅ Dashboard: Loading complete, showing dashboard');
         } else {
-          console.log('⚠️ No subscription in /api/auth/me response, redirecting to pricing');
+          console.log('⚠️ Dashboard: No subscription, redirecting to pricing');
           // NO SUBSCRIPTION - Redirect to pricing page
           router.push('/pricing');
+          return;
         }
 
         // Load stats in parallel (only if has subscription)
         await loadStats();
 
-        setIsLoading(false);
       } catch (err) {
-        console.error('Init error:', err);
+        console.error('❌ Dashboard init error:', err);
         router.push("/login");
       }
     };
