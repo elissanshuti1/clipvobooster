@@ -108,7 +108,7 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
                 </button>
               </div>
             ) : (
-              <a href="/api/auth/google" style={{ background: '#ffffff', color: '#000000', padding: '8px 14px', borderRadius: 8, display: 'inline-flex', alignItems: 'center' }} className="inline-flex items-center gap-2 text-sm font-medium">Get Started Free</a>
+              <a href="/api/auth/google" style={{ background: '#ffffff', color: '#000000', padding: '8px 14px', borderRadius: 8, display: 'inline-flex', alignItems: 'center' }} className="inline-flex items-center gap-2 text-sm font-medium">Get Started</a>
             )}
           </div>
         )}
@@ -160,7 +160,7 @@ export default function Nav({ isLoggedIn = false }: NavProps) {
                 </>
               ) : (
                 <li className="pt-2 border-t border-white/6">
-                  <a href="/api/auth/google" className="block px-2 py-2 bg-white text-black rounded-md text-center" onClick={() => setOpen(false)}>Get Started Free</a>
+                  <a href="/api/auth/google" className="block px-2 py-2 bg-white text-black rounded-md text-center" onClick={() => setOpen(false)}>Get Started</a>
                 </li>
               )}
             </ul>
