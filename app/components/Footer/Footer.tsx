@@ -100,7 +100,6 @@ export default function Footer() {
             <div className="foot-soc">
               <a href="mailto:trivora00@gmail.com">trivora00@gmail.com</a>
               <a href="/support">Support Center</a>
-              <a href="https://twitter.com/clipvobooster" target="_blank" rel="noopener noreferrer">Twitter</a>
             </div>
           </div>
         </div>
