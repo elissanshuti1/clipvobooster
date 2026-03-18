@@ -5,7 +5,7 @@ import clientPromise from '@/lib/mongodb';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    
+
     // Dodo may pass different parameters - handle both formats
     let checkoutId = searchParams.get('client_reference_id') || searchParams.get('checkout_id');
     const status = searchParams.get('status');
@@ -14,46 +14,103 @@ export async function GET(req: Request) {
 
     console.log('Dodo callback received:', { checkoutId, status, subscriptionId, email });
 
+    const client = await clientPromise;
+    const db = client.db('clipvobooster');
+    const users = db.collection('users');
+    const checkouts = db.collection('checkouts');
+
     // If we have subscription_id and status=active, payment was successful
     if (subscriptionId && status === 'active') {
-      // Dodo redirected directly - find checkout by subscription or email
-      const client = await clientPromise;
-      const db = client.db('clipvobooster');
-      const users = db.collection('users');
-      const checkouts = db.collection('checkouts');
+      console.log('Payment confirmed by Dodo - subscription_id:', subscriptionId);
 
-      // Find user by email
+      // Find user by email from Dodo callback
       if (email) {
         const user = await users.findOne({ email });
         if (user) {
-          // Find recent checkout for this user
+          // Find recent checkout for this user to get plan details
           const checkout = await checkouts.findOne(
-            { userId: String(user._id), status: 'pending' },
+            { userId: String(user._id), status: { $in: ['pending', 'completed'] } },
             { sort: { createdAt: -1 } }
           );
 
           if (checkout) {
-            checkoutId = checkout.checkoutId;
-          }
-        }
-      }
+            // Update checkout status
+            await checkouts.updateOne(
+              { _id: checkout._id },
+              { 
+                $set: { 
+                  status: 'completed', 
+                  completedAt: new Date(),
+                  subscriptionId: subscriptionId,
+                  dodoEmail: email
+                } 
+              }
+            );
 
-      // Redirect to success page
-      const redirectUrl = checkoutId 
-        ? `/payment/success?checkout_id=${checkoutId}&plan=${checkout.plan || 'lifetime'}`
-        : '/payment/success?status=success';
-      
-      return NextResponse.redirect(new URL(redirectUrl, process.env.NEXT_PUBLIC_PROD_URL));
+            // Update user's subscription - THIS IS THE KEY FIX
+            await users.updateOne(
+              { _id: user._id },
+              {
+                $set: {
+                  subscription: {
+                    plan: checkout.plan,
+                    planName: checkout.planDetails.name,
+                    price: checkout.planDetails.price,
+                    interval: checkout.planDetails.interval,
+                    status: 'active',
+                    startDate: new Date(),
+                    checkoutId: checkout.checkoutId,
+                    subscriptionId: subscriptionId,
+                    verifiedByWebhook: false
+                  },
+                  updatedAt: new Date()
+                }
+              }
+            );
+
+            console.log(`Subscription activated for user ${user._id}, plan: ${checkout.plan}`);
+
+            // Redirect to success page with checkout info
+            const redirectUrl = `/payment/success?checkout_id=${checkout.checkoutId}&plan=${checkout.plan}&status=success`;
+            return NextResponse.redirect(new URL(redirectUrl, process.env.NEXT_PUBLIC_PROD_URL));
+          } else {
+            // No checkout found, but we have a valid subscription from Dodo
+            // Create a default subscription based on what Dodo sent
+            await users.updateOne(
+              { _id: user._id },
+              {
+                $set: {
+                  subscription: {
+                    plan: 'lifetime',
+                    planName: 'Lifetime',
+                    price: 60,
+                    interval: 'one-time',
+                    status: 'active',
+                    startDate: new Date(),
+                    subscriptionId: subscriptionId,
+                    verifiedByDodoDirect: true
+                  },
+                  updatedAt: new Date()
+                }
+              }
+            );
+
+            console.log(`Subscription created from Dodo direct redirect for user ${user._id}`);
+            return NextResponse.redirect(new URL('/payment/success?status=success', process.env.NEXT_PUBLIC_PROD_URL));
+          }
+        } else {
+          console.error('User not found for email:', email);
+          return NextResponse.redirect(new URL('/pricing?error=user_not_found', process.env.NEXT_PUBLIC_PROD_URL));
+        }
+      } else {
+        console.error('No email provided by Dodo');
+        return NextResponse.redirect(new URL('/pricing?error=no_email', process.env.NEXT_PUBLIC_PROD_URL));
+      }
     }
 
     if (!checkoutId) {
       return NextResponse.redirect(new URL('/pricing?error=invalid_checkout', process.env.NEXT_PUBLIC_PROD_URL));
     }
-
-    const client = await clientPromise;
-    const db = client.db('clipvobooster');
-    const checkouts = db.collection('checkouts');
-    const users = db.collection('users');
 
     // Find the checkout session
     const checkout = await checkouts.findOne({ checkoutId });
@@ -94,6 +151,8 @@ export async function GET(req: Request) {
           }
         }
       );
+
+      console.log(`Subscription activated via success status for user ${checkout.userId}`);
 
       // Redirect to success page
       const successUrl = `/payment/success?checkout_id=${checkoutId}&plan=${checkout.plan}`;
