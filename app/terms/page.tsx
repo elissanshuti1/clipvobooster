@@ -160,7 +160,78 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">6. Payment and Billing</h2>
+              <h2 className="legal-heading">7. Lifetime Plan Terms</h2>
+              <p className="legal-text">
+                The Lifetime Plan is a one-time payment plan that provides extended access to the Service. By purchasing this plan, you agree to the following terms:
+              </p>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.1 Definition of "Lifetime"</h3>
+              <p className="legal-text">
+                "Lifetime" refers to the operational lifetime of the ClipVoBooster Service. This means:
+              </p>
+              <ul className="legal-list">
+                <li>Access continues as long as the Service is operational and actively maintained</li>
+                <li>In the event the Service is discontinued, access will terminate</li>
+                <li>"Lifetime" does not guarantee access for the customer's entire lifetime</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.2 Fair Use Policy - Email Limits</h3>
+              <p className="legal-text">
+                The Lifetime Plan includes a fair use limit of <strong>2,000 emails per month</strong>. This limit:
+              </p>
+              <ul className="legal-list">
+                <li>Ensures sustainable service operation for all lifetime users</li>
+                <li>Covers typical business usage for email marketing campaigns</li>
+                <li>May be adjusted with 30 days notice if service costs change significantly</li>
+                <li>Additional emails can be purchased separately if needed</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.3 Included Features</h3>
+              <p className="legal-text">
+                Lifetime Plan includes all features available at the time of purchase, plus:
+              </p>
+              <ul className="legal-list">
+                <li>All Professional plan features</li>
+                <li>Priority customer support</li>
+                <li>Early access to new features (beta programs)</li>
+              </ul>
+              <p className="legal-text">
+                New features added after purchase may have separate fees or usage limits if they involve significant third-party costs.
+              </p>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.4 Service Continuity</h3>
+              <p className="legal-text">
+                While we intend to operate the Service indefinitely, in the event of service discontinuation:
+              </p>
+              <ul className="legal-list">
+                <li>We will provide at least 90 days advance notice</li>
+                <li>You will be able to export all your data during this period</li>
+                <li>Pro-rated refunds may be available based on service lifetime</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.5 Transferability</h3>
+              <p className="legal-text">
+                Lifetime Plan subscriptions are:
+              </p>
+              <ul className="legal-list">
+                <li>Tied to the original purchaser's account</li>
+                <li>Non-transferable to other accounts without prior approval</li>
+                <li>Non-refundable except as required by law</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>7.6 Third-Party Costs</h3>
+              <p className="legal-text">
+                The Lifetime Plan fee covers ClipVoBooster service costs. However:
+              </p>
+              <ul className="legal-list">
+                <li>Third-party service changes (Google API, SMTP providers) may require plan adjustments</li>
+                <li>Significant third-party price increases may result in fair use limit adjustments</li>
+                <li>We will communicate any changes at least 30 days in advance</li>
+              </ul>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">8. Payment and Billing</h2>
               <p className="legal-text">
                 The Service offers both free and paid plans. For paid subscriptions:
               </p>
@@ -173,7 +244,7 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">7. Intellectual Property</h2>
+              <h2 className="legal-heading">9. Intellectual Property</h2>
               <p className="legal-text">
                 The Service and its original content, features, and functionality are owned by ClipVoBooster and are protected by international copyright, trademark, and other intellectual property laws.
               </p>
@@ -183,7 +254,7 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">8. Disclaimer of Warranties</h2>
+              <h2 className="legal-heading">10. Disclaimer of Warranties</h2>
               <p className="legal-text">
                 The Service is provided "as is" and "as available" without warranties of any kind, either express or implied. We do not warrant that:
               </p>
@@ -196,7 +267,7 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">9. Limitation of Liability</h2>
+              <h2 className="legal-heading">11. Limitation of Liability</h2>
               <p className="legal-text">
                 To the maximum extent permitted by law, ClipVoBooster shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including:
               </p>
@@ -212,21 +283,21 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">10. Termination</h2>
+              <h2 className="legal-heading">12. Termination</h2>
               <p className="legal-text">
                 We may terminate or suspend your account and access to the Service immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users, us, or third parties.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">11. Changes to Terms</h2>
+              <h2 className="legal-heading">13. Changes to Terms</h2>
               <p className="legal-text">
                 We reserve the right to modify these terms at any time. We will notify users of material changes via email or through the Service. Your continued use of the Service after changes constitutes acceptance of the new terms.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">12. Governing Law and Jurisdiction</h2>
+              <h2 className="legal-heading">14. Governing Law and Jurisdiction</h2>
               <p className="legal-text">
                 These Terms shall be governed by and construed in accordance with the laws of the Republic of Rwanda, without regard to conflict of law provisions.
               </p>
@@ -236,7 +307,7 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">13. Dispute Resolution</h2>
+              <h2 className="legal-heading">15. Dispute Resolution</h2>
               <p className="legal-text">
                 Before filing any legal action, you agree to first attempt to resolve disputes by contacting us at trivora00@gmail.com. We will attempt to resolve the dispute informally within 30 days of receiving notice.
               </p>
@@ -246,14 +317,14 @@ export default function TermsPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">14. Class Action Waiver</h2>
+              <h2 className="legal-heading">16. Class Action Waiver</h2>
               <p className="legal-text">
                 You agree to resolve any dispute on an individual basis and waive any right to participate in class actions, class arbitrations, or representative actions against ClipVoBooster.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">15. Contact Information</h2>
+              <h2 className="legal-heading">17. Contact Information</h2>
               <p className="legal-text">
                 For questions about these Terms of Service, please contact us at:
               </p>
@@ -261,16 +332,6 @@ export default function TermsPage() {
                 <strong>Company:</strong> ClipVoBooster<br />
                 <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a><br />
                 <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
-              </p>
-            </div>
-
-            <div className="legal-section">
-              <h2 className="legal-heading">13. Contact Information</h2>
-              <p className="legal-text">
-                For questions about these Terms of Service, please contact us at:
-              </p>
-              <p className="legal-text">
-                Email: trivora00@gmail.com
               </p>
             </div>
           </div>

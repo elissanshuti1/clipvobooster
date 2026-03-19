@@ -483,7 +483,7 @@ export default function Body() {
           <div className="rise d1">
             <span className="hero-badge">
               <span className="hero-badge-dot" />
-              Unlimited AI Email Marketing
+              AI-Powered Email Marketing
             </span>
           </div>
 
@@ -631,11 +631,14 @@ export default function Body() {
               <div className="pricing-price">
                 $60<span style={{ fontSize: 16, color: 'var(--muted)' }}>/one-time</span>
               </div>
-              <p className="pricing-desc">Pay once, use forever. All features, unlimited access. No monthly fees.</p>
+              <p className="pricing-desc">Pay once, use forever. All features, high-volume access. No monthly fees.</p>
+              <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: '12px', marginBottom: '16px', fontStyle: 'italic' }}>
+                * Lifetime access includes 2,000 emails/month. Service available while platform operates.
+              </div>
               <ul className="pricing-features">
                 <li>
                   <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Unlimited emails
+                  2,000 emails/month
                 </li>
                 <li>
                   <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>

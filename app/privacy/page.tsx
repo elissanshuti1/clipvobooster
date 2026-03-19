@@ -242,7 +242,73 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">9. Cookies and Tracking</h2>
+              <h2 className="legal-heading">9. Email Tracking and Analytics</h2>
+              <p className="legal-text">
+                Our Service includes email tracking features to help you measure the performance of your email campaigns. By using the Service, you consent to the following tracking activities:
+              </p>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.1 Tracking Technologies We Use</h3>
+              <ul className="legal-list">
+                <li><strong>Tracking Pixels:</strong> Small, invisible images embedded in emails that record when an email is opened. This helps us provide open rate analytics.</li>
+                <li><strong>Link Tracking:</strong> URLs in emails are routed through our tracking system to record click-through rates and engagement.</li>
+                <li><strong>Email Client Information:</strong> We may collect information about the email client, device type, and approximate location (based on IP address) when emails are opened.</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.2 Information Collected Through Tracking</h3>
+              <ul className="legal-list">
+                <li>Email open timestamps and frequency</li>
+                <li>Click timestamps and clicked links</li>
+                <li>IP address (for geolocation approximation)</li>
+                <li>Email client and device information</li>
+                <li>Number of times an email was opened</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.3 Legal Basis for Tracking (GDPR)</h3>
+              <p className="legal-text">
+                For users in the European Economic Area (EEA) and United Kingdom, we process tracking data based on:
+              </p>
+              <ul className="legal-list">
+                <li><strong>Legitimate Interest:</strong> Providing email analytics is necessary for the performance of our service and helps businesses measure campaign effectiveness.</li>
+                <li><strong>Consent:</strong> By using our Service, you confirm that you have obtained appropriate consent from email recipients for tracking activities, or have a legitimate basis for sending tracked emails.</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.4 Your Responsibilities as a User</h3>
+              <p className="legal-text">
+                When sending emails through ClipVoBooster, you are responsible for:
+              </p>
+              <ul className="legal-list">
+                <li>Ensuring you have proper consent or legal basis to send emails to recipients</li>
+                <li>Informing recipients about tracking in your own privacy policy if required</li>
+                <li>Complying with applicable email marketing laws (CAN-SPAM, GDPR, CASL, etc.)</li>
+                <li>Respecting recipient preferences and unsubscribe requests</li>
+              </ul>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.5 Recipient Rights</h3>
+              <p className="legal-text">
+                Recipients of emails sent through our Service have the right to:
+              </p>
+              <ul className="legal-list">
+                <li>Request information about what tracking data is stored</li>
+                <li>Request deletion of their tracking data</li>
+                <li>Opt-out of future tracking by unsubscribing from emails</li>
+              </ul>
+              <p className="legal-text">
+                Recipients can contact the email sender directly to exercise these rights. For technical assistance, recipients can contact us at trivora00@gmail.com.
+              </p>
+
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>9.6 Data Retention for Tracking Data</h3>
+              <p className="legal-text">
+                Email tracking data is retained for:
+              </p>
+              <ul className="legal-list">
+                <li><strong>Active Accounts:</strong> For the duration of your subscription plus 12 months</li>
+                <li><strong>Deleted Accounts:</strong> Tracking data is deleted within 30 days of account deletion</li>
+                <li><strong>Individual Emails:</strong> You can request deletion of specific email tracking data at any time</li>
+              </ul>
+            </div>
+
+            <div className="legal-section">
+              <h2 className="legal-heading">10. Cookies and Website Tracking</h2>
               <p className="legal-text">
                 We use cookies and similar technologies to:
               </p>
@@ -258,37 +324,39 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">10. Third-Party Services</h2>
+              <h2 className="legal-heading">11. Third-Party Services</h2>
               <p className="legal-text">
                 The Service integrates with third-party services that have their own privacy policies:
               </p>
               <ul className="legal-list">
-                <li><strong>Google/Gmail:</strong> For authentication and email sending</li>
-                <li><strong>MongoDB Atlas:</strong> For data storage</li>
-                <li><strong>OpenRouter AI:</strong> For AI email generation</li>
-                <li><strong>Vercel:</strong> For hosting</li>
+                <li><strong>Google/Gmail:</strong> For authentication and email sending. Google's Privacy Policy applies.</li>
+                <li><strong>Brevo (SMTP):</strong> For email delivery and unsubscribe management. Brevo processes email data according to their Privacy Policy.</li>
+                <li><strong>MongoDB Atlas:</strong> For secure data storage with encryption at rest.</li>
+                <li><strong>OpenRouter AI:</strong> For AI-powered email content generation.</li>
+                <li><strong>Vercel:</strong> For application hosting and infrastructure.</li>
+                <li><strong>Google Analytics:</strong> For website usage analytics (if enabled).</li>
               </ul>
               <p className="legal-text">
-                We are not responsible for the privacy practices of these third parties.
+                We are not responsible for the privacy practices of these third parties. We encourage you to review their privacy policies.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">11. International Data Transfers</h2>
+              <h2 className="legal-heading">12. International Data Transfers</h2>
               <p className="legal-text">
                 Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place, such as Standard Contractual Clauses, to protect your data.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">12. Children's Privacy</h2>
+              <h2 className="legal-heading">13. Children's Privacy</h2>
               <p className="legal-text">
                 The Service is not intended for children under 18 years of age. We do not knowingly collect personal information from children. If we discover that we have collected information from a child, we will delete it immediately.
               </p>
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">13. Changes to This Policy</h2>
+              <h2 className="legal-heading">14. Changes to This Policy</h2>
               <p className="legal-text">
                 We may update this Privacy Policy from time to time. We will notify you of material changes by:
               </p>
@@ -303,7 +371,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">14. GDPR Compliance (EU Users)</h2>
+              <h2 className="legal-heading">15. GDPR Compliance (EU Users)</h2>
               <p className="legal-text">
                 For users in the European Economic Area, we process your data based on:
               </p>
@@ -319,7 +387,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">15. CCPA Compliance (California Users)</h2>
+              <h2 className="legal-heading">16. CCPA Compliance (California Users)</h2>
               <p className="legal-text">
                 California residents have the right to:
               </p>
@@ -336,7 +404,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="legal-section">
-              <h2 className="legal-heading">16. Contact Us</h2>
+              <h2 className="legal-heading">17. Contact Us</h2>
               <p className="legal-text">
                 For questions about this Privacy Policy or our data practices, contact us at:
               </p>

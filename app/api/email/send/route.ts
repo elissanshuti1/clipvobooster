@@ -116,7 +116,9 @@ export async function POST(req: Request) {
         </div>
       </div>
       <div class="footer">
-        <p style="margin:0">This email was sent from ${senderName}. If you no longer wish to receive these emails, you can reply to unsubscribe.</p>
+        <p style="margin:0">This email was sent from ${senderName}.</p>
+        <p style="margin:8px 0 0 0">Kigali, Rwanda</p>
+        <p style="margin:8px 0 0 0">If you no longer wish to receive these emails, you can reply to unsubscribe.</p>
       </div>
     </div>
   </div>

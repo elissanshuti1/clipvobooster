@@ -11,11 +11,11 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "ClipVoBooster - Unlimited AI Email Marketing with Real-time Tracking",
+    default: "ClipVoBooster - AI Email Marketing with Real-time Tracking",
     template: "%s | ClipVoBooster"
   },
-  description: "Turn strangers into paying customers on autopilot. AI-powered email platform that writes, sends, and tracks professional emails. Unlimited emails, real-time tracking, beautiful designs.",
-  keywords: ["email marketing", "AI emails", "email tracking", "Gmail automation", "business growth", "lead generation", "email analytics", "cold outreach", "unlimited emails"],
+  description: "Turn strangers into paying customers on autopilot. AI-powered email platform that writes, sends, and tracks professional emails. Personalized campaigns, real-time tracking, beautiful designs.",
+  keywords: ["email marketing", "AI emails", "email tracking", "Gmail automation", "business growth", "lead generation", "email analytics", "cold outreach", "personalized email campaigns"],
   authors: [{ name: "ClipVoBooster Team" }],
   creator: "ClipVoBooster",
   openGraph: {
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://clipvo.site",
     siteName: "ClipVoBooster",
-    title: "ClipVoBooster - Unlimited AI Email Marketing",
+    title: "ClipVoBooster - AI Email Marketing",
     description: "Turn strangers into paying customers on autopilot. AI writes, sends, and tracks professional emails.",
     images: [
       {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClipVoBooster - Unlimited AI Email Marketing",
+    title: "ClipVoBooster - AI Email Marketing",
     description: "Turn strangers into paying customers on autopilot.",
     creator: "@clipvobooster"
   },
