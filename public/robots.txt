@@ -1,52 +1,167 @@
 # robots.txt for ClipVoBooster
 # https://clipvo.site
+# Last updated: March 2026
 
+# Default rules for all crawlers
 User-agent: *
 Allow: /
-
-# Allow all crawlers
-Allow: /
 Allow: /about
+Allow: /features
+Allow: /pricing
 Allow: /terms
 Allow: /privacy
 Allow: /refund
+Allow: /support
+Allow: /login
+Allow: /signup
+Allow: /forgot-password
+Allow: /reset-password
 
 # Disallow dashboard and private areas
 Disallow: /dashboard
-Disallow: /login
-Disallow: /signup
-Disallow: /reset-password
-Disallow: /forgot-password
-
-# Disallow API endpoints
 Disallow: /api
+Disallow: /admin
+Disallow: /*?*
 
-# Sitemap
+# Disallow dynamic parameters that create duplicate content
+Disallow: /*?redirect=*
+Disallow: /*?plan=*
+
+# Sitemap location
 Sitemap: https://clipvo.site/sitemap.xml
 
-# Crawl-delay for polite crawling
+# Crawl-delay for polite crawling (optional)
 Crawl-delay: 1
 
-# Google specific
+# ========================================
+# Google Specific Rules
+# ========================================
 User-agent: Googlebot
 Allow: /
+Allow: /about
+Allow: /features
+Allow: /pricing
+Allow: /terms
+Allow: /privacy
+Allow: /refund
+Allow: /support
+Disallow: /dashboard
+Disallow: /api
+Disallow: /admin
+
+# Allow Google to crawl important pages faster
+# Googlebot supports additional parameters
+Allow: /*.js$
+Allow: /*.css$
+
+# ========================================
+# Google Image Bot
+# ========================================
+User-agent: Googlebot-Image
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.webp$
+Allow: /*.svg$
 Disallow: /dashboard
 Disallow: /api
 
-# Bing specific
+# ========================================
+# Bing Specific Rules
+# ========================================
 User-agent: Bingbot
 Allow: /
+Allow: /about
+Allow: /features
+Allow: /pricing
+Disallow: /dashboard
+Disallow: /api
+Disallow: /admin
+
+# ========================================
+# Social Media Bots (for link previews)
+# ========================================
+
+# Twitter Bot
+User-agent: Twitterbot
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+
+# Facebook Crawler
+User-agent: facebookexternalhit
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+
+# LinkedIn Crawler
+User-agent: LinkedInBot
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+
+# Pinterest
+User-agent: Pinterest
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+
+# WhatsApp
+User-agent: WhatsApp
+Allow: /
+Allow: /*.png$
+Allow: /*.jpg$
+
+# ========================================
+# SEO and Analytics Tools
+# ========================================
+
+# Ahrefs Bot
+User-agent: AhrefsBot
+Allow: /
 Disallow: /dashboard
 Disallow: /api
 
-# Twitter bot for card preview
-User-agent: Twitterbot
+# SEMrush Bot
+User-agent: SEMrushBot
+Allow: /
+Disallow: /dashboard
+Disallow: /api
+
+# Moz Bot
+User-agent: Moz
+Allow: /
+Disallow: /dashboard
+Disallow: /api
+
+# ========================================
+# AI and Machine Learning Bots (Optional)
+# ========================================
+
+# Allow AI training bots (optional - can be removed if preferred)
+User-agent: ChatGPT-User
 Allow: /
 
-# Facebook crawler
-User-agent: facebookexternalhit
+User-agent: GPTBot
 Allow: /
 
-# LinkedIn crawler
-User-agent: LinkedInBot
+User-agent: CCBot
 Allow: /
+
+# ========================================
+# Bad Bots - Block Completely
+# ========================================
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: AhrefsSiteAudit
+Disallow: /
+
+User-agent: SemrushSiteAudit
+Disallow: /
+
+# Block empty user agents (often spam bots)
+User-agent: ""
+Disallow: /

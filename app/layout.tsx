@@ -10,6 +10,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://clipvo.site'),
   title: {
     default: "ClipVoBooster - AI Email Marketing with Real-time Tracking",
     template: "%s | ClipVoBooster"

@@ -2,10 +2,52 @@
 
 import Body from "@/app/components/Body/Body";
 import Footer from "@/app/components/Footer/Footer";
+import Script from "next/script";
 
 export default function Landing() {
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ClipVoBooster",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web-based",
+    "offers": {
+      "@type": "Offer",
+      "price": "15.00",
+      "priceCurrency": "USD"
+    },
+    "description": "AI-powered email marketing platform that writes, sends, and tracks professional emails with real-time analytics.",
+    "featureList": "AI email generation, Email tracking, Gmail integration, Contact management, Analytics dashboard",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.8",
+      "ratingCount": "150",
+      "bestRating": "5",
+      "worstRating": "1"
+    },
+    "author": {
+      "@type": "Organization",
+      "name": "ClipVoBooster Team",
+      "url": "https://clipvo.site",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Kigali",
+        "addressCountry": "Rwanda"
+      }
+    },
+    "url": "https://clipvo.site",
+    "image": "https://clipvo.site/og-image.png",
+    "screenshot": "https://clipvo.site/og-image.png"
+  };
+
   return (
     <>
+      <Script
+        id="software-application-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        strategy="afterInteractive"
+      />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@300;400&display=swap');
         /* Scoped to landing-root to avoid overriding global/site styles */
