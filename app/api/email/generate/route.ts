@@ -88,7 +88,7 @@ STRUCTURE (FOLLOW EXACTLY):
 2. Opening paragraph (2-3 sentences): How you found them, genuine compliment about their work/business
 3. Introduction paragraph (3-4 sentences): Who you are, what your company does, why you're reaching out
 4. Value proposition paragraph (4-5 sentences): Detailed explanation of how your product solves their problems, include specific benefits and features
-5. Social proof paragraph (2-3 sentences): Mention results other customers achieved, build credibility
+5. Social proof paragraph (2-3 sentences): Mention results others achieved, build credibility
 6. Call-to-action paragraph (2-3 sentences): Clear, friendly invitation to learn more or visit website
 7. Professional closing with signature
 

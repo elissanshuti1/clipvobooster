@@ -189,7 +189,7 @@ export default function FeaturesClient() {
               Everything you need for<br />successful email marketing
             </h1>
             <p className="features-subtitle">
-              Powerful features to help you create, send, and track professional emails that convert prospects into customers.
+              Powerful features to help you create, send, and track professional emails that connect with your audience.
             </p>
           </div>
 
@@ -275,7 +275,7 @@ export default function FeaturesClient() {
               <div className="feature-icon">👥</div>
               <h2 className="feature-title">Contact Management</h2>
               <p className="feature-desc">
-                Organize your contacts and leads in one place. Easy to add, manage, and reach out to your entire network.
+                Organize your contacts in one place. Easy to add, manage, and reach out to your entire network.
               </p>
               <ul className="feature-list">
                 <li>Import contacts</li>
@@ -292,7 +292,7 @@ export default function FeaturesClient() {
               Ready to transform your email marketing?
             </h2>
             <p className="cta-text">
-              Join thousands of businesses using ClipVoBooster to send better emails and convert more prospects.
+              Join thousands of businesses using ClipVoBooster to send better emails and achieve better results.
             </p>
             <Link href="/api/auth/google" className="cta-button">
               Start Sending Free

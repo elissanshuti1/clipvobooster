@@ -15,7 +15,6 @@ interface Product {
   painPoints: string[];
   uniqueSellingPoint: string;
   status: string;
-  leadsGenerated: number;
   emailsSent: number;
 }
 
@@ -24,7 +23,6 @@ export default function DashboardProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [generatingLeads, setGeneratingLeads] = useState<string | null>(null);
   const [creatingProduct, setCreatingProduct] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
   
@@ -103,20 +101,19 @@ export default function DashboardProducts() {
   };
 
   const deleteProduct = async (productId: string, productName: string) => {
-    if (!confirm(`Delete "${productName}"?\n\nThis will also delete:\n• All ${productName}'s leads\n• All associated campaigns\n\nThis action cannot be undone!`)) {
+    if (!confirm(`Delete "${productName}"?\n\nThis will also delete:\n• All associated campaigns\n\nThis action cannot be undone!`)) {
       return;
     }
-    
+
     try {
       const res = await fetch(`/api/products/${productId}`, {
         method: 'DELETE'
       });
-      
+
       const result = await res.json();
-      
+
       if (res.ok) {
-        // Show success notification instead of alert
-        setNotification({ type: 'success', message: `Deleted "${productName}" and ${result.deletedLeads} leads` });
+        setNotification({ type: 'success', message: `Deleted "${productName}"` });
         setTimeout(() => setNotification(null), 3000);
         loadProducts();
       } else {
@@ -127,39 +124,6 @@ export default function DashboardProducts() {
       console.error('Failed to delete product:', err);
       setNotification({ type: 'error', message: 'Failed to delete product' });
       setTimeout(() => setNotification(null), 3000);
-    }
-  };
-
-  const generateLeads = async (productId: string) => {
-    setGeneratingLeads(productId);
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId })
-      });
-      
-      const data = await res.json();
-      
-      if (res.ok && data.count > 0) {
-        setNotification({ type: 'success', message: `Found ${data.count} REAL people! Redirecting...` });
-        setTimeout(() => {
-          setNotification(null);
-          router.push('/dashboard/leads');
-        }, 1500);
-      } else if (res.ok && data.count === 0) {
-        setNotification({ type: 'error', message: 'No active leads found. Try again later.' });
-        setTimeout(() => setNotification(null), 3000);
-      } else {
-        setNotification({ type: 'error', message: data.error || 'Failed to find leads' });
-        setTimeout(() => setNotification(null), 3000);
-      }
-    } catch (err) {
-      console.error('Failed to find leads:', err);
-      setNotification({ type: 'error', message: 'Network error. Please try again.' });
-      setTimeout(() => setNotification(null), 3000);
-    } finally {
-      setGeneratingLeads(null);
     }
   };
 
@@ -394,10 +358,6 @@ export default function DashboardProducts() {
                 <div className="product-description">{product.description}</div>
                 <div className="product-stats">
                   <div className="stat">
-                    <div className="stat-value">{product.leadsGenerated}</div>
-                    <div className="stat-label">Leads</div>
-                  </div>
-                  <div className="stat">
                     <div className="stat-value">{product.emailsSent}</div>
                     <div className="stat-label">Emails</div>
                   </div>
@@ -407,22 +367,6 @@ export default function DashboardProducts() {
                   </div>
                 </div>
                 <div className="product-actions">
-                  <button
-                    className="action-btn primary"
-                    onClick={() => generateLeads(product._id)}
-                    disabled={generatingLeads === product._id}
-                  >
-                    {generatingLeads === product._id ? '⏳ Generating...' : '🎯 Find Leads'}
-                  </button>
-                  <button
-                    className="action-btn secondary"
-                    onClick={() => {
-                      console.log('Navigating to leads for product:', product._id);
-                      router.push(`/dashboard/leads?productId=${product._id}`);
-                    }}
-                  >
-                    📧 View Leads ({product.leadsGenerated || 0})
-                  </button>
                   <button
                     className="action-btn secondary"
                     onClick={() => deleteProduct(product._id, product.name)}
@@ -440,7 +384,7 @@ export default function DashboardProducts() {
             <div className="empty-state-icon">📦</div>
             <div className="empty-state-title">No products yet</div>
             <div className="empty-state-text">
-              Add your first product to start finding potential customers
+              Add your first product to start managing your email campaigns
             </div>
             <button className="add-btn" onClick={() => setShowAddModal(true)}>
               <span>➕</span> Add Your First Product
@@ -454,7 +398,7 @@ export default function DashboardProducts() {
         <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="modal" onClick={e => e.stopPropagation()}>
             <h2 className="modal-title">Add New Product</h2>
-            <p className="modal-subtitle">Tell us about your product so we can find the right customers</p>
+            <p className="modal-subtitle">Tell us about your product and start managing your email campaigns</p>
             
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -501,7 +445,7 @@ export default function DashboardProducts() {
                   className="form-textarea"
                   value={formData.targetAudience}
                   onChange={e => setFormData({...formData, targetAudience: e.target.value})}
-                  placeholder="Who is your ideal customer? (e.g., Small business owners, marketers, developers)"
+                  placeholder="Who is your ideal audience? (e.g., Small business owners, marketers, developers)"
                 />
               </div>
               

@@ -176,7 +176,7 @@ export default function DashboardAdvertising() {
       <div className="rise">
         <div className="header">
           <h1 className="page-title">🎯 Advertising Methods</h1>
-          <p className="page-subtitle">25+ powerful ways to promote your products and find customers</p>
+          <p className="page-subtitle">25+ powerful ways to promote your products</p>
         </div>
 
         <div className="info-banner rise">
@@ -184,8 +184,8 @@ export default function DashboardAdvertising() {
           <div className="info-content">
             <div className="info-title">How it works</div>
             <div className="info-text">
-              Select any advertising method below to execute it. Our AI will help you create campaigns, 
-              generate content, and find potential customers. Credits are deducted based on the method complexity.
+              Select any advertising method below to execute it. Our AI will help you create campaigns
+              and generate content. Credits are deducted based on the method complexity.
             </div>
           </div>
         </div>

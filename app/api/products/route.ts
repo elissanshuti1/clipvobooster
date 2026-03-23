@@ -32,25 +32,10 @@ export async function GET(req: Request) {
     }
     
     const products = db.collection('products');
-    const leads = db.collection('leads');
-    
+
     const userProducts = await products.find({ userId: String(payload.sub) }).sort({ createdAt: -1 }).toArray();
-    
-    // Get accurate lead count for each product
-    const productsWithLeads = await Promise.all(
-      userProducts.map(async (product) => {
-        const leadCount = await leads.countDocuments({ 
-          productId: product._id,
-          userId: String(payload.sub)
-        });
-        return {
-          ...product,
-          leadsGenerated: leadCount
-        };
-      })
-    );
-    
-    return NextResponse.json(productsWithLeads || []);
+
+    return NextResponse.json(userProducts || []);
   } catch (err: any) {
     console.error('Get products error:', err.message);
     // Check if it's a MongoDB connection error
@@ -114,7 +99,6 @@ export async function POST(req: Request) {
       uniqueSellingPoint: uniqueSellingPoint || '',
       status: 'active',
       creditsSpent: 0,
-      leadsGenerated: 0,
       emailsSent: 0,
       createdAt: new Date(),
       updatedAt: new Date()

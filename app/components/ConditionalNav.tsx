@@ -10,6 +10,11 @@ export default function ConditionalNav() {
   const pathname = usePathname();
   const hasCheckedRef = useRef(false);
 
+  // Don't show nav on admin pages
+  if (pathname?.startsWith('/secure/admin')) {
+    return null;
+  }
+
   const checkAuth = async () => {
     try {
       const r = await fetch('/api/auth/me');

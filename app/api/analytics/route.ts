@@ -38,9 +38,6 @@ export async function GET(req: Request) {
 
     const stats = {
       sent: allEmails.length,
-      opened: allEmails.filter(e => e.opened).length,
-      openRate: allEmails.length > 0 ? Math.round((allEmails.filter(e => e.opened).length / allEmails.length) * 100) : 0,
-      totalOpens: allEmails.reduce((sum, e) => sum + (e.openCount || 0), 0),
       clicked: uniqueClicks,
       clickRate: allEmails.length > 0 ? Math.round((uniqueClicks / allEmails.length) * 100) : 0,
       totalClicks: allClicks.length
@@ -57,9 +54,6 @@ export async function GET(req: Request) {
         to: e.to,
         subject: e.subject,
         status: e.status,
-        opened: e.opened,
-        openedAt: e.openedAt,
-        openCount: e.openCount,
         clickCount: e.clickCount || 0,
         lastClickedAt: e.lastClickedAt,
         sentAt: e.sentAt

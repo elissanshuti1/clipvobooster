@@ -4,6 +4,28 @@ import type { NextRequest } from 'next/server';
 export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get('token');
+  const adminToken = req.cookies.get('admin_token');
+
+  // Admin routes protection
+  if (url.pathname.startsWith('/secure/admin')) {
+    // Add noindex headers for all admin pages
+    const response = NextResponse.next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+    
+    // If trying to access admin login page while already logged in
+    if (adminToken && url.pathname === '/secure/admin') {
+      url.pathname = '/secure/admin/dashboard';
+      return NextResponse.redirect(url);
+    }
+
+    // If not logged in and trying to access admin pages (except login)
+    if (!adminToken && url.pathname !== '/secure/admin') {
+      url.pathname = '/secure/admin';
+      return NextResponse.redirect(url);
+    }
+
+    return response;
+  }
 
   // If user is logged in and trying to access landing page, redirect to dashboard
   if (token && url.pathname === '/') {
@@ -27,5 +49,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/dashboard/:path*', '/login', '/signup', '/pricing'],
+  matcher: ['/', '/dashboard/:path*', '/login', '/signup', '/pricing', '/secure/admin/:path*'],
 };

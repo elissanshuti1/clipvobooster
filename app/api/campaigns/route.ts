@@ -59,29 +59,29 @@ export async function POST(req: Request) {
     }
     
     const body = await req.json();
-    const { name, productId, method, budget, targetLeads, description } = body;
-    
+    const { name, productId, method, budget, targetContacts, description } = body;
+
     const client = await clientPromise;
     const db = client.db('clipvobooster');
-    
+
     // Check if campaigns collection exists, create if not
     const collections = await db.listCollections({ name: 'campaigns' }).toArray();
     if (collections.length === 0) {
       await db.createCollection('campaigns');
     }
-    
+
     const campaigns = db.collection('campaigns');
-    
+
     const campaign = {
       userId: String(payload.sub),
       productId: productId || null,
       name: name || 'Untitled Campaign',
       method: method || 'manual',
       budget: budget || 0,
-      targetLeads: targetLeads || 0,
+      targetContacts: targetContacts || 0,
       description: description || '',
       status: 'draft',
-      leadsContacted: 0,
+      contactsReached: 0,
       emailsSent: 0,
       responses: 0,
       conversions: 0,

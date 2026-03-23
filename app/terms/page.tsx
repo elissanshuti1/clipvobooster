@@ -95,7 +95,7 @@ export default function TermsPage() {
             <div className="legal-section">
               <h2 className="legal-heading">1. Agreement to Terms</h2>
               <p className="legal-text">
-                By accessing or using ClipVoBooster ("the Service"), you agree to be bound by these Terms of Service and all applicable laws and regulations. If you do not agree with any of these terms, you are prohibited from using or accessing this site.
+                By accessing or using ClipVoBooster ("the Service"), you agree to be bound by these Terms of Service and all applicable laws and regulations. These Terms are a legal agreement between you and <strong>Trivora</strong>, the company operating ClipVoBooster. If you do not agree with any of these terms, you are prohibited from using or accessing this site.
               </p>
             </div>
 
@@ -329,7 +329,8 @@ export default function TermsPage() {
                 For questions about these Terms of Service, please contact us at:
               </p>
               <p className="legal-text">
-                <strong>Company:</strong> ClipVoBooster<br />
+                <strong>Legal Entity:</strong> Trivora<br />
+                <strong>Service:</strong> ClipVoBooster<br />
                 <strong>Email:</strong> <a href="mailto:trivora00@gmail.com" style={{ color: '#6366f1', textDecoration: 'none' }}>trivora00@gmail.com</a><br />
                 <strong>Support:</strong> <Link href="/support" style={{ color: '#6366f1', textDecoration: 'none' }}>Visit Support Center</Link>
               </p>

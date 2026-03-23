@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { Suspense } from "react";
 import "./globals.css";
 import ConditionalNav from "@/app/components/ConditionalNav";
+import VisitTracker from "@/app/components/VisitTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -15,8 +17,8 @@ export const metadata: Metadata = {
     default: "ClipVoBooster - AI Email Marketing with Real-time Tracking",
     template: "%s | ClipVoBooster"
   },
-  description: "Turn strangers into paying customers on autopilot. AI-powered email platform that writes, sends, and tracks professional emails. Personalized campaigns, real-time tracking, beautiful designs.",
-  keywords: ["email marketing", "AI emails", "email tracking", "Gmail automation", "business growth", "lead generation", "email analytics", "cold outreach", "personalized email campaigns"],
+  description: "AI-powered email platform that writes, sends, and tracks professional emails. Personalized campaigns, real-time tracking, beautiful designs.",
+  keywords: ["email marketing", "AI emails", "email tracking", "Gmail automation", "business growth", "email analytics", "personalized email campaigns"],
   authors: [{ name: "ClipVoBooster Team" }],
   creator: "ClipVoBooster",
   openGraph: {
@@ -25,7 +27,7 @@ export const metadata: Metadata = {
     url: "https://clipvo.site",
     siteName: "ClipVoBooster",
     title: "ClipVoBooster - AI Email Marketing",
-    description: "Turn strangers into paying customers on autopilot. AI writes, sends, and tracks professional emails.",
+    description: "AI writes, sends, and tracks professional emails.",
     images: [
       {
         url: "/og-image.png",
@@ -38,7 +40,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "ClipVoBooster - AI Email Marketing",
-    description: "Turn strangers into paying customers on autopilot.",
+    description: "AI writes, sends, and tracks professional emails.",
     creator: "@clipvobooster"
   },
   icons: {
@@ -89,6 +91,9 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-[#08090d] text-[#dde1e9] min-h-screen flex flex-col`}
         style={{ background: '#08090d', color: '#dde1e9' }}
       >
+        <Suspense fallback={null}>
+          <VisitTracker />
+        </Suspense>
         <ConditionalNav />
         {/* The flex-grow ensures the footer stays at bottom if content is short */}
         <main className="flex-grow w-full">

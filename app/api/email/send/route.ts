@@ -39,12 +39,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Generate tracking ID
+    // Generate tracking ID for click tracking
     const trackingId = `trk_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-    // Use production URL for tracking (localhost won't work when email is opened elsewhere)
+    // Use production URL for tracking
     const appUrl = process.env.NEXT_PUBLIC_PROD_URL || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     console.log('App URL for tracking:', appUrl);
-    const trackingPixel = `<img src="${appUrl}/api/track?t=${trackingId}" width="1" height="1" style="display:none" />`;
 
     // Add promotion link with user's website from profile
     const senderName = user.profile?.projectName || user.name || user.email.split('@')[0];
@@ -111,9 +110,6 @@ export async function POST(req: Request) {
         }
         ${senderWebsite ? `<div style="text-align:center"><a href="${appUrl}/api/track?t=${trackingId}&u=${encodeURIComponent(senderWebsite)}" class="cta-button" target="_blank">Visit Our Website</a></div>` : ''}
         ${signatureHtml}
-        <div style="text-align:center;margin-top:24px">
-          <img src="${appUrl}/api/track?t=${trackingId}" width="1" height="1" style="display:none;border:0;height:1px;width:1px" alt="" />
-        </div>
       </div>
       <div class="footer">
         <p style="margin:0">This email was sent from ${senderName}.</p>
@@ -122,7 +118,6 @@ export async function POST(req: Request) {
       </div>
     </div>
   </div>
-  ${trackingPixel}
 </body>
 </html>
     `.trim();

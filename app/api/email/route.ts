@@ -9,56 +9,67 @@ export async function POST(req: Request) {
     const cookie = (req as any).headers.get('cookie') || '';
     const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('token='));
     const token = m ? m.split('=')[1] : null;
-    
+
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
+
     let payload;
     try {
       payload = jwt.verify(token, process.env.JWT_SECRET as string);
     } catch (jwtError) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
+
     const body = await req.json();
-    const { leadId, productId, customMessage } = body;
-    
+    const { contactId, productId, customMessage, recipientName, recipientEmail, recipientCompany } = body;
+
     let client;
     let db;
-    let lead;
+    let contact;
     let product;
-    
+
     try {
       client = await clientPromise;
       db = client.db('clipvobooster');
-      
-      const leads = db.collection('leads');
+
+      const contacts = db.collection('contacts');
       const products = db.collection('products');
-      
-      lead = await leads.findOne({ 
-        _id: new ObjectId(leadId),
-        userId: String(payload.sub) 
-      });
-      
-      if (!lead) {
-        return NextResponse.json({ error: 'Lead not found' }, { status: 404 });
+
+      if (contactId) {
+        contact = await contacts.findOne({
+          _id: new ObjectId(contactId),
+          userId: String(payload.sub)
+        });
+      }
+
+      if (productId) {
+        product = await products.findOne({
+          _id: new ObjectId(productId),
+          userId: String(payload.sub)
+        });
+      }
+
+      if (!contact) {
+        contact = { 
+          name: recipientName || 'there', 
+          email: recipientEmail || '', 
+          company: recipientCompany || '' 
+        };
       }
       
-      product = await products.findOne({ 
-        _id: productId ? new ObjectId(productId) : lead.productId,
-        userId: String(payload.sub) 
-      });
+      if (!product) {
+        product = { name: 'Product', description: 'Great product', url: 'https://example.com' };
+      }
     } catch (dbError) {
       console.error('Database error:', dbError);
-      // Continue with lead data we have from the request
-      lead = { name: 'Potential Customer', email: 'contact@company.com', company: 'Company', need: 'Interested in your product' };
+      contact = { name: recipientName || 'there', email: recipientEmail || '', company: recipientCompany || '' };
       product = { name: 'Product', description: 'Great product', url: 'https://example.com' };
     }
-    
+
     // Generate email using AI
     let emailData = { subject: '', body: '' };
-    
+
     try {
       const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
@@ -79,8 +90,7 @@ export async function POST(req: Request) {
               role: 'user',
               content: `Write a personalized outreach email:
 
-RECIPIENT: ${lead.name} from ${lead.company}
-THEIR NEED: ${lead.need}
+RECIPIENT: ${contact.name} from ${contact.company || 'their company'}
 
 PRODUCT: ${product.name}
 DESCRIPTION: ${product.description}
@@ -93,11 +103,11 @@ Format as JSON: {"subject": "...", "body": "..."}`
           temperature: 0.7
         })
       });
-      
+
       if (aiResponse.ok) {
         const aiData = await aiResponse.json();
         const aiContent = aiData.choices?.[0]?.message?.content || '';
-        
+
         try {
           const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
@@ -110,15 +120,15 @@ Format as JSON: {"subject": "...", "body": "..."}`
     } catch (aiError) {
       console.error('AI generation error:', aiError);
     }
-    
+
     // Fallback: Generate email without AI if AI fails
     if (!emailData.subject || !emailData.body) {
-      const firstName = lead.name?.split(' ')[0] || 'there';
+      const firstName = contact.name?.split(' ')[0] || 'there';
       emailData = {
-        subject: `Quick question about ${lead.company || 'your business'}`,
+        subject: `Quick question about ${contact.company || 'your business'}`,
         body: `Hi ${firstName},
 
-I saw that ${lead.company} might be interested in ${product.name}.
+I wanted to reach out about ${product.name}.
 
 ${product.description}
 
@@ -130,33 +140,21 @@ Best regards,
 The Team`
       };
     }
-    
-    // Try to update lead as contacted (non-blocking)
-    try {
-      const leads = db.collection('leads');
-      await leads.updateOne(
-        { _id: new ObjectId(leadId) },
-        { $set: { contacted: true, lastContactedAt: new Date() } }
-      );
-    } catch (e) {
-      console.error('Failed to update lead:', e);
-    }
-    
+
     return NextResponse.json({
       email: emailData,
-      lead: { name: lead.name, email: lead.email },
+      contact: { name: contact.name, email: contact.email },
       product: { name: product.name, url: product.url, description: product.description }
     });
-    
+
   } catch (err: any) {
     console.error('Generate email error:', err.message);
-    // Return a generated email even on error
     return NextResponse.json({
       email: {
         subject: 'Let\'s connect!',
         body: 'Hi there,\n\nI wanted to reach out about our product.\n\nBest regards'
       },
-      lead: { name: 'Lead', email: 'lead@company.com' },
+      contact: { name: 'Contact', email: 'contact@company.com' },
       product: { name: 'Product', url: '', description: '' }
     });
   }

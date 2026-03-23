@@ -21,6 +21,8 @@ Allow: /reset-password
 Disallow: /dashboard
 Disallow: /api
 Disallow: /admin
+Disallow: /secure
+Disallow: /secure/admin
 Disallow: /*?*
 
 # Disallow dynamic parameters that create duplicate content
@@ -48,6 +50,8 @@ Allow: /support
 Disallow: /dashboard
 Disallow: /api
 Disallow: /admin
+Disallow: /secure
+Disallow: /secure/admin
 
 # Allow Google to crawl important pages faster
 # Googlebot supports additional parameters

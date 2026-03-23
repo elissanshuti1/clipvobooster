@@ -488,7 +488,7 @@ export default function Body() {
           </div>
 
           <h1 className="rise d2">
-            Turn Strangers into<br /><em>Paying Customers with Smart Email.</em>
+            Turn Strangers into<br /><em>Connections with Smart Email.</em>
           </h1>
 
           <p className="hero-p rise d3">
@@ -669,7 +669,7 @@ export default function Body() {
         </div>
       </section>
 
-      {/* LIVE LEADS */}
+      {/* REAL-TIME ENGAGEMENT */}
       <section className="sec live-sec" id="live">
         <div className="wrap">
           <div className="live-top">
@@ -715,10 +715,10 @@ export default function Body() {
                 </div>
               </div>
               <p className="card-desc">
-                Sarah clicked through to your pricing page! This lead is showing strong interest. Send a personalized follow-up now.
+                Sarah clicked through to your pricing page! They're showing strong interest. Send a personalized follow-up now.
               </p>
               <div className="cstats">
-                {[{ v: "3", l: "Opens" }, { v: "2", l: "Clicks" }, { v: "Hot", l: "Lead" }].map((s, i) => (
+                {[{ v: "3", l: "Opens" }, { v: "2", l: "Clicks" }, { v: "Hot", l: "Interest" }].map((s, i) => (
                   <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
                 ))}
               </div>
@@ -782,7 +782,7 @@ export default function Body() {
           <div className="nl">
             <div className="nl-text">
               <h2>Ready to Grow Your Business?</h2>
-              <p>Join businesses and creators using ClipVoBooster to convert strangers into loyal customers. Start sending professional emails today.</p>
+              <p>Join businesses and creators using ClipVoBooster to build meaningful connections. Start sending professional emails today.</p>
             </div>
             <div className="nl-form">
               <a href="/api/auth/google" className="nl-btn" style={{ textDecoration: 'none' }}>

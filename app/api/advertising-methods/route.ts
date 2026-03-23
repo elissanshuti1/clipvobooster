@@ -5,8 +5,8 @@ import jwt from 'jsonwebtoken';
 export async function GET(req: Request) {
   try {
     const methods = [
-      { id: 1, name: 'AI Lead Generation', icon: '🤖', description: 'Use AI to find potential customers', credits: 10, category: 'AI' },
-      { id: 2, name: 'Email Outreach', icon: '📧', description: 'Send personalized emails to leads', credits: 5, category: 'Email' },
+      { id: 1, name: 'AI Contact Discovery', icon: '🤖', description: 'Use AI to find potential contacts', credits: 10, category: 'AI' },
+      { id: 2, name: 'Email Outreach', icon: '📧', description: 'Send personalized emails to contacts', credits: 5, category: 'Email' },
       { id: 3, name: 'Social Media Posts', icon: '📱', description: 'Generate viral social media content', credits: 8, category: 'Social' },
       { id: 4, name: 'LinkedIn Automation', icon: '💼', description: 'Connect with professionals on LinkedIn', credits: 15, category: 'Social' },
       { id: 5, name: 'Twitter/X Threads', icon: '🐦', description: 'Create engaging thread sequences', credits: 8, category: 'Social' },
@@ -31,7 +31,7 @@ export async function GET(req: Request) {
       { id: 24, name: 'Partnership Outreach', icon: '🤝', description: 'Find and contact partners', credits: 20, category: 'Growth' },
       { id: 25, name: 'Retargeting Campaign', icon: '🎯', description: 'Set up retargeting strategies', credits: 22, category: 'Ads' },
     ];
-    
+
     return NextResponse.json(methods);
   } catch (err: any) {
     console.error('Get methods error:', err);
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     
     // Get method details
     const methods = [
-      { id: 1, name: 'AI Lead Generation', credits: 10 },
+      { id: 1, name: 'AI Contact Discovery', credits: 10 },
       { id: 2, name: 'Email Outreach', credits: 5 },
       { id: 3, name: 'Social Media Posts', credits: 8 },
       { id: 4, name: 'LinkedIn Automation', credits: 15 },

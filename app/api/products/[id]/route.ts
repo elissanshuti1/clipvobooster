@@ -31,39 +31,32 @@ export async function DELETE(
     const client = await clientPromise;
     const db = client.db('clipvobooster');
     const products = db.collection('products');
-    const leads = db.collection('leads');
     const campaigns = db.collection('campaigns');
-    
+
     // Verify ownership
     const product = await products.findOne({
       _id: new ObjectId(productId),
       userId: String(payload.sub)
     });
-    
+
     if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
-    
-    // Delete all leads for this product
-    const leadsResult = await leads.deleteMany({
-      productId: new ObjectId(productId)
-    });
-    
+
     // Delete all campaigns for this product
     const campaignsResult = await campaigns.deleteMany({
       productId: new ObjectId(productId)
     });
-    
+
     // Delete the product
     await products.deleteOne({
       _id: new ObjectId(productId)
     });
-    
-    console.log(`Deleted product ${product.name}: ${leadsResult.deletedCount} leads, ${campaignsResult.deletedCount} campaigns`);
-    
+
+    console.log(`Deleted product ${product.name}: ${campaignsResult.deletedCount} campaigns`);
+
     return NextResponse.json({
       message: `Deleted "${product.name}" and all associated data`,
-      deletedLeads: leadsResult.deletedCount,
       deletedCampaigns: campaignsResult.deletedCount
     });
     

@@ -6,30 +6,35 @@ import { useRouter } from "next/navigation";
 export default function DashboardOverview() {
   const router = useRouter();
   const [user, setUser] = useState<{ name?: string; email?: string; picture?: string } | null>(null);
-  const [stats, setStats] = useState({ emailsSent: 0, contacts: 0, opens: 0, clicks: 0 });
+  const [stats, setStats] = useState({ emailsSent: 0, contacts: 0, clicks: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [userProfile, setUserProfile] = useState<{ projectName?: string; projectDescription?: string } | null>(null);
 
   const loadStats = async () => {
     try {
-      const [analyticsRes, contactsRes] = await Promise.all([
+      const [analyticsRes, contactsRes, profileRes] = await Promise.all([
         fetch("/api/analytics"),
-        fetch("/api/contacts")
+        fetch("/api/contacts"),
+        fetch("/api/profile")
       ]);
 
       const analyticsData = await analyticsRes.json();
       const contactsData = await contactsRes.json();
+      const profileData = await profileRes.json();
 
       if (analyticsData?.stats) {
         setStats(s => ({
           ...s,
           emailsSent: analyticsData.stats.sent,
-          opens: analyticsData.stats.opened,
           clicks: analyticsData.stats.clicked
         }));
       }
       if (contactsData) {
         setStats(s => ({ ...s, contacts: Array.isArray(contactsData) ? contactsData.length : 0 }));
+      }
+      if (profileData) {
+        setUserProfile(profileData.profile || null);
       }
       return true;
     } catch (err) {
@@ -232,10 +237,6 @@ export default function DashboardOverview() {
               <div className="stat-label">Emails Sent</div>
             </div>
             <div className="stat-card">
-              <div className="stat-value">{stats.opens}</div>
-              <div className="stat-label">Emails Opened</div>
-            </div>
-            <div className="stat-card">
               <div className="stat-value">{stats.clicks}</div>
               <div className="stat-label">Link Clicks</div>
             </div>
@@ -279,7 +280,7 @@ export default function DashboardOverview() {
                 <div style={{ fontSize: 24 }}>1️⃣</div>
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)', marginBottom: 4 }}>Add Contacts</div>
-                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>Upload your customer email list</div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>Upload your contact email list</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 12, alignItems: 'start' }}>

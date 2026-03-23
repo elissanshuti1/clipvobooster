@@ -126,7 +126,7 @@ export default function LoadingDashboard() {
           gap: 16,
           marginTop: 24
         }}>
-          {['🎯 Find Leads', '📧 Email Outreach', '📊 Analytics'].map((hint, i) => (
+          {['📧 Email Outreach', '📊 Analytics', '🎯 Campaigns'].map((hint, i) => (
             <div key={i} style={{
               padding: '8px 16px',
               background: 'var(--bg1)',
