@@ -1,70 +1,70 @@
-'use client';
+import { getPostBySlug, getAllPosts } from "@/lib/blog/utils";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import {
+  Calendar,
+  Clock,
+  User,
+  ArrowLeft,
+  Tag,
+  Share2,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Mail,
+} from "lucide-react";
+import { Metadata } from "next";
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Calendar, Clock, User, ArrowLeft, Tag, Share2, Twitter, Linkedin, Facebook, Mail } from 'lucide-react';
-
-interface BlogPost {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  author: string;
-  category: string;
-  tags: string[];
-  readTime: number;
-  content: string;
+interface PageProps {
+  params: Promise<{ slug: string }>;
 }
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
+export async function generateStaticParams() {
+  const posts = getAllPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
 
-  useEffect(() => {
-    async function loadPost() {
-      try {
-        const response = await fetch(`/api/blog/${params.slug}`);
-        if (response.ok) {
-          const data = await response.json();
-          setPost(data);
-        }
-      } catch (error) {
-        console.error('Error loading post:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (params.slug) {
-      loadPost();
-    }
-  }, [params.slug]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#08090d] flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-400">Loading article...</p>
-        </div>
-      </div>
-    );
-  }
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
 
   if (!post) {
-    return (
-      <div className="min-h-screen bg-[#08090d] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-white mb-4">Article Not Found</h1>
-          <p className="text-gray-400 mb-8">The article you're looking for doesn't exist.</p>
-          <Link href="/blog" className="text-indigo-400 hover:text-indigo-300">
-            ← Back to Blog
-          </Link>
-        </div>
-      </div>
-    );
+    return {
+      title: "Blog Post Not Found",
+    };
+  }
+
+  return {
+    title: `${post.title} | ClipVoBooster Blog`,
+    description: post.excerpt,
+    keywords: post.tags,
+    authors: [{ name: post.author }],
+    openGraph: {
+      title: post.title,
+      description: post.excerpt,
+      type: "article",
+      publishedTime: post.date,
+      authors: [post.author],
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: PageProps) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
+
+  if (!post) {
+    notFound();
   }
 
   const shareUrl = encodeURIComponent(`https://clipvo.site/blog/${post.slug}`);
@@ -75,7 +75,10 @@ export default function BlogPostPage() {
       {/* Header */}
       <header className="border-b border-gray-800">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <Link href="/blog" className="inline-flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-colors mb-8">
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 text-gray-400 hover:text-indigo-400 transition-colors mb-8"
+          >
             <ArrowLeft size={20} />
             <span>Back to Blog</span>
           </Link>
@@ -94,9 +97,7 @@ export default function BlogPostPage() {
             {post.title}
           </h1>
 
-          <p className="text-xl text-gray-300 mb-8">
-            {post.excerpt}
-          </p>
+          <p className="text-xl text-gray-300 mb-8">{post.excerpt}</p>
 
           <div className="flex flex-wrap items-center justify-between gap-4 pb-8">
             <div className="flex items-center gap-6">
@@ -106,7 +107,13 @@ export default function BlogPostPage() {
               </div>
               <div className="flex items-center gap-2 text-gray-400">
                 <Calendar size={16} />
-                <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                <span>
+                  {new Date(post.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </span>
               </div>
             </div>
 
@@ -154,7 +161,7 @@ export default function BlogPostPage() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <div 
+        <div
           className="prose prose-lg prose-invert max-w-none
             prose-headings:text-white prose-headings:font-bold
             prose-h1:text-4xl prose-h1:mb-6 prose-h1:mt-12
@@ -172,42 +179,7 @@ export default function BlogPostPage() {
             prose-td:border prose-td:border-gray-700 prose-td:p-3
             prose-img:rounded-xl prose-img:border prose-img:border-gray-700"
         >
-          {post.content.split('\n').map((paragraph, index) => {
-            // Simple markdown-like parsing
-            if (paragraph.startsWith('# ')) {
-              return <h1 key={index}>{paragraph.slice(2)}</h1>;
-            }
-            if (paragraph.startsWith('## ')) {
-              return <h2 key={index}>{paragraph.slice(3)}</h2>;
-            }
-            if (paragraph.startsWith('### ')) {
-              return <h3 key={index}>{paragraph.slice(4)}</h3>;
-            }
-            if (paragraph.startsWith('- **')) {
-              const match = paragraph.match(/- \*\*(.+?)\*\* - (.+)/);
-              if (match) {
-                return (
-                  <li key={index} className="ml-4">
-                    <strong>{match[1]}</strong> - {match[2]}
-                  </li>
-                );
-              }
-            }
-            if (paragraph.startsWith('- ')) {
-              return <li key={index} className="ml-4">{paragraph.slice(2)}</li>;
-            }
-            if (paragraph.startsWith('|')) {
-              // Skip table rows for now - simplified rendering
-              return null;
-            }
-            if (paragraph.startsWith('```')) {
-              return null;
-            }
-            if (paragraph.trim() === '') {
-              return null;
-            }
-            return <p key={index}>{paragraph}</p>;
-          })}
+          {renderContent(post.content)}
         </div>
 
         {/* Tags */}
@@ -233,7 +205,8 @@ export default function BlogPostPage() {
             Ready to Put These Insights into Practice?
           </h3>
           <p className="text-gray-300 mb-6">
-            Start creating high-converting email campaigns with ClipVoBooster's AI-powered platform.
+            Start creating high-converting email campaigns with ClipVoBooster's
+            AI-powered platform.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -253,4 +226,164 @@ export default function BlogPostPage() {
       </div>
     </article>
   );
+}
+
+// Helper function to render markdown content
+function renderContent(content: string) {
+  const lines = content.split("\n");
+  const elements: JSX.Element[] = [];
+  let inCodeBlock = false;
+  let codeContent: string[] = [];
+  let codeLanguage = "";
+  let listItems: string[] = [];
+  let inList = false;
+  let tableRows: string[] = [];
+  let inTable = false;
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={`list-${elements.length}`}>
+          {listItems.map((item, i) => {
+            // Check for bold text
+            const boldMatch = item.match(/\*\*(.+?)\*\*/);
+            return (
+              <li key={i}>
+                {boldMatch ? (
+                  <>
+                    <strong>{boldMatch[1]}</strong>
+                    {item.replace(boldMatch[0], "").replace("- ", "").trim()}
+                  </>
+                ) : (
+                  item.replace("- ", "")
+                )}
+              </li>
+            );
+          })}
+        </ul>,
+      );
+      listItems = [];
+      inList = false;
+    }
+  };
+
+  const flushTable = () => {
+    if (tableRows.length > 1) {
+      const headers = tableRows[0]
+        .split("|")
+        .filter((cell) => cell.trim())
+        .map((cell) => cell.trim());
+      const dataRows = tableRows.slice(2).map((row) =>
+        row
+          .split("|")
+          .filter((cell) => cell.trim())
+          .map((cell) => cell.trim()),
+      );
+
+      elements.push(
+        <table key={`table-${elements.length}`}>
+          <thead>
+            <tr>
+              {headers.map((header, i) => (
+                <th key={i}>{header}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {dataRows.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>,
+      );
+      tableRows = [];
+      inTable = false;
+    }
+  };
+
+  lines.forEach((line, index) => {
+    // Code blocks
+    if (line.startsWith("```")) {
+      if (!inCodeBlock) {
+        flushList();
+        flushTable();
+        inCodeBlock = true;
+        codeLanguage = line.slice(3);
+        codeContent = [];
+      } else {
+        elements.push(
+          <pre key={index}>
+            <code>{codeContent.join("\n")}</code>
+          </pre>,
+        );
+        inCodeBlock = false;
+      }
+      return;
+    }
+
+    if (inCodeBlock) {
+      codeContent.push(line);
+      return;
+    }
+
+    // Tables
+    if (line.startsWith("|")) {
+      inTable = true;
+      tableRows.push(line);
+      if (!line.includes("---")) {
+        flushList();
+      }
+      return;
+    } else if (inTable) {
+      flushTable();
+    }
+
+    // Empty line
+    if (line.trim() === "") {
+      flushList();
+      return;
+    }
+
+    // Headings
+    if (line.startsWith("### ")) {
+      flushList();
+      elements.push(<h3 key={index}>{line.slice(4)}</h3>);
+    } else if (line.startsWith("## ")) {
+      flushList();
+      elements.push(<h2 key={index}>{line.slice(3)}</h2>);
+    } else if (line.startsWith("# ")) {
+      flushList();
+      elements.push(<h1 key={index}>{line.slice(2)}</h1>);
+    }
+    // List items
+    else if (line.startsWith("- ") || line.startsWith("* ")) {
+      inList = true;
+      listItems.push(line.slice(2));
+    }
+    // Regular paragraph
+    else {
+      flushList();
+      // Check for bold text in paragraph
+      const parts = line.split(/(\*\*.*?\*\*)/g);
+      elements.push(
+        <p key={index}>
+          {parts.map((part, i) => {
+            if (part.startsWith("**") && part.endsWith("**")) {
+              return <strong key={i}>{part.slice(2, -2)}</strong>;
+            }
+            return part;
+          })}
+        </p>,
+      );
+    }
+  });
+
+  flushList();
+  flushTable();
+
+  return elements;
 }
