@@ -26,15 +26,25 @@ export default function AdminUsers() {
   };
 
   const handleSuspend = async (userId: string, email: string) => {
-    if (!confirm(`Suspend user ${email}? They won't be able to access their account.`)) return;
-    
+    if (
+      !confirm(
+        `Suspend user ${email}? They won't be able to access their account.`,
+      )
+    )
+      return;
+
     setActionLoading(userId);
     try {
-      await fetch(`/api/admin/users/${userId}/suspend`, { method: "POST" });
-      loadUsers();
-      alert("User suspended successfully");
-    } catch (error) {
-      alert("Failed to suspend user");
+      const res = await fetch(`/api/admin/users/${userId}/suspend`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to suspend");
+      }
+      await loadUsers();
+    } catch (error: any) {
+      alert(error.message || "Failed to suspend user");
     } finally {
       setActionLoading(null);
     }
@@ -42,29 +52,44 @@ export default function AdminUsers() {
 
   const handleActivate = async (userId: string, email: string) => {
     if (!confirm(`Activate user ${email}?`)) return;
-    
+
     setActionLoading(userId);
     try {
-      await fetch(`/api/admin/users/${userId}/activate`, { method: "POST" });
-      loadUsers();
-      alert("User activated successfully");
-    } catch (error) {
-      alert("Failed to activate user");
+      const res = await fetch(`/api/admin/users/${userId}/activate`, {
+        method: "POST",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to activate");
+      }
+      await loadUsers();
+    } catch (error: any) {
+      alert(error.message || "Failed to activate user");
     } finally {
       setActionLoading(null);
     }
   };
 
   const handleDelete = async (userId: string, email: string) => {
-    if (!confirm(`DELETE user ${email}? This action cannot be undone and all their data will be lost.`)) return;
-    
+    if (
+      !confirm(
+        `DELETE user ${email}? This action cannot be undone and all their data will be lost.`,
+      )
+    )
+      return;
+
     setActionLoading(userId);
     try {
-      await fetch(`/api/admin/users/${userId}`, { method: "DELETE" });
-      loadUsers();
-      alert("User deleted successfully");
-    } catch (error) {
-      alert("Failed to delete user");
+      const res = await fetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete");
+      }
+      await loadUsers();
+    } catch (error: any) {
+      alert(error.message || "Failed to delete user");
     } finally {
       setActionLoading(null);
     }
@@ -73,8 +98,12 @@ export default function AdminUsers() {
   const filteredUsers = users.filter((user: any) => {
     if (filter === "active" && user.isSuspended) return false;
     if (filter === "suspended" && !user.isSuspended) return false;
-    if (searchTerm && !user.email?.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !user.name?.toLowerCase().includes(searchTerm.toLowerCase())) return false;
+    if (
+      searchTerm &&
+      !user.email?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !user.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+      return false;
     return true;
   });
 
@@ -219,7 +248,9 @@ export default function AdminUsers() {
       </div>
 
       {isLoading ? (
-        <div style={{ color: "#fff", textAlign: "center", padding: "40px" }}>Loading...</div>
+        <div style={{ color: "#fff", textAlign: "center", padding: "40px" }}>
+          Loading...
+        </div>
       ) : (
         <table className="users-table">
           <thead>
@@ -236,23 +267,43 @@ export default function AdminUsers() {
             {filteredUsers.map((user: any) => (
               <tr key={user._id}>
                 <td>
-                  <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: "50%",
-                      background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontWeight: 600
-                    }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "12px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: 600,
+                      }}
+                    >
                       {(user.name || user.email).charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontWeight: 500 }}>{user.name || "User"}</span>
+                    <span style={{ fontWeight: 500 }}>
+                      {user.name || "User"}
+                    </span>
                   </div>
                 </td>
                 <td>{user.email}</td>
                 <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                <td>{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</td>
                 <td>
-                  <span className={`status-badge ${user.isSuspended ? "status-suspended" : "status-active"}`}>
+                  {user.lastLogin
+                    ? new Date(user.lastLogin).toLocaleDateString()
+                    : "Never"}
+                </td>
+                <td>
+                  <span
+                    className={`status-badge ${user.isSuspended ? "status-suspended" : "status-active"}`}
+                  >
                     {user.isSuspended ? "Suspended" : "Active"}
                   </span>
                 </td>
