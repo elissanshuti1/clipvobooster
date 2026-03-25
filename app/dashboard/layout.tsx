@@ -6,19 +6,49 @@ import Link from "next/link";
 import NotificationBell from "@/app/components/NotificationBell";
 
 const NAV_ITEMS = [
-  { id: "overview", label: "Overview", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
-  { id: "compose", label: "Compose", icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" },
-  { id: "contacts", label: "Contacts", icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" },
-  { id: "emails", label: "Sent Emails", icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" },
-  { id: "analytics", label: "Analytics", icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" },
-  { id: "settings", label: "Settings", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
+  {
+    id: "overview",
+    label: "Overview",
+    icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+  },
+  {
+    id: "compose",
+    label: "Compose",
+    icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+  },
+  {
+    id: "contacts",
+    label: "Contacts",
+    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z",
+  },
+  {
+    id: "emails",
+    label: "Sent Emails",
+    icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+  },
+  {
+    id: "analytics",
+    label: "Analytics",
+    icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+  },
+  {
+    id: "settings",
+    label: "Settings",
+    icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z",
+  },
 ];
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const [user, setUser] = useState<{ name?: string; email?: string } | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -31,46 +61,53 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           return;
         }
         const userData = await userRes.json();
-        
+
+        // Check if user is suspended
+        if (userData?.isSuspended) {
+          console.log("🚫 User is suspended, redirecting to suspended page");
+          router.push("/account-suspended");
+          return;
+        }
+
         setUser(userData);
-        console.log('✅ Dashboard layout: User loaded:', userData.name);
-        
+        console.log("✅ Dashboard layout: User loaded:", userData.name);
+
         // No subscription check - users can use the app freely
         setIsLoading(false);
       } catch (err) {
-        console.error('Dashboard layout init error:', err);
+        console.error("Dashboard layout init error:", err);
         router.push("/login");
       }
     };
-    
+
     initDashboard();
   }, [router]);
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
       });
-      window.location.href = '/login';
+      window.location.href = "/login";
     } catch (err) {
-      console.error('Logout failed:', err);
-      window.location.href = '/login';
+      console.error("Logout failed:", err);
+      window.location.href = "/login";
     }
   };
 
   const getInitials = (name?: string, email?: string) => {
     if (name) {
-      const firstName = name.split(' ')[0];
+      const firstName = name.split(" ")[0];
       return firstName.charAt(0).toUpperCase();
     }
     if (email) {
       return email.charAt(0).toUpperCase();
     }
-    return 'U';
+    return "U";
   };
 
-  const currentTab = pathname?.split('/').pop() || 'overview';
+  const currentTab = pathname?.split("/").pop() || "overview";
 
   if (isLoading) {
     return (
@@ -84,24 +121,34 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           @keyframes spin { to { transform: rotate(360deg); } }
           @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         `}</style>
-        <div style={{
-          minHeight: '100vh',
-          background: 'var(--bg)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 20
-        }}>
-          <div style={{
-            width: 50,
-            height: 50,
-            border: '4px solid rgba(255,255,255,0.1)',
-            borderTop: '4px solid #6366f1',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite'
-          }} />
-          <p style={{ color: 'var(--muted)', fontSize: 14, animation: 'pulse 2s ease-in-out infinite' }}>
+        <div
+          style={{
+            minHeight: "100vh",
+            background: "var(--bg)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            gap: 20,
+          }}
+        >
+          <div
+            style={{
+              width: 50,
+              height: 50,
+              border: "4px solid rgba(255,255,255,0.1)",
+              borderTop: "4px solid #6366f1",
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+            }}
+          />
+          <p
+            style={{
+              color: "var(--muted)",
+              fontSize: 14,
+              animation: "pulse 2s ease-in-out infinite",
+            }}
+          >
             Loading dashboard...
           </p>
         </div>
@@ -417,11 +464,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="dashboard-shell">
         {/* Sidebar */}
-        <aside className={`dashboard-sidebar ${sidebarOpen ? '' : 'collapsed'}`}>
+        <aside
+          className={`dashboard-sidebar ${sidebarOpen ? "" : "collapsed"}`}
+        >
           {/* Header */}
           <div className="sidebar-header">
             <div className="sidebar-logo">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#08090d" strokeWidth="2.5" strokeLinecap="round">
+              <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="#08090d"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
                 <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
               </svg>
             </div>
@@ -434,9 +491,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Link
                 key={item.id}
                 href={`/dashboard/${item.id}`}
-                className={`nav-link ${currentTab === item.id ? 'active' : ''}`}
+                className={`nav-link ${currentTab === item.id ? "active" : ""}`}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d={item.icon} />
                 </svg>
                 <span className="nav-label">{item.label}</span>
@@ -451,11 +515,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {getInitials(user?.name, user?.email)}
               </div>
               <div className="user-info">
-                <div className="user-name">{user?.name || user?.email?.split('@')[0] || 'User'}</div>
-                <div className="user-email">{user?.email || ''}</div>
+                <div className="user-name">
+                  {user?.name || user?.email?.split("@")[0] || "User"}
+                </div>
+                <div className="user-email">{user?.email || ""}</div>
               </div>
-              <button className="logout-btn" onClick={handleLogout} title="Logout">
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <button
+                className="logout-btn"
+                onClick={handleLogout}
+                title="Logout"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="18"
+                  height="18"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                   <polyline points="16 17 21 12 16 7" />
                   <line x1="21" y1="12" x2="9" y2="12" />
@@ -469,13 +548,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <div className="dashboard-main">
           {/* Topbar */}
           <div className="dashboard-topbar">
-            <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width="18"
+                height="18"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
             <span className="topbar-title">
-              {NAV_ITEMS.find(n => n.id === currentTab)?.label || 'Dashboard'}
+              {NAV_ITEMS.find((n) => n.id === currentTab)?.label || "Dashboard"}
             </span>
             <div className="topbar-right">
               <NotificationBell />
@@ -483,13 +573,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Content */}
-          <div className="dashboard-content">
-            {children}
-          </div>
+          <div className="dashboard-content">{children}</div>
         </div>
       </div>
       {/* Hidden element to pass user data to children */}
-      <div id="user-data" data-user-name={user?.name || ''} data-user-email={user?.email || ''} style={{ display: 'none' }} />
+      <div
+        id="user-data"
+        data-user-name={user?.name || ""}
+        data-user-email={user?.email || ""}
+        style={{ display: "none" }}
+      />
     </>
   );
 }
