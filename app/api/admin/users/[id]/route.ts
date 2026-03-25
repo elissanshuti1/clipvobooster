@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 import { verifyToken } from "@/lib/jwt";
+import { ObjectId } from "mongodb";
 
 export async function DELETE(req: Request) {
   try {
@@ -25,9 +26,12 @@ export async function DELETE(req: Request) {
     const url = new URL(req.url);
     const userId = url.pathname.split("/").slice(-2)[0];
 
+    if (!userId || userId.length !== 24) {
+      return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+    }
+
     const client = await clientPromise;
     const db = client.db("clipvobooster");
-    const ObjectId = require("mongodb").ObjectId;
 
     // Get user email before deleting
     const user = await db
@@ -61,7 +65,7 @@ export async function DELETE(req: Request) {
   } catch (error: any) {
     console.error("Admin delete user error:", error.message);
     return NextResponse.json(
-      { error: "Failed to delete user" },
+      { error: "Failed to delete user: " + error.message },
       { status: 500 },
     );
   }
