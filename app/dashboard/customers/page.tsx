@@ -67,9 +67,9 @@ export default function CustomersPage() {
 
         // Check if we need to auto-generate (if no leads at all)
         if (leadsData.length === 0) {
-          // Auto-generate on first visit
+          // Auto-generate on first visit - pass hasProfileData directly since state isn't updated yet
           console.log("🎯 No leads, generating...");
-          generateLeads();
+          generateLeads(hasProfileData);
         } else {
           console.log("✅ Has leads, showing page");
           setLoading(false);
@@ -84,8 +84,11 @@ export default function CustomersPage() {
     }
   };
 
-  const generateLeads = async () => {
-    if (!hasProfile) {
+  const generateLeads = async (profileCheck = null) => {
+    // Use passed value or fall back to state
+    const hasProf = profileCheck !== null ? profileCheck : hasProfile;
+
+    if (!hasProf) {
       router.push("/dashboard/profile");
       return;
     }
