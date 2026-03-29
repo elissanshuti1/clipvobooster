@@ -17,8 +17,9 @@ function CheckoutContent() {
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
 
   const checkoutId = searchParams.get("checkoutId");
-  const productId = searchParams.get("productId");
+  const priceId = searchParams.get("priceId");
   const plan = searchParams.get("plan");
+  const customerEmail = searchParams.get("email");
 
   const clientToken = "test_14360885662003008ab180a517a";
 
@@ -30,15 +31,14 @@ function CheckoutContent() {
   useEffect(() => {
     addDebug("🔍 Checkout page loaded");
     addDebug(
-      `📋 Params: checkoutId=${checkoutId}, productId=${productId}, plan=${plan}`,
+      `📋 Params: checkoutId=${checkoutId}, priceId=${priceId}, plan=${plan}, email=${customerEmail}`,
     );
 
-    if (!checkoutId || !productId || !plan) {
+    if (!checkoutId || !priceId || !plan) {
       setError("Invalid checkout parameters");
       return;
     }
 
-    // Wait for Paddle to load
     const checkPaddle = setInterval(() => {
       if (window.Paddle) {
         clearInterval(checkPaddle);
@@ -47,7 +47,6 @@ function CheckoutContent() {
       }
     }, 100);
 
-    // Timeout after 10 seconds
     setTimeout(() => {
       if (!window.Paddle) {
         clearInterval(checkPaddle);
@@ -61,6 +60,8 @@ function CheckoutContent() {
   const initializeCheckout = () => {
     try {
       addDebug("🚀 Initializing Paddle...");
+      addDebug(`🔑 Using token: ${clientToken.substring(0, 10)}...`);
+      addDebug(`📦 Price ID: ${priceId}`);
 
       window.Paddle.Environment.set("sandbox");
       addDebug("✅ Environment set to sandbox");
@@ -82,9 +83,11 @@ function CheckoutContent() {
             router.push("/plans?payment=cancelled");
           }
 
-          if (data.name === "error") {
+          if (data.name === "error" || data.error) {
             addDebug(`❌ Error: ${JSON.stringify(data)}`);
-            setError("Payment error occurred");
+            setError(
+              `Payment error: ${data.error?.message || "Unknown error"}`,
+            );
           }
         },
       });
@@ -93,18 +96,31 @@ function CheckoutContent() {
 
       setTimeout(() => {
         try {
-          window.Paddle.Checkout.open({
-            items: [{ priceId: productId, quantity: 1 }],
-            checkout: {
-              settings: {
-                displayMode: "overlay",
-                theme: "dark",
-                allowLogout: false,
-                locale: "en",
-                successUrl: `${window.location.origin}/api/payment/paddle/success?status=success&checkout_id=${checkoutId}`,
-              },
+          const checkoutConfig: any = {
+            settings: {
+              displayMode: "overlay",
+              theme: "dark",
+              allowLogout: false,
+              locale: "en",
+              successUrl: `${window.location.origin}/api/payment/paddle/success?status=success&checkout_id=${checkoutId}`,
             },
-          });
+            items: [
+              {
+                price_id: priceId,
+                quantity: 1,
+              },
+            ],
+          };
+
+          // Add customer email if available
+          if (customerEmail) {
+            checkoutConfig.customer = {
+              email: customerEmail,
+            };
+            addDebug(`👤 Customer email: ${customerEmail}`);
+          }
+
+          window.Paddle.Checkout.open(checkoutConfig);
           addDebug("✅ Checkout opened successfully");
         } catch (openErr: any) {
           addDebug(`❌ Failed to open checkout: ${openErr.message}`);

@@ -5,7 +5,20 @@ import cookie from "cookie";
 
 const MONGODB_URI = process.env.MONGODB_URI || "";
 const JWT_SECRET = process.env.JWT_SECRET || "";
-const PADDLE_CLIENT_TOKEN = process.env.PADDLE_CLIENT_TOKEN || "";
+
+// Get price ID based on plan
+function getPriceId(plan: string): string {
+  switch (plan) {
+    case "starter":
+      return process.env.PADDLE_PRICE_ID_STARTER || "";
+    case "professional":
+      return process.env.PADDLE_PRICE_ID_PROFESSIONAL || "";
+    case "business":
+      return process.env.PADDLE_PRICE_ID_BUSINESS || "";
+    default:
+      return process.env.PADDLE_PRICE_ID_STARTER || "";
+  }
+}
 
 // Get product ID based on plan
 function getProductId(plan: string): string {
@@ -33,7 +46,7 @@ function getPlanDetails(plan: string): {
     case "professional":
       return { name: "Professional", price: 29, interval: "month" };
     case "business":
-      return { name: "Business", price: 99, interval: "month" };
+      return { name: "Business", price: 49, interval: "month" };
     default:
       return { name: "Starter", price: 15, interval: "month" };
   }
@@ -41,7 +54,6 @@ function getPlanDetails(plan: string): {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get user from JWT token
     const cookies = cookie.parse(request.headers.get("cookie") || "");
     const token = cookies.token;
 
@@ -71,24 +83,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const priceId = getPriceId(plan);
     const productId = getProductId(plan);
     const planDetails = getPlanDetails(plan);
 
-    if (!productId) {
+    if (!priceId || !productId) {
       return NextResponse.json(
-        { error: "Product ID not configured for this plan" },
+        { error: "Product/Price ID not configured for this plan" },
         { status: 500 },
       );
     }
 
-    // Connect to MongoDB
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     const db = client.db();
     const users = db.collection("users");
     const checkouts = db.collection("checkouts");
 
-    // Find user
     const user = await users.findOne({ email: decoded.email });
 
     if (!user) {
@@ -96,7 +107,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Check if user already has an active subscription
     if (user.subscription && user.subscription.status === "active") {
       await client.close();
       return NextResponse.json(
@@ -105,7 +115,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create checkout record
     const checkoutId = `chk_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const checkoutData = {
       checkoutId,
@@ -113,6 +122,7 @@ export async function POST(request: NextRequest) {
       email: user.email,
       plan,
       planDetails,
+      priceId,
       productId,
       status: "pending",
       createdAt: new Date(),
@@ -120,15 +130,15 @@ export async function POST(request: NextRequest) {
 
     await checkouts.insertOne(checkoutData);
 
-    // Generate Paddle checkout URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const checkoutUrl = `${baseUrl}/payment/paddle/checkout?checkoutId=${checkoutId}&productId=${productId}&plan=${plan}`;
+    const checkoutUrl = `${baseUrl}/payment/paddle/checkout?checkoutId=${checkoutId}&priceId=${priceId}&plan=${plan}&email=${encodeURIComponent(user.email)}`;
 
     await client.close();
 
     return NextResponse.json({
       checkoutUrl,
       checkoutId,
+      priceId,
       productId,
       plan,
       planDetails,

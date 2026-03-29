@@ -229,7 +229,6 @@ export default function PlansClient() {
       `}</style>
 
       <div className="plans-page">
-        {/* Header */}
         <header className="plans-header">
           <div className="user-info">
             <div className="user-avatar">
@@ -242,7 +241,6 @@ export default function PlansClient() {
           </button>
         </header>
 
-        {/* Main Content */}
         <div className="plans-wrap">
           <div className="plans-header-text">
             <h1 className="plans-title">Choose Your Plan</h1>
@@ -282,14 +280,48 @@ export default function PlansClient() {
                   <CheckIcon />
                   Gmail integration
                 </li>
+                <li>
+                  <CheckIcon />
+                  Basic templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  Email opens & clicks tracking
+                </li>
+                <li>
+                  <CheckIcon />
+                  Basic dashboard
+                </li>
+                <li>
+                  <CheckIcon />
+                  Reddit scanning
+                </li>
               </ul>
               <button
                 className="plans-btn primary"
                 onClick={() => handlePurchase("starter")}
-                disabled={isProcessing === "starter"}
+                disabled={!!subscription || isProcessing === "starter"}
               >
-                {isProcessing === "starter" ? "Processing..." : "Get Started"}
-                {isProcessing !== "starter" && <ArrowIcon />}
+                {isProcessing === "starter" ? (
+                  <>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        border: "2px solid rgba(255,255,255,0.3)",
+                        borderTop: "2px solid white",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ArrowIcon />
+                    Get Started
+                  </>
+                )}
               </button>
             </div>
 
@@ -301,7 +333,7 @@ export default function PlansClient() {
                 $29<span>/month</span>
               </div>
               <p className="plans-desc">
-                For growing businesses scaling their outreach.
+                For growing businesses serious about sales.
               </p>
               <ul className="plans-features">
                 <li>
@@ -310,7 +342,7 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  500 emails/month
+                  1,000 emails/month
                 </li>
                 <li>
                   <CheckIcon />
@@ -326,18 +358,46 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Email templates
+                  Custom templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  A/B testing
+                </li>
+                <li>
+                  <CheckIcon />
+                  Advanced tracking
+                </li>
+                <li>
+                  <CheckIcon />
+                  Team collaboration
                 </li>
               </ul>
               <button
                 className="plans-btn primary"
                 onClick={() => handlePurchase("professional")}
-                disabled={isProcessing === "professional"}
+                disabled={!!subscription || isProcessing === "professional"}
               >
-                {isProcessing === "professional"
-                  ? "Processing..."
-                  : "Get Started"}
-                {isProcessing !== "professional" && <ArrowIcon />}
+                {isProcessing === "professional" ? (
+                  <>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        border: "2px solid rgba(255,255,255,0.3)",
+                        borderTop: "2px solid white",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ArrowIcon />
+                    Get Started
+                  </>
+                )}
               </button>
             </div>
 
@@ -345,7 +405,7 @@ export default function PlansClient() {
             <div className="plans-card">
               <h3 className="plans-name">Business</h3>
               <div className="plans-price">
-                $99<span>/month</span>
+                $49<span>/month</span>
               </div>
               <p className="plans-desc">
                 For teams managing large-scale campaigns.
@@ -361,28 +421,54 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Team Collaboration
-                </li>
-                <li>
-                  <CheckIcon />
-                  Dedicated Support
-                </li>
-                <li>
-                  <CheckIcon />
                   Custom integrations
+                </li>
+                <li>
+                  <CheckIcon />
+                  Dedicated support
                 </li>
                 <li>
                   <CheckIcon />
                   API access
                 </li>
+                <li>
+                  <CheckIcon />
+                  White-label option
+                </li>
+                <li>
+                  <CheckIcon />
+                  Custom reporting
+                </li>
+                <li>
+                  <CheckIcon />
+                  SLA guarantee
+                </li>
               </ul>
               <button
                 className="plans-btn primary"
                 onClick={() => handlePurchase("business")}
-                disabled={isProcessing === "business"}
+                disabled={!!subscription || isProcessing === "business"}
               >
-                {isProcessing === "business" ? "Processing..." : "Get Started"}
-                {isProcessing !== "business" && <ArrowIcon />}
+                {isProcessing === "business" ? (
+                  <>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        border: "2px solid rgba(255,255,255,0.3)",
+                        borderTop: "2px solid white",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ArrowIcon />
+                    Get Started
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -422,7 +508,7 @@ function ArrowIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      <path d="M5 12h14M12 5l7 7-7 7" />
+      <path d="M5 12h14M13 6l6 6-6 6" />
     </svg>
   );
 }
