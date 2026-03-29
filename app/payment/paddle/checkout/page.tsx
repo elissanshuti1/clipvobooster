@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Script from "next/script";
 
 declare global {
@@ -14,8 +14,7 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [error, setError] = useState("");
-  const [isPaddleLoaded, setIsPaddleLoaded] = useState(false);
-  const [isInitializing, setIsInitializing] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
 
   const checkoutId = searchParams.get("checkoutId");
   const productId = searchParams.get("productId");
@@ -23,58 +22,77 @@ function CheckoutContent() {
 
   const clientToken = "test_14360885662003008ab180a517a";
 
-  // Log parameters for debugging
-  useEffect(() => {
-    console.log("🔍 Checkout params:", { checkoutId, productId, plan });
-  }, [checkoutId, productId, plan]);
+  const addDebug = (msg: string) => {
+    console.log(msg);
+    setDebugInfo((prev) => [...prev, msg]);
+  };
 
-  const initializePaddle = useCallback(() => {
-    if (!window.Paddle || isInitializing) {
-      console.log("⚠️ Paddle not ready or already initializing");
+  useEffect(() => {
+    addDebug("🔍 Checkout page loaded");
+    addDebug(
+      `📋 Params: checkoutId=${checkoutId}, productId=${productId}, plan=${plan}`,
+    );
+
+    if (!checkoutId || !productId || !plan) {
+      setError("Invalid checkout parameters");
       return;
     }
 
-    setIsInitializing(true);
+    // Wait for Paddle to load
+    const checkPaddle = setInterval(() => {
+      if (window.Paddle) {
+        clearInterval(checkPaddle);
+        addDebug("✅ Paddle loaded");
+        initializeCheckout();
+      }
+    }, 100);
 
+    // Timeout after 10 seconds
+    setTimeout(() => {
+      if (!window.Paddle) {
+        clearInterval(checkPaddle);
+        setError("Paddle failed to load. Please refresh the page.");
+      }
+    }, 10000);
+
+    return () => clearInterval(checkPaddle);
+  }, []);
+
+  const initializeCheckout = () => {
     try {
-      console.log("🚀 Initializing Paddle...");
+      addDebug("🚀 Initializing Paddle...");
 
-      // Set sandbox environment
       window.Paddle.Environment.set("sandbox");
+      addDebug("✅ Environment set to sandbox");
 
-      // Initialize Paddle
       window.Paddle.Initialize({
         token: clientToken,
         eventCallback: (data: any) => {
-          console.log("📡 Paddle event:", data);
+          addDebug(`📡 Event: ${data.name}`);
 
           if (data.name === "checkout.completed") {
-            console.log("✅ Checkout completed!");
-            const subscriptionId = data.data.subscription_id;
-            const customerId = data.data.customer_id;
-
-            window.location.href = `/api/payment/paddle/success?status=success&subscription_id=${subscriptionId}&customer_id=${customerId}&checkout_id=${checkoutId}`;
+            addDebug("✅ Payment completed!");
+            const subId = data.data.subscription_id;
+            const custId = data.data.customer_id;
+            window.location.href = `/api/payment/paddle/success?status=success&subscription_id=${subId}&customer_id=${custId}&checkout_id=${checkoutId}`;
           }
 
           if (data.name === "checkout.closed") {
-            console.log("❌ Checkout closed");
+            addDebug("❌ Checkout closed");
             router.push("/plans?payment=cancelled");
           }
 
           if (data.name === "error") {
-            console.error("❌ Paddle error:", data);
-            setError("Payment error occurred. Please try again.");
+            addDebug(`❌ Error: ${JSON.stringify(data)}`);
+            setError("Payment error occurred");
           }
         },
       });
 
-      console.log("✅ Paddle initialized, opening checkout...");
+      addDebug("⏳ Opening checkout...");
 
-      // Open checkout after a short delay
       setTimeout(() => {
         try {
-          console.log("🛒 Opening checkout with productId:", productId);
-
           window.Paddle.Checkout.open({
             items: [{ priceId: productId, quantity: 1 }],
             checkout: {
@@ -87,37 +105,17 @@ function CheckoutContent() {
               },
             },
           });
-
-          console.log("✅ Checkout opened successfully");
-        } catch (openError) {
-          console.error("❌ Failed to open checkout:", openError);
-          setError("Failed to open checkout. Please try again.");
+          addDebug("✅ Checkout opened successfully");
+        } catch (openErr: any) {
+          addDebug(`❌ Failed to open checkout: ${openErr.message}`);
+          setError(`Failed to open checkout: ${openErr.message}`);
         }
       }, 500);
-    } catch (initError) {
-      console.error("❌ Failed to initialize Paddle:", initError);
-      setError("Failed to initialize payment. Please refresh the page.");
+    } catch (err: any) {
+      addDebug(`❌ Initialization error: ${err.message}`);
+      setError(`Failed to initialize: ${err.message}`);
     }
-  }, [productId, checkoutId, router, isInitializing]);
-
-  useEffect(() => {
-    if (!checkoutId || !productId || !plan) {
-      setError("Invalid checkout parameters");
-      return;
-    }
-
-    // Initialize Paddle once it's loaded
-    if (isPaddleLoaded && window.Paddle && !isInitializing) {
-      initializePaddle();
-    }
-  }, [
-    isPaddleLoaded,
-    checkoutId,
-    productId,
-    plan,
-    isInitializing,
-    initializePaddle,
-  ]);
+  };
 
   if (error) {
     return (
@@ -130,10 +128,11 @@ function CheckoutContent() {
           justifyContent: "center",
           flexDirection: "column",
           gap: "24px",
+          padding: "24px",
         }}
       >
         <h1 style={{ color: "#f87171", fontSize: "24px" }}>Checkout Error</h1>
-        <p style={{ color: "#8b95a5", maxWidth: "400px", textAlign: "center" }}>
+        <p style={{ color: "#8b95a5", textAlign: "center", maxWidth: "400px" }}>
           {error}
         </p>
         <div style={{ display: "flex", gap: "12px" }}>
@@ -168,6 +167,36 @@ function CheckoutContent() {
             Back to Plans
           </button>
         </div>
+        {debugInfo.length > 0 && (
+          <details
+            style={{ marginTop: "24px", maxWidth: "500px", width: "100%" }}
+          >
+            <summary
+              style={{ cursor: "pointer", color: "#5a6373", fontSize: "13px" }}
+            >
+              Debug Info (click to expand)
+            </summary>
+            <div
+              style={{
+                marginTop: "12px",
+                background: "#0e1018",
+                padding: "16px",
+                borderRadius: "8px",
+                fontSize: "11px",
+                fontFamily: "monospace",
+                color: "#8b95a5",
+                maxHeight: "300px",
+                overflowY: "auto",
+              }}
+            >
+              {debugInfo.map((log, i) => (
+                <div key={i} style={{ padding: "2px 0" }}>
+                  {log}
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
     );
   }
@@ -182,12 +211,7 @@ function CheckoutContent() {
         justifyContent: "center",
       }}
     >
-      <div
-        style={{
-          textAlign: "center",
-          color: "#dde1e9",
-        }}
-      >
+      <div style={{ textAlign: "center", color: "#dde1e9" }}>
         <div
           style={{
             width: 40,
@@ -203,15 +227,9 @@ function CheckoutContent() {
           Opening secure checkout...
         </p>
         <p style={{ color: "#5a6373", fontSize: "13px", marginTop: "8px" }}>
-          Please wait while we prepare your payment
+          Please wait
         </p>
-        <style>{`
-          @keyframes spin {
-            to {
-              transform: rotate(360deg);
-            }
-          }
-        `}</style>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     </div>
   );
@@ -223,12 +241,8 @@ export default function PaddleCheckoutPage() {
       <Script
         src="https://cdn.paddle.com/paddle/v2/paddle.js"
         strategy="lazyOnload"
-        onLoad={() => {
-          console.log("✅ Paddle script loaded");
-        }}
-        onError={() => {
-          console.error("❌ Failed to load Paddle script");
-        }}
+        onLoad={() => console.log("✅ Paddle script loaded")}
+        onError={(e) => console.error("❌ Paddle script failed to load", e)}
       />
       <Suspense
         fallback={
@@ -251,9 +265,7 @@ export default function PaddleCheckoutPage() {
                 animation: "spin 1s linear infinite",
               }}
             />
-            <style>{`
-              @keyframes spin { to { transform: rotate(360deg); } }
-            `}</style>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
           </div>
         }
       >
