@@ -524,6 +524,19 @@ export default function DashboardLayout({
                   {user?.name || user?.email?.split("@")[0] || "User"}
                 </div>
                 <div className="user-email">{user?.email || ""}</div>
+                {user?.subscription && (
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      color: "#10b981",
+                      marginTop: "4px",
+                      fontWeight: 600,
+                    }}
+                  >
+                    ✅ {user.subscription.planName || user.subscription.plan}{" "}
+                    Plan
+                  </div>
+                )}
               </div>
               <button
                 className="logout-btn"

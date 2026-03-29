@@ -12,11 +12,17 @@ export async function GET(request: NextRequest) {
 
   console.log("🎉 Payment Success Callback:", {
     status,
-    subscriptionId,
-    checkoutId,
+    subscriptionId: subscriptionId || "MISSING",
+    customerId: customerId || "MISSING",
+    checkoutId: checkoutId || "MISSING",
   });
 
-  if (status !== "success" || !subscriptionId) {
+  // Check if we have valid subscription_id (not "undefined" string)
+  if (
+    status !== "success" ||
+    !subscriptionId ||
+    subscriptionId === "undefined"
+  ) {
     console.log("❌ Payment failed - invalid status or no subscription ID");
     return NextResponse.redirect(new URL("/plans?payment=failed", request.url));
   }
@@ -28,20 +34,35 @@ export async function GET(request: NextRequest) {
     const users = db.collection("users");
     const checkouts = db.collection("checkouts");
 
-    let checkout;
+    // Find checkout record
+    let checkout = null;
     if (checkoutId) {
       checkout = await checkouts.findOne({ checkoutId });
       console.log("📋 Checkout found:", checkout ? "YES" : "NO");
+      if (checkout) {
+        console.log("  - Plan:", checkout.plan);
+        console.log("  - Email:", checkout.email);
+      }
+    }
+
+    // If no checkoutId, try to find by subscription_id
+    if (!checkout && subscriptionId) {
+      checkout = await checkouts.findOne({ subscriptionId });
+      console.log(
+        "📋 Checkout found by subscriptionId:",
+        checkout ? "YES" : "NO",
+      );
     }
 
     if (!checkout) {
       await client.close();
-      console.log("❌ Checkout not found for ID:", checkoutId);
+      console.log("❌ Checkout not found");
       return NextResponse.redirect(
         new URL("/plans?payment=failed", request.url),
       );
     }
 
+    // Find user by email from checkout
     const user = await users.findOne({ email: checkout.email });
     console.log("👤 User found:", user ? "YES" : "NO");
 
@@ -54,39 +75,49 @@ export async function GET(request: NextRequest) {
     }
 
     // Update checkout status
-    await checkouts.updateOne(
+    const updateResult = await checkouts.updateOne(
       { checkoutId },
       {
         $set: {
           status: "completed",
-          subscriptionId,
-          customerId,
+          subscriptionId: subscriptionId || "unknown",
+          customerId: customerId || "unknown",
           completedAt: new Date(),
         },
       },
     );
-    console.log("✅ Checkout status updated to completed");
+    console.log("✅ Checkout updated:", updateResult.modifiedCount, "document");
+
+    // Get plan details
+    const planName =
+      checkout.planDetails?.name || checkout.plan || "Subscription";
+    const planPrice = checkout.planDetails?.price || 0;
+    const planInterval = checkout.planDetails?.interval || "month";
 
     // Update user's subscription
-    await users.updateOne(
+    const userUpdateResult = await users.updateOne(
       { email: checkout.email },
       {
         $set: {
           subscription: {
             plan: checkout.plan,
-            planName: checkout.planDetails?.name || "Subscription",
-            price: checkout.planDetails?.price || 0,
-            interval: checkout.planDetails?.interval || "month",
+            planName: planName,
+            price: planPrice,
+            interval: planInterval,
             status: "active",
-            subscriptionId,
-            customerId,
-            checkoutId,
+            subscriptionId: subscriptionId || "unknown",
+            customerId: customerId || "unknown",
+            checkoutId: checkoutId || "unknown",
             startDate: new Date(),
           },
         },
       },
     );
-    console.log("✅ User subscription updated in database");
+    console.log(
+      "✅ User subscription updated:",
+      userUpdateResult.modifiedCount,
+      "document",
+    );
 
     await client.close();
 
@@ -94,10 +125,7 @@ export async function GET(request: NextRequest) {
     const successUrl = new URL("/payment/success", request.url);
     successUrl.searchParams.set("subscription_id", subscriptionId);
     successUrl.searchParams.set("plan", checkout.plan);
-    successUrl.searchParams.set(
-      "planName",
-      checkout.planDetails?.name || "Subscription",
-    );
+    successUrl.searchParams.set("planName", planName);
 
     const response = NextResponse.redirect(successUrl);
 

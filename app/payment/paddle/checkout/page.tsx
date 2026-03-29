@@ -70,12 +70,23 @@ function CheckoutContent() {
         token: clientToken,
         eventCallback: (data: any) => {
           addDebug(`📡 Event: ${data.name}`);
+          addDebug(`📦 Event data: ${JSON.stringify(data.data || {})}`);
 
           if (data.name === "checkout.completed") {
             addDebug("✅ Payment completed!");
-            const subId = data.data.subscription_id;
-            const custId = data.data.customer_id;
-            window.location.href = `/api/payment/paddle/success?status=success&subscription_id=${subId}&customer_id=${custId}&checkout_id=${checkoutId}`;
+            const subId = data.data?.subscription_id || data.data?.id;
+            const custId = data.data?.customer_id || data.data?.customer?.id;
+            addDebug(`📋 Subscription ID: ${subId || "MISSING"}`);
+            addDebug(`📋 Customer ID: ${custId || "MISSING"}`);
+
+            if (!subId) {
+              addDebug("❌ No subscription ID in response!");
+              // Still try to redirect with what we have
+            }
+
+            const redirectUrl = `/api/payment/paddle/success?status=success&subscription_id=${subId || ""}&customer_id=${custId || ""}&checkout_id=${checkoutId}`;
+            addDebug(`🔗 Redirecting to: ${redirectUrl}`);
+            window.location.href = redirectUrl;
           }
 
           if (data.name === "checkout.closed") {
