@@ -1,8 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
-import Script from "next/script";
+import { useEffect, useState } from "react";
 
 declare global {
   interface Window {
@@ -10,11 +9,11 @@ declare global {
   }
 }
 
-function CheckoutContent() {
+export default function PaddleCheckoutPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [error, setError] = useState("");
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const checkoutId = searchParams.get("checkoutId");
   const priceId = searchParams.get("priceId");
@@ -23,140 +22,106 @@ function CheckoutContent() {
 
   const clientToken = "test_14360885662003008ab180a517a";
 
-  const addDebug = (msg: string) => {
-    console.log(msg);
-    setDebugInfo((prev) => [...prev, msg]);
-  };
-
   useEffect(() => {
-    addDebug("🔍 Checkout page loaded");
-    addDebug(
-      `📋 Params: checkoutId=${checkoutId}, priceId=${priceId}, plan=${plan}, email=${customerEmail}`,
-    );
+    console.log("🔍 Checkout params:", {
+      checkoutId,
+      priceId,
+      plan,
+      customerEmail,
+    });
 
     if (!checkoutId || !priceId || !plan) {
       setError("Invalid checkout parameters");
       return;
     }
 
-    const checkPaddle = setInterval(() => {
-      if (window.Paddle) {
-        clearInterval(checkPaddle);
-        addDebug("✅ Paddle loaded");
-        initializeCheckout();
-      }
-    }, 100);
+    // Load Paddle script dynamically
+    const script = document.createElement("script");
+    script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
+    script.async = true;
+    script.onload = () => {
+      console.log("✅ Paddle script loaded");
+      setIsLoaded(true);
+    };
+    script.onerror = () => {
+      console.error("❌ Paddle script failed to load");
+      setError("Failed to load payment system. Please refresh.");
+    };
+    document.body.appendChild(script);
 
-    setTimeout(() => {
-      if (!window.Paddle) {
-        clearInterval(checkPaddle);
-        setError("Paddle failed to load. Please refresh the page.");
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
       }
-    }, 10000);
-
-    return () => clearInterval(checkPaddle);
+    };
   }, []);
 
-  const initializeCheckout = () => {
-    try {
-      addDebug("🚀 Initializing Paddle...");
-      addDebug(`🔑 Using token: ${clientToken.substring(0, 10)}...`);
-      addDebug(`📦 Price ID: ${priceId}`);
+  useEffect(() => {
+    if (!isLoaded || !window.Paddle) return;
 
-      window.Paddle.Environment.set("sandbox");
-      addDebug("✅ Environment set to sandbox");
+    console.log("🚀 Initializing Paddle...");
 
-      window.Paddle.Initialize({
-        token: clientToken,
-        eventCallback: (data: any) => {
-          addDebug(`📡 Event: ${data.name}`);
-          addDebug(`📦 Full event data: ${JSON.stringify(data)}`);
+    window.Paddle.Environment.set("sandbox");
 
-          if (data.name === "checkout.completed") {
-            addDebug("✅ Payment completed!");
+    window.Paddle.Initialize({
+      token: clientToken,
+      eventCallback: (data: any) => {
+        console.log("📡 Paddle event:", data.name);
+        console.log("📦 Event data:", JSON.stringify(data.data, null, 2));
 
-            // Paddle v2 returns data differently - check multiple paths
-            const checkoutData = data.data || {};
-            const subscriptionId =
-              checkoutData.subscription_id ||
-              checkoutData.id ||
-              checkoutData.subscription?.id;
-            const customerId =
-              checkoutData.customer_id || checkoutData.customer?.id;
+        if (data.name === "checkout.completed") {
+          console.log("✅ Payment completed!");
+          const subscriptionId = data.data?.subscription_id || data.data?.id;
+          const customerId = data.data?.customer_id || data.data?.customer?.id;
 
-            addDebug(
-              `📋 Extracted Subscription ID: ${subscriptionId || "MISSING"}`,
-            );
-            addDebug(`📋 Extracted Customer ID: ${customerId || "MISSING"}`);
+          console.log("📋 Subscription ID:", subscriptionId);
+          console.log("📋 Customer ID:", customerId);
 
-            if (!subscriptionId) {
-              addDebug("❌ No subscription ID found in response!");
-              addDebug(
-                "📦 Data object keys: " + Object.keys(checkoutData).join(", "),
-              );
-              setError(
-                "Payment completed but no subscription ID received. Please contact support with checkout ID: " +
-                  checkoutId,
-              );
-              return;
-            }
-
-            const redirectUrl = `/api/payment/paddle/success?status=success&subscription_id=${subscriptionId}&customer_id=${customerId || ""}&checkout_id=${checkoutId}`;
-            addDebug(`🔗 Redirecting to: ${redirectUrl}`);
-            window.location.href = redirectUrl;
-          }
-
-          if (data.name === "checkout.closed") {
-            addDebug("❌ Checkout closed");
-            router.push("/plans?payment=cancelled");
-          }
-
-          if (data.name === "error" || data.error) {
-            addDebug(`❌ Error: ${JSON.stringify(data)}`);
+          if (!subscriptionId) {
             setError(
-              `Payment error: ${data.error?.message || "Unknown error"}`,
+              "Payment completed but no subscription ID. Contact support with checkout ID: " +
+                checkoutId,
             );
-          }
-        },
-      });
-
-      addDebug("⏳ Opening checkout...");
-
-      setTimeout(() => {
-        try {
-          const checkoutConfig: any = {
-            settings: {
-              displayMode: "overlay",
-              theme: "dark",
-              allowLogout: false,
-              locale: "en",
-              successUrl: `${window.location.origin}/api/payment/paddle/success?status=success&checkout_id=${checkoutId}`,
-            },
-            items: [
-              {
-                price_id: priceId,
-                quantity: 1,
-              },
-            ],
-          };
-
-          if (customerEmail) {
-            checkoutConfig.customer = { email: customerEmail };
-            addDebug(`👤 Customer email: ${customerEmail}`);
+            return;
           }
 
-          window.Paddle.Checkout.open(checkoutConfig);
-          addDebug("✅ Checkout opened successfully");
-        } catch (openErr: any) {
-          addDebug(`❌ Failed to open checkout: ${openErr.message}`);
-          setError(`Failed to open checkout: ${openErr.message}`);
+          const redirectUrl = `/api/payment/paddle/success?status=success&subscription_id=${subscriptionId}&customer_id=${customerId || ""}&checkout_id=${checkoutId}`;
+          console.log("🔗 Redirecting to:", redirectUrl);
+          window.location.href = redirectUrl;
         }
-      }, 500);
-    } catch (err: any) {
-      addDebug(`❌ Initialization error: ${err.message}`);
-      setError(`Failed to initialize: ${err.message}`);
-    }
-  };
+
+        if (data.name === "checkout.closed") {
+          router.push("/plans?payment=cancelled");
+        }
+
+        if (data.error) {
+          setError("Payment error: " + (data.error.message || "Unknown error"));
+        }
+      },
+    });
+
+    // Open checkout
+    setTimeout(() => {
+      console.log("⏳ Opening checkout...");
+      window.Paddle.Checkout.open({
+        settings: {
+          displayMode: "overlay",
+          theme: "dark",
+          allowLogout: false,
+          locale: "en",
+          successUrl: `${window.location.origin}/api/payment/paddle/success?status=success&checkout_id=${checkoutId}`,
+        },
+        items: [
+          {
+            price_id: priceId,
+            quantity: 1,
+          },
+        ],
+        ...(customerEmail ? { customer: { email: customerEmail } } : {}),
+      });
+      console.log("✅ Checkout opened");
+    }, 300);
+  }, [isLoaded, priceId, checkoutId, customerEmail, router]);
 
   if (error) {
     return (
@@ -172,8 +137,8 @@ function CheckoutContent() {
           padding: "24px",
         }}
       >
-        <h1 style={{ color: "#f87171", fontSize: "24px" }}>Checkout Error</h1>
-        <p style={{ color: "#8b95a5", textAlign: "center", maxWidth: "400px" }}>
+        <h1 style={{ color: "#f87171", fontSize: "24px" }}>Error</h1>
+        <p style={{ color: "#8b95a5", maxWidth: "400px", textAlign: "center" }}>
           {error}
         </p>
         <div style={{ display: "flex", gap: "12px" }}>
@@ -186,11 +151,9 @@ function CheckoutContent() {
               border: "none",
               borderRadius: "10px",
               cursor: "pointer",
-              fontSize: "15px",
-              fontWeight: "600",
             }}
           >
-            Try Again
+            Refresh
           </button>
           <button
             onClick={() => router.push("/plans")}
@@ -201,43 +164,11 @@ function CheckoutContent() {
               border: "1px solid rgba(255,255,255,0.2)",
               borderRadius: "10px",
               cursor: "pointer",
-              fontSize: "15px",
-              fontWeight: "600",
             }}
           >
             Back to Plans
           </button>
         </div>
-        {debugInfo.length > 0 && (
-          <details
-            style={{ marginTop: "24px", maxWidth: "500px", width: "100%" }}
-          >
-            <summary
-              style={{ cursor: "pointer", color: "#5a6373", fontSize: "13px" }}
-            >
-              Debug Info (click to expand)
-            </summary>
-            <div
-              style={{
-                marginTop: "12px",
-                background: "#0e1018",
-                padding: "16px",
-                borderRadius: "8px",
-                fontSize: "11px",
-                fontFamily: "monospace",
-                color: "#8b95a5",
-                maxHeight: "300px",
-                overflowY: "auto",
-              }}
-            >
-              {debugInfo.map((log, i) => (
-                <div key={i} style={{ padding: "2px 0" }}>
-                  {log}
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
       </div>
     );
   }
@@ -267,51 +198,8 @@ function CheckoutContent() {
         <p style={{ color: "#8b95a5", fontSize: "16px" }}>
           Opening secure checkout...
         </p>
-        <p style={{ color: "#5a6373", fontSize: "13px", marginTop: "8px" }}>
-          Please wait
-        </p>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     </div>
-  );
-}
-
-export default function PaddleCheckoutPage() {
-  return (
-    <>
-      <Script
-        src="https://cdn.paddle.com/paddle/v2/paddle.js"
-        strategy="lazyOnload"
-        onLoad={() => console.log("✅ Paddle script loaded")}
-        onError={(e) => console.error("❌ Paddle script failed to load", e)}
-      />
-      <Suspense
-        fallback={
-          <div
-            style={{
-              minHeight: "100vh",
-              background: "#08090d",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                border: "3px solid rgba(255,255,255,0.1)",
-                borderTop: "3px solid #6366f1",
-                borderRadius: "50%",
-                animation: "spin 1s linear infinite",
-              }}
-            />
-            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-          </div>
-        }
-      >
-        <CheckoutContent />
-      </Suspense>
-    </>
   );
 }
