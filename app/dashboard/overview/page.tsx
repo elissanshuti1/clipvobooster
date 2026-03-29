@@ -77,7 +77,9 @@ export default function DashboardOverview() {
       });
 
       if (res.ok) {
-        setHasProfile(true);
+        console.log("✅ Profile saved, reloading page...");
+        // Force reload to re-check profile
+        window.location.reload();
       } else {
         const data = await res.json();
         alert(data.error || "Failed to save profile");
