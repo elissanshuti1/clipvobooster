@@ -70,21 +70,38 @@ function CheckoutContent() {
         token: clientToken,
         eventCallback: (data: any) => {
           addDebug(`📡 Event: ${data.name}`);
-          addDebug(`📦 Event data: ${JSON.stringify(data.data || {})}`);
+          addDebug(`📦 Full event data: ${JSON.stringify(data)}`);
 
           if (data.name === "checkout.completed") {
             addDebug("✅ Payment completed!");
-            const subId = data.data?.subscription_id || data.data?.id;
-            const custId = data.data?.customer_id || data.data?.customer?.id;
-            addDebug(`📋 Subscription ID: ${subId || "MISSING"}`);
-            addDebug(`📋 Customer ID: ${custId || "MISSING"}`);
 
-            if (!subId) {
-              addDebug("❌ No subscription ID in response!");
-              // Still try to redirect with what we have
+            // Paddle v2 returns data differently - check multiple paths
+            const checkoutData = data.data || {};
+            const subscriptionId =
+              checkoutData.subscription_id ||
+              checkoutData.id ||
+              checkoutData.subscription?.id;
+            const customerId =
+              checkoutData.customer_id || checkoutData.customer?.id;
+
+            addDebug(
+              `📋 Extracted Subscription ID: ${subscriptionId || "MISSING"}`,
+            );
+            addDebug(`📋 Extracted Customer ID: ${customerId || "MISSING"}`);
+
+            if (!subscriptionId) {
+              addDebug("❌ No subscription ID found in response!");
+              addDebug(
+                "📦 Data object keys: " + Object.keys(checkoutData).join(", "),
+              );
+              setError(
+                "Payment completed but no subscription ID received. Please contact support with checkout ID: " +
+                  checkoutId,
+              );
+              return;
             }
 
-            const redirectUrl = `/api/payment/paddle/success?status=success&subscription_id=${subId || ""}&customer_id=${custId || ""}&checkout_id=${checkoutId}`;
+            const redirectUrl = `/api/payment/paddle/success?status=success&subscription_id=${subscriptionId}&customer_id=${customerId || ""}&checkout_id=${checkoutId}`;
             addDebug(`🔗 Redirecting to: ${redirectUrl}`);
             window.location.href = redirectUrl;
           }
@@ -123,11 +140,8 @@ function CheckoutContent() {
             ],
           };
 
-          // Add customer email if available
           if (customerEmail) {
-            checkoutConfig.customer = {
-              email: customerEmail,
-            };
+            checkoutConfig.customer = { email: customerEmail };
             addDebug(`👤 Customer email: ${customerEmail}`);
           }
 
