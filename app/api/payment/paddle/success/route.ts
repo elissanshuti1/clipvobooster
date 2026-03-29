@@ -1,20 +1,25 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { MongoClient } from 'mongodb';
+import { NextRequest, NextResponse } from "next/server";
+import { MongoClient } from "mongodb";
 
-const MONGODB_URI = process.env.MONGODB_URI || '';
+const MONGODB_URI = process.env.MONGODB_URI || "";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const status = searchParams.get('status');
-  const subscriptionId = searchParams.get('subscription_id');
-  const customerId = searchParams.get('customer_id');
-  const checkoutId = searchParams.get('checkout_id');
+  const status = searchParams.get("status");
+  const subscriptionId = searchParams.get("subscription_id");
+  const customerId = searchParams.get("customer_id");
+  const checkoutId = searchParams.get("checkout_id");
 
-  // Redirect to pricing page with error if payment failed
-  if (status !== 'success' || !subscriptionId) {
-    return NextResponse.redirect(
-      new URL('/pricing?payment=failed', request.url)
-    );
+  console.log("🎉 Payment Success Callback:", {
+    status,
+    subscriptionId,
+    checkoutId,
+  });
+
+  // Redirect to plans page with error if payment failed
+  if (status !== "success" || !subscriptionId) {
+    console.log("❌ Payment failed - invalid status or no subscription ID");
+    return NextResponse.redirect(new URL("/plans?payment=failed", request.url));
   }
 
   try {
@@ -22,29 +27,33 @@ export async function GET(request: NextRequest) {
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     const db = client.db();
-    const users = db.collection('users');
-    const checkouts = db.collection('checkouts');
+    const users = db.collection("users");
+    const checkouts = db.collection("checkouts");
 
     // Find checkout record
     let checkout;
     if (checkoutId) {
       checkout = await checkouts.findOne({ checkoutId });
+      console.log("📋 Checkout found:", checkout ? "YES" : "NO");
     }
 
     if (!checkout) {
       await client.close();
+      console.log("❌ Checkout not found for ID:", checkoutId);
       return NextResponse.redirect(
-        new URL('/pricing?payment=failed', request.url)
+        new URL("/plans?payment=failed", request.url),
       );
     }
 
     // Find user by email from checkout
     const user = await users.findOne({ email: checkout.email });
+    console.log("👤 User found:", user ? "YES" : "NO");
 
     if (!user) {
       await client.close();
+      console.log("❌ User not found for email:", checkout.email);
       return NextResponse.redirect(
-        new URL('/pricing?payment=failed', request.url)
+        new URL("/plans?payment=failed", request.url),
       );
     }
 
@@ -53,13 +62,14 @@ export async function GET(request: NextRequest) {
       { checkoutId },
       {
         $set: {
-          status: 'completed',
+          status: "completed",
           subscriptionId,
           customerId,
           completedAt: new Date(),
         },
-      }
+      },
     );
+    console.log("✅ Checkout status updated to completed");
 
     // Update user's subscription
     await users.updateOne(
@@ -68,32 +78,35 @@ export async function GET(request: NextRequest) {
         $set: {
           subscription: {
             plan: checkout.plan,
-            planName: checkout.planDetails?.name || 'Subscription',
+            planName: checkout.planDetails?.name || "Subscription",
             price: checkout.planDetails?.price || 0,
-            interval: checkout.planDetails?.interval || 'month',
-            status: 'active',
+            interval: checkout.planDetails?.interval || "month",
+            status: "active",
             subscriptionId,
             customerId,
             checkoutId,
             startDate: new Date(),
           },
         },
-      }
+      },
     );
+    console.log("✅ User subscription updated");
 
     await client.close();
 
     // Redirect to success page with subscription info
-    const successUrl = new URL('/payment/success', request.url);
-    successUrl.searchParams.set('subscription_id', subscriptionId);
-    successUrl.searchParams.set('plan', checkout.plan);
-    successUrl.searchParams.set('planName', checkout.planDetails?.name || 'Subscription');
+    const successUrl = new URL("/payment/success", request.url);
+    successUrl.searchParams.set("subscription_id", subscriptionId);
+    successUrl.searchParams.set("plan", checkout.plan);
+    successUrl.searchParams.set(
+      "planName",
+      checkout.planDetails?.name || "Subscription",
+    );
 
+    console.log("✅ Redirecting to success page");
     return NextResponse.redirect(successUrl);
   } catch (error) {
-    console.error('Paddle success callback error:', error);
-    return NextResponse.redirect(
-      new URL('/pricing?payment=failed', request.url)
-    );
+    console.error("❌ Paddle success callback error:", error);
+    return NextResponse.redirect(new URL("/plans?payment=failed", request.url));
   }
 }
