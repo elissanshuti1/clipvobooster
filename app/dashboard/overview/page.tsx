@@ -27,6 +27,10 @@ export default function DashboardOverview() {
         const userData = userRes.ok ? await userRes.json() : null;
         const profileData = profileRes.ok ? await profileRes.json() : null;
 
+        console.log("📡 User data:", userData);
+        console.log("📡 Profile response:", profileData);
+        console.log("📡 Profile object:", profileData?.profile);
+
         if (!userData) {
           router.push("/login");
           return;
@@ -34,10 +38,20 @@ export default function DashboardOverview() {
 
         setUser(userData);
 
+        // Check if profile exists - check multiple possible field locations
+        const profile = profileData?.profile;
         const hasProfileData = !!(
-          profileData?.profile?.projectName &&
-          profileData?.profile?.projectDescription
+          profile &&
+          (profile.projectName || profile.project?.name) &&
+          (profile.projectDescription || profile.project?.description)
         );
+
+        console.log("📋 Profile check result:", hasProfileData);
+        console.log("📋 Profile fields:", {
+          projectName: profile?.projectName,
+          projectDescription: profile?.projectDescription,
+        });
+
         setHasProfile(hasProfileData);
 
         if (hasProfileData) {
