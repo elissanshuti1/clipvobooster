@@ -121,13 +121,10 @@ export async function GET(request: NextRequest) {
 
     await client.close();
 
-    // Create response with redirect AND cookie update
-    const successUrl = new URL("/payment/success", request.url);
-    successUrl.searchParams.set("subscription_id", subscriptionId);
-    successUrl.searchParams.set("plan", checkout.plan);
-    successUrl.searchParams.set("planName", planName);
+    // Redirect directly to dashboard with cookie update
+    const dashboardUrl = new URL("/dashboard/overview", request.url);
 
-    const response = NextResponse.redirect(successUrl);
+    const response = NextResponse.redirect(dashboardUrl);
 
     // Update the has_subscription cookie to true
     const maxAge = 30 * 24 * 60 * 60; // 30 days
@@ -142,7 +139,7 @@ export async function GET(request: NextRequest) {
     });
 
     console.log("✅ Cookie updated: has_subscription=true");
-    console.log("✅ Redirecting to success page");
+    console.log("✅ Redirecting directly to dashboard");
 
     return response;
   } catch (error) {

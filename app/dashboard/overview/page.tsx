@@ -11,7 +11,9 @@ export default function DashboardOverview() {
   const [hasProfile, setHasProfile] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [projectName, setProjectName] = useState("");
+  const [projectUrl, setProjectUrl] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
+  const [targetAudience, setTargetAudience] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export default function DashboardOverview() {
         }
 
         setUser(userData);
+
         const hasProfileData = !!(
           profileData?.profile?.projectName &&
           profileData?.profile?.projectDescription
@@ -39,7 +42,9 @@ export default function DashboardOverview() {
 
         if (hasProfileData) {
           setProjectName(profileData.profile.projectName || "");
+          setProjectUrl(profileData.profile.projectUrl || "");
           setProjectDescription(profileData.profile.projectDescription || "");
+          setTargetAudience(profileData.profile.targetAudience || "");
         }
 
         setIsLoading(false);
@@ -54,7 +59,7 @@ export default function DashboardOverview() {
 
   const handleSaveProfile = async () => {
     if (!projectName || !projectDescription) {
-      alert("Please fill in both fields");
+      alert("Please fill in at least product name and description");
       return;
     }
 
@@ -65,7 +70,9 @@ export default function DashboardOverview() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectName,
+          projectUrl,
           projectDescription,
+          targetAudience,
         }),
       });
 
@@ -202,7 +209,7 @@ export default function DashboardOverview() {
             </p>
 
             <div className="form-group">
-              <label className="form-label">Product/Project Name</label>
+              <label className="form-label">Product/Project Name *</label>
               <input
                 type="text"
                 className="form-input"
@@ -213,7 +220,18 @@ export default function DashboardOverview() {
             </div>
 
             <div className="form-group">
-              <label className="form-label">Product Description</label>
+              <label className="form-label">Product URL / Website</label>
+              <input
+                type="url"
+                className="form-input"
+                placeholder="https://yourproduct.com"
+                value={projectUrl}
+                onChange={(e) => setProjectUrl(e.target.value)}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Product Description *</label>
               <textarea
                 className="form-textarea"
                 placeholder="Describe what your product does, who it's for, and what problem it solves..."
@@ -222,12 +240,23 @@ export default function DashboardOverview() {
               />
             </div>
 
+            <div className="form-group">
+              <label className="form-label">Target Audience</label>
+              <textarea
+                className="form-textarea"
+                placeholder="Who are your ideal customers? (optional)"
+                value={targetAudience}
+                onChange={(e) => setTargetAudience(e.target.value)}
+                style={{ minHeight: "80px" }}
+              />
+            </div>
+
             <button
               className="btn btn-primary"
               onClick={handleSaveProfile}
               disabled={isSaving || !projectName || !projectDescription}
             >
-              {isSaving ? "Saving..." : "Save & Find Customers"}
+              {isSaving ? "Saving..." : "Save & Start Finding Customers"}
               {!isSaving && (
                 <svg
                   width="20"
