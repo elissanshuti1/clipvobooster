@@ -54,6 +54,21 @@ function getPlanDetails(plan: string): {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log("🔍 Paddle Create Checkout - Starting...");
+    console.log("📋 Env vars check:");
+    console.log(
+      "  - PADDLE_PRICE_ID_STARTER:",
+      process.env.PADDLE_PRICE_ID_STARTER || "❌ NOT SET",
+    );
+    console.log(
+      "  - PADDLE_PRICE_ID_PROFESSIONAL:",
+      process.env.PADDLE_PRICE_ID_PROFESSIONAL || "❌ NOT SET",
+    );
+    console.log(
+      "  - PADDLE_PRICE_ID_BUSINESS:",
+      process.env.PADDLE_PRICE_ID_BUSINESS || "❌ NOT SET",
+    );
+
     const cookies = cookie.parse(request.headers.get("cookie") || "");
     const token = cookies.token;
 
@@ -75,6 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { plan } = await request.json();
+    console.log("📦 Plan requested:", plan);
 
     if (!plan || !["starter", "professional", "business"].includes(plan)) {
       return NextResponse.json(
@@ -87,7 +103,11 @@ export async function POST(request: NextRequest) {
     const productId = getProductId(plan);
     const planDetails = getPlanDetails(plan);
 
-    if (!priceId || !productId) {
+    console.log("🏷️  Price ID for", plan, ":", priceId);
+    console.log("🏷️  Product ID for", plan, ":", productId);
+
+    if (!priceId) {
+      console.error("❌ Price ID is empty for plan:", plan);
       return NextResponse.json(
         { error: "Product/Price ID not configured for this plan" },
         { status: 500 },
@@ -139,7 +159,6 @@ export async function POST(request: NextRequest) {
       checkoutUrl,
       checkoutId,
       priceId,
-      productId,
       plan,
       planDetails,
     });
