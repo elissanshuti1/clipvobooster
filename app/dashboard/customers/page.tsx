@@ -85,14 +85,19 @@ export default function CustomersPage() {
   };
 
   const generateLeads = async (profileCheck = null) => {
+    console.log("🚀 Starting lead generation...");
+    console.log("📋 Profile check:", { profileCheck, hasProfile });
+
     // Use passed value or fall back to state
     const hasProf = profileCheck !== null ? profileCheck : hasProfile;
 
     if (!hasProf) {
+      console.log("❌ No profile, redirecting to /dashboard/profile");
       router.push("/dashboard/profile");
       return;
     }
 
+    console.log("✅ Profile OK, starting generation...");
     setGenerating(true);
     setLoading(true);
     setProgress({
