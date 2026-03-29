@@ -140,6 +140,16 @@ export async function POST(req: Request) {
 
     console.log(`📊 Found ${recentPosts.length} recent posts to analyze`);
 
+    // If no posts found, return error with details
+    if (recentPosts.length === 0) {
+      console.log("⚠️ No recent posts found in target subreddits");
+      return NextResponse.json({
+        error:
+          "No recent posts found. Reddit might be rate limiting. Try again in a few minutes.",
+        newLeadsCount: 0,
+      });
+    }
+
     // Update progress: found posts
     const totalBatches = Math.ceil(recentPosts.length / 10);
     updateProgress(userId, {
