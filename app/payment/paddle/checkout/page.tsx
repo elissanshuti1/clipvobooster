@@ -109,7 +109,7 @@ function CheckoutContent() {
           theme: "dark",
           allowLogout: false,
           locale: "en",
-          successUrl: `${window.location.origin}/api/payment/paddle/success?status=success&checkout_id=${checkoutId}`,
+          // No successUrl - eventCallback handles redirect
         },
         items: [
           {
