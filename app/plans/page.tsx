@@ -226,6 +226,27 @@ export default function PlansClient() {
           opacity: 0.7; cursor: not-allowed;
           transform: none; box-shadow: none;
         }
+        .alert-box {
+          background: rgba(248, 113, 113, 0.1);
+          border: 1px solid rgba(248, 113, 113, 0.3);
+          border-radius: 16px;
+          padding: 20px 24px;
+          margin-bottom: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        .alert-box-title {
+          color: #f87171;
+          font-size: 16px;
+          font-weight: 600;
+          margin-bottom: 4px;
+        }
+        .alert-box-desc {
+          color: #8b95a5;
+          font-size: 14px;
+        }
       `}</style>
 
       <div className="plans-page">
@@ -249,6 +270,46 @@ export default function PlansClient() {
             </p>
           </div>
 
+          {user && !subscription && (
+            <div className="alert-box">
+              <div>
+                <div className="alert-box-title">
+                  📋 You're on the Free Plan
+                </div>
+                <div className="alert-box-desc">
+                  Upgrade to unlock all features and access your dashboard.
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "transparent",
+                  color: "#cbd5e1",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#f87171";
+                  e.currentTarget.style.color = "#f87171";
+                  e.currentTarget.style.background = "rgba(248, 113, 113, 0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                  e.currentTarget.style.color = "#cbd5e1";
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+
           <div className="plans-grid">
             {/* Starter */}
             <div className="plans-card">
@@ -262,19 +323,15 @@ export default function PlansClient() {
               <ul className="plans-features">
                 <li>
                   <CheckIcon />
-                  Unlimited AI Generation
+                  300 emails/month
                 </li>
                 <li>
                   <CheckIcon />
-                  Real-time Email Tracking
+                  100 AI-discovered leads/month
                 </li>
                 <li>
                   <CheckIcon />
-                  Basic Analytics
-                </li>
-                <li>
-                  <CheckIcon />
-                  100 emails/month
+                  AI email writing
                 </li>
                 <li>
                   <CheckIcon />
@@ -346,31 +403,31 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Advanced Analytics
+                  500 AI-discovered leads/month
                 </li>
                 <li>
                   <CheckIcon />
-                  Priority Support
+                  Custom email templates
                 </li>
                 <li>
                   <CheckIcon />
-                  AI email writing
+                  Priority lead discovery
                 </li>
                 <li>
                   <CheckIcon />
-                  Custom templates
+                  Save unlimited leads
                 </li>
                 <li>
                   <CheckIcon />
-                  A/B testing
+                  Real-time notifications
                 </li>
                 <li>
                   <CheckIcon />
-                  Advanced tracking
+                  Advanced analytics dashboard
                 </li>
                 <li>
                   <CheckIcon />
-                  Team collaboration
+                  Priority support
                 </li>
               </ul>
               <button
@@ -417,7 +474,15 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Unlimited emails
+                  5,000 emails/month
+                </li>
+                <li>
+                  <CheckIcon />
+                  2,000 AI-discovered leads/month
+                </li>
+                <li>
+                  <CheckIcon />
+                  Team collaboration tools
                 </li>
                 <li>
                   <CheckIcon />
@@ -425,15 +490,7 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Dedicated support
-                </li>
-                <li>
-                  <CheckIcon />
-                  API access
-                </li>
-                <li>
-                  <CheckIcon />
-                  White-label option
+                  Dedicated account manager
                 </li>
                 <li>
                   <CheckIcon />
@@ -442,6 +499,10 @@ export default function PlansClient() {
                 <li>
                   <CheckIcon />
                   SLA guarantee
+                </li>
+                <li>
+                  <CheckIcon />
+                  White-label option
                 </li>
               </ul>
               <button
