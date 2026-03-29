@@ -5,6 +5,7 @@ export function middleware(req: NextRequest) {
   const url = req.nextUrl.clone();
   const token = req.cookies.get("token");
   const adminToken = req.cookies.get("admin_token");
+  const hasSubscription = req.cookies.get("has_subscription")?.value === "true";
   const isSuspended = req.cookies.get("is_suspended")?.value === "true";
 
   // If user is suspended, redirect to suspended page (except for suspended page itself and logout)
@@ -47,21 +48,41 @@ export function middleware(req: NextRequest) {
     return response;
   }
 
-  // If user is logged in and trying to access landing page, redirect to dashboard
+  // If user is logged in and trying to access landing page, redirect based on subscription
   if (token && url.pathname === "/") {
-    url.pathname = "/dashboard/overview";
+    if (hasSubscription) {
+      url.pathname = "/dashboard/overview";
+    } else {
+      url.pathname = "/plans";
+    }
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in and trying to access login/signup, redirect to dashboard
+  // If user is logged in and trying to access login/signup, redirect based on subscription
   if (token && (url.pathname === "/login" || url.pathname === "/signup")) {
-    url.pathname = "/dashboard/overview";
+    if (hasSubscription) {
+      url.pathname = "/dashboard/overview";
+    } else {
+      url.pathname = "/plans";
+    }
     return NextResponse.redirect(url);
   }
 
   // If user is NOT logged in and trying to access dashboard, redirect to login
   if (!token && url.pathname.startsWith("/dashboard")) {
     url.pathname = "/login";
+    return NextResponse.redirect(url);
+  }
+
+  // If user is logged in WITHOUT subscription and tries to access dashboard, redirect to plans
+  if (token && !hasSubscription && url.pathname.startsWith("/dashboard")) {
+    url.pathname = "/plans";
+    return NextResponse.redirect(url);
+  }
+
+  // If user is logged in WITHOUT subscription and tries to access pricing, redirect to plans
+  if (token && !hasSubscription && url.pathname === "/pricing") {
+    url.pathname = "/plans";
     return NextResponse.redirect(url);
   }
 

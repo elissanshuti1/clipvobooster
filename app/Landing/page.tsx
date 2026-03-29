@@ -8,36 +8,38 @@ export default function Landing() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "name": "ClipVoBooster",
-    "applicationCategory": "BusinessApplication",
-    "operatingSystem": "Web-based",
-    "offers": {
+    name: "ClipVoBooster",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web-based",
+    offers: {
       "@type": "Offer",
-      "price": "15.00",
-      "priceCurrency": "USD"
+      price: "15.00",
+      priceCurrency: "USD",
     },
-    "description": "AI-powered email marketing platform that writes, sends, and tracks professional emails with real-time analytics.",
-    "featureList": "AI email generation, Email tracking, Gmail integration, Contact management, Analytics dashboard",
-    "aggregateRating": {
+    description:
+      "AI-powered customer discovery and email platform. Find people actively looking for your product on Reddit, then reach them with perfect AI-written emails that close deals.",
+    featureList:
+      "AI customer discovery, Reddit lead generation, AI email writing, Email tracking, Gmail integration, Contact management, Analytics dashboard, Deal closing tools",
+    aggregateRating: {
       "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "150",
-      "bestRating": "5",
-      "worstRating": "1"
+      ratingValue: "4.8",
+      ratingCount: "150",
+      bestRating: "5",
+      worstRating: "1",
     },
-    "author": {
+    author: {
       "@type": "Organization",
-      "name": "ClipVoBooster Team",
-      "url": "https://clipvo.site",
-      "address": {
+      name: "ClipVoBooster Team",
+      url: "https://clipvo.site",
+      address: {
         "@type": "PostalAddress",
-        "addressLocality": "Kigali",
-        "addressCountry": "Rwanda"
-      }
+        addressLocality: "Kigali",
+        addressCountry: "Rwanda",
+      },
     },
-    "url": "https://clipvo.site",
-    "image": "https://clipvo.site/og-image.png",
-    "screenshot": "https://clipvo.site/og-image.png"
+    url: "https://clipvo.site",
+    image: "https://clipvo.site/og-image.png",
+    screenshot: "https://clipvo.site/og-image.png",
   };
 
   return (

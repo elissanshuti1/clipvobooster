@@ -189,7 +189,7 @@ export default function PricingClient() {
 
     setIsProcessing(plan);
     try {
-      const res = await fetch("/api/payment/dodo/create", {
+      const res = await fetch("/api/payment/paddle/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
@@ -201,7 +201,7 @@ export default function PricingClient() {
         throw new Error(data.error || "Failed to create checkout");
       }
 
-      // Redirect to Dodo checkout
+      // Redirect to Paddle checkout
       window.location.href = data.checkoutUrl;
     } catch (err: any) {
       console.error("Purchase error:", err);
@@ -591,14 +591,10 @@ export default function PricingClient() {
 
           {/* Header */}
           <div className="pricing-header">
-            <h1 className="pricing-title">
-              Invest in Growth,
-              <br />
-              Not Features.
-            </h1>
+            <h1 className="pricing-title">Simple Pricing. Real Results.</h1>
             <p className="pricing-subtitle">
-              Choose the plan that fits your business. All plans include
-              unlimited AI generation and real-time tracking.
+              Choose the plan that fits your business. All plans include AI
+              customer discovery and email tracking.
             </p>
           </div>
 
@@ -618,6 +614,71 @@ export default function PricingClient() {
             </div>
           )}
 
+          {/* Free Plan Alert - For logged in users without subscription */}
+          {user && !subscription && (
+            <div
+              style={{
+                background: "rgba(248, 113, 113, 0.1)",
+                border: "1px solid rgba(248, 113, 113, 0.3)",
+                borderRadius: "16px",
+                padding: "20px 24px",
+                marginBottom: "40px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "16px",
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    color: "#f87171",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                    marginBottom: "4px",
+                  }}
+                >
+                  📋 You're on the Free Plan
+                </div>
+                <div
+                  style={{
+                    color: "#8b95a5",
+                    fontSize: "14px",
+                  }}
+                >
+                  Upgrade to unlock all features and access your dashboard.
+                </div>
+              </div>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: "10px",
+                  border: "1px solid rgba(255,255,255,0.2)",
+                  background: "transparent",
+                  color: "#cbd5e1",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#f87171";
+                  e.currentTarget.style.color = "#f87171";
+                  e.currentTarget.style.background = "rgba(248, 113, 113, 0.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                  e.currentTarget.style.color = "#cbd5e1";
+                  e.currentTarget.style.background = "transparent";
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          )}
+
           {/* Pricing Cards */}
           <div className="pricing-grid">
             {/* Starter Plan */}
@@ -628,8 +689,7 @@ export default function PricingClient() {
                 <span>/month</span>
               </div>
               <p className="pricing-desc">
-                Perfect for solopreneurs just getting started with email
-                marketing.
+                For solopreneurs finding their first customers.
               </p>
               <ul className="pricing-features">
                 <li>
@@ -645,7 +705,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  100 emails/month
+                  300 emails/month
                 </li>
                 <li>
                   <svg
@@ -660,7 +720,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Unlimited AI generation
+                  100 AI-discovered leads/month
                 </li>
                 <li>
                   <svg
@@ -675,7 +735,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Open & click tracking
+                  AI email writing
                 </li>
                 <li>
                   <svg
@@ -690,7 +750,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Basic analytics
+                  Gmail integration
                 </li>
                 <li>
                   <svg
@@ -705,7 +765,52 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Professional email delivery
+                  Basic templates
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Email opens & clicks tracking
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Basic dashboard
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Reddit scanning
                 </li>
               </ul>
               {subscription?.plan === "starter" ? (
@@ -742,15 +847,7 @@ export default function PricingClient() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <rect
-                          x="1"
-                          y="4"
-                          width="22"
-                          height="16"
-                          rx="2"
-                          ry="2"
-                        />
-                        <line x1="1" y1="10" x2="23" y2="10" />
+                        <path d="M5 12h14M13 6l6 6-6 6" />
                       </svg>
                       Get Started
                     </>
@@ -759,7 +856,7 @@ export default function PricingClient() {
               )}
             </div>
 
-            {/* Pro Plan */}
+            {/* Professional Plan */}
             <div className="pricing-card featured">
               <div className="pricing-badge">Most Popular</div>
               <h3 className="pricing-name">Professional</h3>
@@ -768,25 +865,9 @@ export default function PricingClient() {
                 <span>/month</span>
               </div>
               <p className="pricing-desc">
-                For growing businesses that need more emails and advanced
-                features.
+                For growing businesses serious about sales.
               </p>
               <ul className="pricing-features">
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  500 emails/month
-                </li>
                 <li>
                   <svg
                     className="check-icon"
@@ -815,7 +896,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Advanced analytics
+                  1,000 emails/month
                 </li>
                 <li>
                   <svg
@@ -830,7 +911,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Custom templates
+                  500 AI-discovered leads/month
                 </li>
                 <li>
                   <svg
@@ -845,7 +926,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Priority support
+                  Custom email templates
                 </li>
                 <li>
                   <svg
@@ -860,7 +941,82 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Remove branding
+                  Priority lead discovery
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Save unlimited leads
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Real-time notifications
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Advanced analytics dashboard
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Engagement scoring
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Priority email support
                 </li>
               </ul>
               {subscription?.plan === "professional" ? (
@@ -897,15 +1053,7 @@ export default function PricingClient() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <rect
-                          x="1"
-                          y="4"
-                          width="22"
-                          height="16"
-                          rx="2"
-                          ry="2"
-                        />
-                        <line x1="1" y1="10" x2="23" y2="10" />
+                        <path d="M5 12h14M13 6l6 6-6 6" />
                       </svg>
                       Get Started
                     </>
@@ -914,16 +1062,15 @@ export default function PricingClient() {
               )}
             </div>
 
-            {/* Lifetime Plan */}
+            {/* Business Plan */}
             <div className="pricing-card">
-              <h3 className="pricing-name">Lifetime</h3>
+              <h3 className="pricing-name">Business</h3>
               <div className="pricing-price">
-                $60
-                <span>/one-time</span>
+                $49
+                <span>/month</span>
               </div>
               <p className="pricing-desc">
-                Pay once, use forever. All features, high-volume access. No
-                monthly fees.
+                For agencies and high-volume teams.
               </p>
               <ul className="pricing-features">
                 <li>
@@ -939,7 +1086,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Send personalized emails to contacts
+                  Everything in Professional
                 </li>
                 <li>
                   <svg
@@ -954,7 +1101,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  All Pro features
+                  5,000 emails/month
                 </li>
                 <li>
                   <svg
@@ -969,7 +1116,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Lifetime access
+                  2,000 AI-discovered leads/month
                 </li>
                 <li>
                   <svg
@@ -984,7 +1131,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Early adopter perks
+                  Unlimited email storage
                 </li>
                 <li>
                   <svg
@@ -999,7 +1146,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  VIP support
+                  Unlimited lead storage
                 </li>
                 <li>
                   <svg
@@ -1014,18 +1161,93 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Pay once, own forever
+                  Team lead sharing
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Custom lead filters
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Unlimited analytics
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Historical data (unlimited)
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Dedicated account manager
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  24/7 priority support
                 </li>
               </ul>
-              {subscription?.plan === "lifetime" ? (
+              {subscription?.plan === "business" ? (
                 <div className="current-plan-badge">Current Plan</div>
               ) : (
                 <button
                   className="pricing-btn primary"
-                  onClick={() => handlePurchase("lifetime")}
-                  disabled={!!subscription || isProcessing === "lifetime"}
+                  onClick={() => handlePurchase("business")}
+                  disabled={!!subscription || isProcessing === "business"}
                 >
-                  {isProcessing === "lifetime" ? (
+                  {isProcessing === "business" ? (
                     <>
                       <div
                         style={{
@@ -1051,17 +1273,9 @@ export default function PricingClient() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <rect
-                          x="1"
-                          y="4"
-                          width="22"
-                          height="16"
-                          rx="2"
-                          ry="2"
-                        />
-                        <line x1="1" y1="10" x2="23" y2="10" />
+                        <path d="M5 12h14M13 6l6 6-6 6" />
                       </svg>
-                      Get Lifetime Access
+                      Get Started
                     </>
                   )}
                 </button>

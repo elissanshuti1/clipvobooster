@@ -51,6 +51,19 @@ export async function POST(req: Request) {
     // Check if user has subscription
     const hasSubscription = !!user.subscription;
 
+    // If user doesn't have subscription, mark them as free plan (no subscription)
+    if (!user.subscription) {
+      await users.updateOne(
+        { email: user.email },
+        {
+          $set: {
+            plan: "free",
+            updatedAt: new Date(),
+          },
+        },
+      );
+    }
+
     const resp = NextResponse.json({
       ok: true,
       user: {

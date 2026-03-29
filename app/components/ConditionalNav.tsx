@@ -11,13 +11,13 @@ export default function ConditionalNav() {
   const hasCheckedRef = useRef(false);
 
   // Don't show nav on admin pages
-  if (pathname?.startsWith('/secure/admin')) {
+  if (pathname?.startsWith("/secure/admin")) {
     return null;
   }
 
   const checkAuth = async () => {
     try {
-      const r = await fetch('/api/auth/me');
+      const r = await fetch("/api/auth/me");
       setIsLoggedIn(r.ok);
     } catch {
       setIsLoggedIn(false);
@@ -41,8 +41,12 @@ export default function ConditionalNav() {
     }
   }, [pathname]);
 
-  // Hide nav completely on dashboard pages
-  if (pathname?.startsWith('/dashboard')) {
+  // Hide nav completely on dashboard, plans, and payment pages
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname?.startsWith("/plans") ||
+    pathname?.startsWith("/payment")
+  ) {
     return null;
   }
 

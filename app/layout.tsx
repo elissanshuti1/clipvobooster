@@ -14,19 +14,24 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://clipvo.site"),
   title: {
-    default: "ClipVoBooster - AI Email Marketing with Real-time Tracking",
+    default: "ClipVoBooster - Find Customers & Close Deals with AI",
     template: "%s | ClipVoBooster",
   },
   description:
-    "AI-powered email platform that writes, sends, and tracks professional emails. Personalized campaigns, real-time tracking, beautiful designs.",
+    "Stop chasing customers. Our AI finds people actively looking for products like yours on Reddit, then helps you reach them with perfect emails. Start closing deals today.",
   keywords: [
-    "email marketing",
+    "find customers",
+    "AI customer discovery",
+    "Reddit lead generation",
+    "close deals",
+    "email outreach",
     "AI emails",
-    "email tracking",
-    "Gmail automation",
-    "business growth",
-    "email analytics",
-    "personalized email campaigns",
+    "customer finding tool",
+    "warm leads",
+    "personalized email",
+    "sales automation",
+    "B2B customer acquisition",
+    "SaaS marketing",
   ],
   authors: [{ name: "ClipVoBooster Team" }],
   creator: "ClipVoBooster",
@@ -35,21 +40,23 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: "https://clipvo.site",
     siteName: "ClipVoBooster",
-    title: "ClipVoBooster - AI Email Marketing",
-    description: "AI writes, sends, and tracks professional emails.",
+    title: "ClipVoBooster - Find Customers & Close Deals",
+    description:
+      "AI finds people actively looking for your product. Perfect emails turn them into customers.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "ClipVoBooster - AI Email Marketing",
+        alt: "ClipVoBooster - AI Customer Discovery & Email Marketing",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ClipVoBooster - AI Email Marketing",
-    description: "AI writes, sends, and tracks professional emails.",
+    title: "ClipVoBooster - Find Customers & Close Deals",
+    description:
+      "AI finds people actively looking for your product. Perfect emails turn them into customers.",
     creator: "@clipvobooster",
   },
   icons: {

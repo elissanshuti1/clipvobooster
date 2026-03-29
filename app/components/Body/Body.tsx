@@ -483,32 +483,51 @@ export default function Body() {
           <div className="rise d1">
             <span className="hero-badge">
               <span className="hero-badge-dot" />
-              AI-Powered Email Marketing
+              AI Customer Discovery + Email Outreach
             </span>
           </div>
 
           <h1 className="rise d2">
-            Turn Strangers into<br /><em>Connections with Smart Email.</em>
+            Stop Chasing Customers.
+            <br />
+            <em>Start Closing Deals.</em>
           </h1>
 
           <p className="hero-p rise d3">
-            Get more replies with AI-powered email that writes, sends, and tracks for you.
-            Create professional campaigns that connect with your audience and grow your business.
+            Our AI finds people actively looking for products like yours on
+            Reddit. Then helps you reach them with perfect emails that turn
+            prospects into paying customers.
           </p>
 
           <div className="hero-btns rise d4">
             <a href="/api/auth/google" className="btn-w">
-              Get Started
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              Start Finding Customers
+              <svg
+                viewBox="0 0 24 24"
+                width="13"
+                height="13"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              >
                 <path d="M5 12h14M13 6l6 6-6 6" />
               </svg>
             </a>
-            <a href="#process" className="btn-g">See How It Works</a>
+            <a href="#process" className="btn-g">
+              See How It Works
+            </a>
           </div>
 
           <div className="nums rise d5">
-            <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '14px' }}>
-              Trusted by creators and businesses worldwide
+            <div
+              style={{
+                textAlign: "center",
+                color: "var(--muted)",
+                fontSize: "14px",
+              }}
+            >
+              Trusted by founders and businesses to find warm customers
             </div>
           </div>
         </div>
@@ -518,16 +537,28 @@ export default function Body() {
       <section className="sec" id="process">
         <div className="wrap">
           <span className="eye">How it Works</span>
-          <h2 className="sec-h">Your Email Marketing Partner</h2>
+          <h2 className="sec-h">Find Customers Who Need You</h2>
           <p className="sec-p">
-            Our AI crafts personalized emails that connect with your audience.
-            Track engagement and follow up at the right moment to grow your business.
+            AI discovers people actively looking for products like yours.
+            Perfect emails start the conversation. You close the deals.
           </p>
           <div className="steps-list">
             {[
-              { n: "01", t: "Connect Gmail in 30 seconds", b: "One click to connect your Gmail. We use Google's secure API — your emails send from YOUR address, building trust with every message." },
-              { n: "02", t: "AI writes emails that connect", b: "Tell us about your product. Our AI crafts personalized, professional emails with a natural, conversational tone. Each email includes your website link and branded signature." },
-              { n: "03", t: "Track engagement and grow", b: "Get notifications when someone opens or clicks. See who's interested and follow up at the perfect moment. Focus on closing deals while we handle the emails." },
+              {
+                n: "01",
+                t: "Tell AI About Your Product",
+                b: "Describe what you sell and who needs it. Our AI learns your product to find perfect matches — people who already want what you offer.",
+              },
+              {
+                n: "02",
+                t: "AI Finds Potential Customers",
+                b: "Our AI scans Reddit daily, finding people saying 'I need this' about products like yours. These aren't cold leads — they're warm prospects actively looking.",
+              },
+              {
+                n: "03",
+                t: "Send Perfect Emails & Close",
+                b: "AI writes personalized emails that get replies. Track opens, clicks, and know who's ready to buy. Focus on closing deals while we find customers.",
+              },
             ].map((s) => (
               <div key={s.n} className="step">
                 <span className="step-n">{s.n}</span>
@@ -540,11 +571,29 @@ export default function Body() {
       </section>
 
       {/* PRICING */}
-      <section className="sec" id="pricing" style={{ background: 'var(--bg1)' }}>
+      <section
+        className="sec"
+        id="pricing"
+        style={{ background: "var(--bg1)" }}
+      >
         <div className="wrap">
-          <h2 className="sec-h" style={{ textAlign: 'center', marginBottom: 16 }}>Invest in Growth,<br />Not Features.</h2>
-          <p className="sec-p" style={{ maxWidth: 500, marginBottom: 64, textAlign: 'center', margin: '0 auto 64px' }}>
-            Choose the plan that fits your business. All plans include unlimited AI generation and real-time tracking.
+          <h2
+            className="sec-h"
+            style={{ textAlign: "center", marginBottom: 16 }}
+          >
+            Simple Pricing. Real Results.
+          </h2>
+          <p
+            className="sec-p"
+            style={{
+              maxWidth: 500,
+              marginBottom: 64,
+              textAlign: "center",
+              margin: "0 auto 64px",
+            }}
+          >
+            Choose the plan that fits your business. All plans include AI
+            customer discovery and email tracking.
           </p>
           <div className="pricing-grid">
             {/* Starter Plan */}
@@ -553,114 +602,527 @@ export default function Body() {
               <div className="pricing-price">
                 $15<span>/month</span>
               </div>
-              <p className="pricing-desc">Perfect for solopreneurs just getting started with email marketing.</p>
+              <p className="pricing-desc">
+                For solopreneurs finding their first customers.
+              </p>
               <ul className="pricing-features">
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  100 emails/month
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  300 emails/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Unlimited AI generation
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  100 AI-discovered leads/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Open & click tracking
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  AI email writing
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Basic analytics
-                </li>
-                <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   Gmail integration
                 </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Basic templates
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Email opens & clicks tracking
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Basic dashboard
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Reddit scanning
+                </li>
               </ul>
-              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+              <a
+                href="/api/auth/google"
+                className="pricing-btn primary"
+                style={{ textDecoration: "none" }}
+              >
                 Get Started
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ marginLeft: 4 }}
+                >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </a>
             </div>
 
-            {/* Pro Plan */}
+            {/* Professional Plan */}
             <div className="pricing-card featured">
+              <div className="pricing-badge">Most Popular</div>
               <div className="pricing-name">Professional</div>
               <div className="pricing-price">
                 $29<span>/month</span>
               </div>
-              <p className="pricing-desc">For growing businesses that need more emails and advanced features.</p>
+              <p className="pricing-desc">
+                For growing businesses serious about sales.
+              </p>
               <ul className="pricing-features">
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  500 emails/month
-                </li>
-                <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
                   Everything in Starter
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Advanced analytics
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  1,000 emails/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Custom templates
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  500 AI-discovered leads/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Priority support
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Custom email templates
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Remove branding
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Priority lead discovery
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Save unlimited leads
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Real-time notifications
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Advanced analytics dashboard
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Engagement scoring
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Priority email support
                 </li>
               </ul>
-              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+              <a
+                href="/api/auth/google"
+                className="pricing-btn primary"
+                style={{ textDecoration: "none" }}
+              >
                 Get Started
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ marginLeft: 4 }}
+                >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </a>
             </div>
 
-            {/* Lifetime Plan */}
+            {/* Business Plan */}
             <div className="pricing-card">
-              <div className="pricing-name">Lifetime</div>
+              <div className="pricing-name">Business</div>
               <div className="pricing-price">
-                $60<span style={{ fontSize: 16, color: 'var(--muted)' }}>/one-time</span>
+                $49<span>/month</span>
               </div>
-              <p className="pricing-desc">Pay once, use forever. All features, high-volume access. No monthly fees.</p>
+              <p className="pricing-desc">
+                For agencies and high-volume teams.
+              </p>
               <ul className="pricing-features">
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Send personalized emails to contacts
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Everything in Professional
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  All Pro features
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  5,000 emails/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Lifetime access
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  2,000 AI-discovered leads/month
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Early adopter perks
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Unlimited email storage
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  VIP support
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Unlimited lead storage
                 </li>
                 <li>
-                  <svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>
-                  Pay once, own forever
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Team lead sharing
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Custom lead filters
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Unlimited analytics
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Historical data (unlimited)
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Dedicated account manager
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  24/7 priority support
                 </li>
               </ul>
-              <a href="/pricing" className="pricing-btn primary" style={{ textDecoration: 'none' }}>
+              <a
+                href="/api/auth/google"
+                className="pricing-btn primary"
+                style={{ textDecoration: "none" }}
+              >
                 Get Started
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" style={{ marginLeft: 4 }}>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ marginLeft: 4 }}
+                >
                   <path d="M5 12h14M13 6l6 6-6 6" />
                 </svg>
               </a>
@@ -677,36 +1139,64 @@ export default function Body() {
               <span className="eye">Real-time Intelligence</span>
               <h2 className="sec-h">See When Someone Engages</h2>
             </div>
-            <a href="/dashboard/analytics" className="live-link">See your analytics →</a>
+            <a href="/dashboard/analytics" className="live-link">
+              See your analytics →
+            </a>
           </div>
           <div className="cards">
             {/* Email Opened Card */}
             <div className="card">
-              <div className="ctag"><span className="ctag-dot" />Email Opened</div>
+              <div className="ctag">
+                <span className="ctag-dot" />
+                Email Opened
+              </div>
               <div className="card-head">
                 <div className="card-ico">📩</div>
                 <div>
                   <div className="card-name">john@company.com</div>
-                  <div className="card-sub">Opened "Quick question about your workflow"</div>
+                  <div className="card-sub">
+                    Opened "Quick question about your workflow"
+                  </div>
                 </div>
               </div>
               <p className="card-desc">
-                John opened your email 2 times and spent 45 seconds reading. Perfect time to follow up with a demo offer or case study.
+                John opened your email 2 times and spent 45 seconds reading.
+                Perfect time to follow up with a demo offer or case study.
               </p>
               <div className="cstats">
-                {[{ v: "2", l: "Opens" }, { v: "1", l: "Clicks" }, { v: "Today", l: "Activity" }].map((s, i) => (
-                  <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
+                {[
+                  { v: "2", l: "Opens" },
+                  { v: "1", l: "Clicks" },
+                  { v: "Today", l: "Activity" },
+                ].map((s, i) => (
+                  <div key={i} className="cstat">
+                    <div className="cstat-v">{s.v}</div>
+                    <div className="cstat-l">{s.l}</div>
+                  </div>
                 ))}
               </div>
               <a href="/dashboard/analytics" className="card-act">
                 View Full Details
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
               </a>
             </div>
 
             {/* Link Clicked Card */}
             <div className="card">
-              <div className="ctag"><span className="ctag-dot" />Link Clicked 🔥</div>
+              <div className="ctag">
+                <span className="ctag-dot" />
+                Link Clicked 🔥
+              </div>
               <div className="card-head">
                 <div className="card-ico">🔗</div>
                 <div>
@@ -715,16 +1205,34 @@ export default function Body() {
                 </div>
               </div>
               <p className="card-desc">
-                Sarah clicked through to your pricing page! They're showing strong interest. Send a personalized follow-up now.
+                Sarah clicked through to your pricing page! They're showing
+                strong interest. Send a personalized follow-up now.
               </p>
               <div className="cstats">
-                {[{ v: "3", l: "Opens" }, { v: "2", l: "Clicks" }, { v: "Hot", l: "Interest" }].map((s, i) => (
-                  <div key={i} className="cstat"><div className="cstat-v">{s.v}</div><div className="cstat-l">{s.l}</div></div>
+                {[
+                  { v: "3", l: "Opens" },
+                  { v: "2", l: "Clicks" },
+                  { v: "Hot", l: "Interest" },
+                ].map((s, i) => (
+                  <div key={i} className="cstat">
+                    <div className="cstat-v">{s.v}</div>
+                    <div className="cstat-l">{s.l}</div>
+                  </div>
                 ))}
               </div>
               <a href="/dashboard/analytics" className="card-act">
                 View Full Details
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
               </a>
             </div>
           </div>
@@ -734,8 +1242,14 @@ export default function Body() {
       {/* STATS */}
       <section className="sec">
         <div className="wrap">
-          <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted)' }}>
-            <p style={{ fontSize: '15px', lineHeight: 1.7 }}>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "40px 20px",
+              color: "var(--muted)",
+            }}
+          >
+            <p style={{ fontSize: "15px", lineHeight: 1.7 }}>
               Trusted by creators, solopreneurs, and small businesses worldwide.
             </p>
           </div>
@@ -746,31 +1260,87 @@ export default function Body() {
       <section className="sec" id="features" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <span className="eye">Why ClipVoBooster</span>
-          <h2 className="sec-h">Everything You Need to<br />Grow Your Business.</h2>
+          <h2 className="sec-h">
+            Find Customers. Close Deals.
+            <br />
+            All in One Platform.
+          </h2>
           <div className="feat-grid">
             <div className="feat feat-wide">
               <div className="feat-ico">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="17"
+                  height="17"
+                  fill="none"
+                  stroke="var(--dim)"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                >
+                  <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </div>
-              <h3>AI-Powered Email Writing</h3>
-              <p>Our AI crafts professional emails that get read, remembered, and replied to. Each email includes your website link and sounds natural and conversational.</p>
+              <h3>AI Customer Discovery</h3>
+              <p>
+                Our AI scans Reddit daily, finding people actively looking for
+                products like yours. These aren't cold leads — they're warm
+                prospects who already want what you sell.
+              </p>
               <div className="chips">
-                {["Professional emails", "Natural tone", "Auto website link", "Beautiful HTML design"].map((c) => <span key={c} className="chip">{c}</span>)}
+                {[
+                  "Find warm customers",
+                  "Reddit lead generation",
+                  "AI-powered matching",
+                  "Real-time discovery",
+                ].map((c) => (
+                  <span key={c} className="chip">
+                    {c}
+                  </span>
+                ))}
               </div>
             </div>
             <div className="feat">
               <div className="feat-ico">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="17"
+                  height="17"
+                  fill="none"
+                  stroke="var(--dim)"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                >
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
               </div>
-              <h3>Real-Time Email Tracking</h3>
-              <p>Know when someone opens your email or clicks your link. Get notifications. See who's interested. Follow up at the perfect moment. Close more deals.</p>
+              <h3>Perfect Email Outreach</h3>
+              <p>
+                AI writes personalized emails that get replies. Professional
+                tone, natural language, and your website link included. Turn
+                prospects into customers.
+              </p>
             </div>
             <div className="feat">
               <div className="feat-ico">
-                <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="var(--dim)" strokeWidth="1.6" strokeLinecap="round"><path d="M9 19v-6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2zm0 0V9a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v10m-6 0a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2m0 0V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v14a2 2 0 0 0-2 2h-2a2 2 0 0 0-2-2z" /></svg>
+                <svg
+                  viewBox="0 0 24 24"
+                  width="17"
+                  height="17"
+                  fill="none"
+                  stroke="var(--dim)"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                >
+                  <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
               </div>
-              <h3>Professional Email Design</h3>
-              <p>Beautiful gradient headers, clean typography, prominent CTA buttons, and your branded signature. Every email looks professional and trustworthy.</p>
+              <h3>Real-Time Tracking</h3>
+              <p>
+                Know when someone opens your email or clicks your link. Get
+                notifications. See who's ready to buy. Follow up at the perfect
+                moment.
+              </p>
             </div>
           </div>
         </div>
@@ -781,11 +1351,19 @@ export default function Body() {
         <div className="wrap">
           <div className="nl">
             <div className="nl-text">
-              <h2>Ready to Grow Your Business?</h2>
-              <p>Join businesses and creators using ClipVoBooster to build meaningful connections. Start sending professional emails today.</p>
+              <h2>Ready to Find Customers?</h2>
+              <p>
+                Join founders and businesses using ClipVoBooster to discover
+                warm customers and close more deals. Start finding customers
+                today.
+              </p>
             </div>
             <div className="nl-form">
-              <a href="/api/auth/google" className="nl-btn" style={{ textDecoration: 'none' }}>
+              <a
+                href="/api/auth/google"
+                className="nl-btn"
+                style={{ textDecoration: "none" }}
+              >
                 Get Started
               </a>
             </div>
@@ -794,11 +1372,19 @@ export default function Body() {
       </section>
 
       {/* COMPLIANCE FOOTER */}
-      <section style={{ padding: '40px 52px', textAlign: 'center' }}>
-        <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '700px', margin: '0 auto' }}>
-          ClipVoBooster helps you create and send professional email campaigns. 
-          We support CAN-SPAM and GDPR compliance. You are responsible for obtaining 
-          proper consent from your email recipients.
+      <section style={{ padding: "40px 52px", textAlign: "center" }}>
+        <p
+          style={{
+            fontSize: "13px",
+            color: "var(--muted)",
+            lineHeight: 1.7,
+            maxWidth: "700px",
+            margin: "0 auto",
+          }}
+        >
+          ClipVoBooster helps you create and send professional email campaigns.
+          We support CAN-SPAM and GDPR compliance. You are responsible for
+          obtaining proper consent from your email recipients.
         </p>
       </section>
     </>
