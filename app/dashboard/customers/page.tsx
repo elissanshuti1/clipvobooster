@@ -132,23 +132,26 @@ export default function CustomersPage() {
       setTimeout(() => clearInterval(interval), 120000);
     }, 500);
 
-    // Add timeout - if takes more than 2 minutes, show error
+    // Add timeout - if takes more than 90 seconds, show error
     const timeoutId = setTimeout(() => {
       clearTimeout(pollInterval);
       setGenerating(false);
       setLoading(false);
+      console.error("⏱️ Lead generation timeout");
       alert(
-        "⏱️ Customer discovery is taking longer than expected. Please try again.",
+        "⏱️ Customer discovery is taking too long. Please try again in a few minutes.",
       );
-    }, 120000);
+    }, 90000);
 
     try {
+      console.log("📡 Calling /api/leads/auto-generate...");
       const res = await fetch("/api/leads/auto-generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
 
       const data = await res.json();
+      console.log("📡 API Response:", data);
 
       if (res.ok) {
         clearTimeout(pollInterval);
@@ -201,6 +204,22 @@ export default function CustomersPage() {
       loadData();
     } catch (err) {
       console.error("Failed to delete lead:", err);
+    }
+  };
+
+  const deleteAllLeads = async () => {
+    if (!confirm("⚠️ Delete ALL customers? This cannot be undone.")) {
+      return;
+    }
+
+    try {
+      await fetch("/api/leads?all=true", { method: "DELETE" });
+      setSavedLeads([]);
+      loadData();
+      alert("✅ All customers deleted");
+    } catch (err) {
+      console.error("Failed to delete all leads:", err);
+      alert("❌ Failed to delete customers");
     }
   };
 
@@ -488,13 +507,27 @@ export default function CustomersPage() {
         {/* Header */}
         <div className="page-header">
           <h1 className="page-title">🎯 Potential Customers</h1>
-          <button
-            className="btn btn-primary"
-            onClick={generateLeads}
-            disabled={generating || !hasProfile}
-          >
-            {generating ? "Finding..." : "🎯 Find Customers"}
-          </button>
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+              className="btn btn-danger"
+              onClick={deleteAllLeads}
+              disabled={savedLeads.length === 0}
+              style={{
+                background: "rgba(239, 68, 68, 0.1)",
+                color: "#ef4444",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+              }}
+            >
+              🗑️ Delete All
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={generateLeads}
+              disabled={generating || !hasProfile}
+            >
+              {generating ? "Finding..." : "🎯 Find Customers"}
+            </button>
+          </div>
         </div>
 
         {/* Info Banner */}
