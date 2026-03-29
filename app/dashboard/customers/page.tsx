@@ -64,20 +64,10 @@ export default function CustomersPage() {
 
       if (Array.isArray(leadsData)) {
         setSavedLeads(leadsData);
-
-        // Check if we need to auto-generate (if no leads at all)
-        if (leadsData.length === 0) {
-          // Auto-generate on first visit - pass hasProfileData directly since state isn't updated yet
-          console.log("🎯 No leads, generating...");
-          generateLeads(hasProfileData);
-        } else {
-          console.log("✅ Has leads, showing page");
-          setLoading(false);
-        }
-      } else {
-        console.log("⚠️ Leads data is not an array");
-        setLoading(false);
+        console.log("✅ Has leads, showing page");
       }
+
+      setLoading(false);
     } catch (err) {
       console.error("Failed to load data:", err);
       setLoading(false);
