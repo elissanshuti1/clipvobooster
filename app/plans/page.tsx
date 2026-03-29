@@ -427,7 +427,11 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Priority support
+                  Engagement scoring
+                </li>
+                <li>
+                  <CheckIcon />
+                  Priority email support
                 </li>
               </ul>
               <button
@@ -464,9 +468,7 @@ export default function PlansClient() {
               <div className="plans-price">
                 $49<span>/month</span>
               </div>
-              <p className="plans-desc">
-                For teams managing large-scale campaigns.
-              </p>
+              <p className="plans-desc">For agencies and high-volume teams.</p>
               <ul className="plans-features">
                 <li>
                   <CheckIcon />
@@ -482,11 +484,27 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Team collaboration tools
+                  Unlimited email storage
                 </li>
                 <li>
                   <CheckIcon />
-                  Custom integrations
+                  Unlimited lead storage
+                </li>
+                <li>
+                  <CheckIcon />
+                  Team lead sharing
+                </li>
+                <li>
+                  <CheckIcon />
+                  Custom lead filters
+                </li>
+                <li>
+                  <CheckIcon />
+                  Unlimited analytics
+                </li>
+                <li>
+                  <CheckIcon />
+                  Historical data (unlimited)
                 </li>
                 <li>
                   <CheckIcon />
@@ -494,15 +512,7 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Custom reporting
-                </li>
-                <li>
-                  <CheckIcon />
-                  SLA guarantee
-                </li>
-                <li>
-                  <CheckIcon />
-                  White-label option
+                  24/7 priority support
                 </li>
               </ul>
               <button
