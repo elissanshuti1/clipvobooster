@@ -119,24 +119,10 @@ export async function GET(req: Request) {
     // Check if user has subscription
     const hasSubscription = !!user.subscription;
 
-    // If user doesn't have subscription, mark them as free plan
-    if (!user.subscription) {
-      await users.updateOne(
-        { email: user.email },
-        {
-          $set: {
-            plan: "free",
-            updatedAt: new Date(),
-          },
-        },
-      );
-    }
+    console.log("Created JWT token, redirecting to dashboard");
 
-    console.log("User has subscription:", hasSubscription);
-
-    // Redirect based on subscription status
-    const redirectPath = hasSubscription ? "/dashboard/overview" : "/pricing";
-    const redirectUrl = new URL(redirectPath, req.url);
+    // Always redirect to dashboard - let the dashboard handle showing content
+    const redirectUrl = new URL("/dashboard/overview", req.url);
     redirectUrl.search = ""; // Clear any existing query params
 
     const response = NextResponse.redirect(redirectUrl);
@@ -162,7 +148,7 @@ export async function GET(req: Request) {
       sameSite: "lax",
     });
 
-    console.log("Cookies set, redirecting to:", redirectPath);
+    console.log("Cookies set, redirecting to dashboard");
 
     return response;
   } catch (err: any) {
