@@ -16,21 +16,18 @@ export async function GET(request: NextRequest) {
     checkoutId,
   });
 
-  // Redirect to plans page with error if payment failed
   if (status !== "success" || !subscriptionId) {
     console.log("❌ Payment failed - invalid status or no subscription ID");
     return NextResponse.redirect(new URL("/plans?payment=failed", request.url));
   }
 
   try {
-    // Connect to MongoDB
     const client = new MongoClient(MONGODB_URI);
     await client.connect();
     const db = client.db();
     const users = db.collection("users");
     const checkouts = db.collection("checkouts");
 
-    // Find checkout record
     let checkout;
     if (checkoutId) {
       checkout = await checkouts.findOne({ checkoutId });
@@ -45,7 +42,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Find user by email from checkout
     const user = await users.findOne({ email: checkout.email });
     console.log("👤 User found:", user ? "YES" : "NO");
 
@@ -90,11 +86,11 @@ export async function GET(request: NextRequest) {
         },
       },
     );
-    console.log("✅ User subscription updated");
+    console.log("✅ User subscription updated in database");
 
     await client.close();
 
-    // Redirect to success page with subscription info
+    // Create response with redirect AND cookie update
     const successUrl = new URL("/payment/success", request.url);
     successUrl.searchParams.set("subscription_id", subscriptionId);
     successUrl.searchParams.set("plan", checkout.plan);
@@ -103,8 +99,24 @@ export async function GET(request: NextRequest) {
       checkout.planDetails?.name || "Subscription",
     );
 
+    const response = NextResponse.redirect(successUrl);
+
+    // Update the has_subscription cookie to true
+    const maxAge = 30 * 24 * 60 * 60; // 30 days
+    const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+
+    response.cookies.set("has_subscription", "true", {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+      maxAge: maxAge,
+      sameSite: "lax",
+    });
+
+    console.log("✅ Cookie updated: has_subscription=true");
     console.log("✅ Redirecting to success page");
-    return NextResponse.redirect(successUrl);
+
+    return response;
   } catch (error) {
     console.error("❌ Paddle success callback error:", error);
     return NextResponse.redirect(new URL("/plans?payment=failed", request.url));
