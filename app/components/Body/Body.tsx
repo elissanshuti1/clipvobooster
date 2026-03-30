@@ -664,7 +664,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Gmail integration
+                  5 email templates
                 </li>
                 <li>
                   <svg
@@ -679,7 +679,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Basic templates
+                  Email support
                 </li>
                 <li>
                   <svg
@@ -694,7 +694,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Email opens & clicks tracking
+                  30-day lead storage
                 </li>
                 <li>
                   <svg
@@ -709,7 +709,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Basic dashboard
+                  Basic analytics
                 </li>
                 <li>
                   <svg
@@ -724,7 +724,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Reddit scanning
+                  1 team member
                 </li>
               </ul>
               <a
@@ -817,7 +817,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Custom email templates
+                  Unlimited templates
                 </li>
                 <li>
                   <svg
@@ -832,7 +832,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Priority lead discovery
+                  Priority chat support
                 </li>
                 <li>
                   <svg
@@ -847,7 +847,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Save unlimited leads
+                  90-day lead storage
                 </li>
                 <li>
                   <svg
@@ -862,7 +862,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Real-time notifications
+                  Advanced analytics
                 </li>
                 <li>
                   <svg
@@ -877,37 +877,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Advanced analytics dashboard
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Engagement scoring
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Priority email support
+                  3 team members
                 </li>
               </ul>
               <a
@@ -969,7 +939,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  5,000 emails/month
+                  2,000 emails/month
                 </li>
                 <li>
                   <svg
@@ -984,7 +954,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  2,000 AI-discovered leads/month
+                  1,000 AI-discovered leads/month
                 </li>
                 <li>
                   <svg
@@ -999,7 +969,22 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Unlimited email storage
+                  Unlimited templates
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Dedicated support
                 </li>
                 <li>
                   <svg
@@ -1029,7 +1014,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Team lead sharing
+                  Custom analytics
                 </li>
                 <li>
                   <svg
@@ -1044,67 +1029,7 @@ export default function Body() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Custom lead filters
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited analytics
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Historical data (unlimited)
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Dedicated account manager
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  24/7 priority support
+                  Unlimited team members
                 </li>
               </ul>
               <a
