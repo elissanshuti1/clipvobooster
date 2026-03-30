@@ -6,7 +6,7 @@ import { updateProgress } from "@/lib/progress-store";
 
 const parser = new Parser();
 
-// POST - SMART customer discovery (finds relevant leads for ANY product)
+// POST - SMART customer discovery (industry-aware, finds relevant leads for ANY product)
 export async function POST(req: Request) {
   try {
     const cookie = (req as any).headers.get("cookie") || "";
@@ -58,22 +58,24 @@ export async function POST(req: Request) {
       matchesFound: 0,
     });
 
-    // Analyze product to determine target subreddits and keywords
+    // Analyze product to determine industry
     const descLower = (
       projectDescription +
       " " +
       (targetAudience || "")
     ).toLowerCase();
 
-    // Determine relevant subreddits based on product
+    // Detect industry and select relevant subreddits + keywords
     const subreddits = [];
+    let industry = "general";
+    let industryLabel = "business";
 
-    // SaaS/Software products
+    // SaaS/Software
     if (
       descLower.includes("saas") ||
       descLower.includes("software") ||
       descLower.includes("app") ||
-      descLower.includes("startup") ||
+      descLower.includes("platform") ||
       descLower.includes("founder")
     ) {
       subreddits.push(
@@ -83,88 +85,218 @@ export async function POST(req: Request) {
         "indiehackers",
         "sideproject",
       );
+      industry = "saas";
+      industryLabel = "SaaS founder";
     }
-    // E-commerce/Retail
+    // E-commerce/Retail/Stock/Inventory
     if (
       descLower.includes("ecommerce") ||
       descLower.includes("shopify") ||
       descLower.includes("retail") ||
-      descLower.includes("store") ||
-      descLower.includes("shop")
+      descLower.includes("shop") ||
+      descLower.includes("stock") ||
+      descLower.includes("inventory") ||
+      descLower.includes("seller") ||
+      descLower.includes("warehouse")
     ) {
-      subreddits.push("ecommerce", "shopify", "smallbusiness", "entrepreneur");
+      subreddits.push(
+        "ecommerce",
+        "shopify",
+        "smallbusiness",
+        "entrepreneur",
+        "retail",
+      );
+      industry = "ecommerce";
+      industryLabel = "seller or retailer";
     }
-    // Marketing/Sales tools
+    // Marketing/Sales/Email
     if (
       descLower.includes("marketing") ||
       descLower.includes("sales") ||
+      descLower.includes("email") ||
       descLower.includes("lead") ||
-      descLower.includes("email")
+      descLower.includes("outreach")
     ) {
-      subreddits.push("marketing", "sales", "smallbusiness", "entrepreneur");
+      subreddits.push(
+        "marketing",
+        "sales",
+        "smallbusiness",
+        "entrepreneur",
+        "digitalmarketing",
+      );
+      industry = "marketing";
+      industryLabel = "marketer or sales professional";
     }
-    // Inventory/Stock management
-    if (
-      descLower.includes("stock") ||
-      descLower.includes("inventory") ||
-      descLower.includes("warehouse")
-    ) {
-      subreddits.push("smallbusiness", "entrepreneur", "logistics");
-    }
-    // Content creators
+    // Content Creators
     if (
       descLower.includes("creator") ||
       descLower.includes("youtube") ||
       descLower.includes("content") ||
-      descLower.includes("influencer")
+      descLower.includes("influencer") ||
+      descLower.includes("tiktok")
     ) {
       subreddits.push(
         "NewTubers",
         "youtube",
         "ContentCreators",
         "entrepreneur",
+        "socialmedia",
       );
+      industry = "creator";
+      industryLabel = "content creator";
     }
-    // Real estate
+    // Real Estate
     if (
       descLower.includes("real estate") ||
       descLower.includes("property") ||
-      descLower.includes("realtor")
+      descLower.includes("realtor") ||
+      descLower.includes("rental")
     ) {
-      subreddits.push("realtors", "realestate", "smallbusiness");
+      subreddits.push(
+        "realtors",
+        "realestate",
+        "smallbusiness",
+        "entrepreneur",
+      );
+      industry = "realestate";
+      industryLabel = "real estate professional";
     }
     // Finance/Accounting
     if (
       descLower.includes("finance") ||
       descLower.includes("accounting") ||
       descLower.includes("invoice") ||
-      descLower.includes("tax")
+      descLower.includes("tax") ||
+      descLower.includes("bookkeeping")
     ) {
-      subreddits.push("smallbusiness", "entrepreneur", "accounting");
+      subreddits.push(
+        "smallbusiness",
+        "entrepreneur",
+        "accounting",
+        "personalfinance",
+      );
+      industry = "finance";
+      industryLabel = "finance professional";
     }
     // Health/Fitness
     if (
       descLower.includes("health") ||
       descLower.includes("fitness") ||
       descLower.includes("gym") ||
-      descLower.includes("wellness")
+      descLower.includes("wellness") ||
+      descLower.includes("nutrition")
     ) {
-      subreddits.push("smallbusiness", "entrepreneur", "fitness");
+      subreddits.push("smallbusiness", "entrepreneur", "fitness", "nutrition");
+      industry = "health";
+      industryLabel = "health or fitness professional";
     }
+    // Education/Courses
+    if (
+      descLower.includes("education") ||
+      descLower.includes("course") ||
+      descLower.includes("teaching") ||
+      descLower.includes("training") ||
+      descLower.includes("coach")
+    ) {
+      subreddits.push(
+        "entrepreneur",
+        "smallbusiness",
+        "onlinebusiness",
+        "teaching",
+      );
+      industry = "education";
+      industryLabel = "educator or coach";
+    }
+
     // Default - general business
     if (subreddits.length === 0) {
       subreddits.push("smallbusiness", "entrepreneur");
+      industry = "general";
+      industryLabel = "business owner";
     }
 
     // Remove duplicates and limit to 5
     const uniqueSubreddits = [...new Set(subreddits)].slice(0, 5);
+    console.log(`📊 Industry detected: ${industry} (${industryLabel})`);
     console.log(`📊 Searching subreddits: ${uniqueSubreddits.join(", ")}`);
 
-    // Extract keywords from product description
+    // Industry-specific keywords for matching
+    const industryKeywords: Record<string, string[]> = {
+      saas: [
+        "saas",
+        "software",
+        "app",
+        "platform",
+        "startup",
+        "founder",
+        "mvp",
+        "launch",
+      ],
+      ecommerce: [
+        "ecommerce",
+        "shopify",
+        "inventory",
+        "stock",
+        "retail",
+        "seller",
+        "warehouse",
+        "order",
+      ],
+      marketing: [
+        "marketing",
+        "sales",
+        "email",
+        "lead",
+        "outreach",
+        "campaign",
+        "conversion",
+      ],
+      creator: [
+        "creator",
+        "youtube",
+        "content",
+        "influencer",
+        "tiktok",
+        "audience",
+        "subscriber",
+      ],
+      realestate: [
+        "real estate",
+        "property",
+        "realtor",
+        "rental",
+        "investment",
+        "listing",
+      ],
+      finance: [
+        "finance",
+        "accounting",
+        "invoice",
+        "tax",
+        "bookkeeping",
+        "payment",
+      ],
+      health: ["health", "fitness", "gym", "wellness", "nutrition", "workout"],
+      education: [
+        "education",
+        "course",
+        "teaching",
+        "training",
+        "coach",
+        "student",
+      ],
+      general: [
+        "business",
+        "startup",
+        "entrepreneur",
+        "company",
+        "product",
+        "customer",
+      ],
+    };
+
     const productKeywords =
-      descLower.match(
-        /\b(saas|software|app|tool|platform|service|product|solution|system|inventory|stock|marketing|sales|email|lead|customer|client|business|startup|founder|creator|ecommerce|shop|store)\b/gi,
-      ) || [];
+      industryKeywords[industry] || industryKeywords.general;
 
     // Problem keywords (what people struggle with)
     const problemKeywords = [
@@ -258,7 +390,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No posts found", newLeadsCount: 0 });
     }
 
-    // Score and filter posts
+    // Score and filter posts with industry-aware matching
     const potentialCustomers: any[] = [];
     const seenUrls = new Set<string>();
 
@@ -282,7 +414,7 @@ export async function POST(req: Request) {
         }
       }
 
-      // Check for product-related keywords
+      // Check for industry-specific keywords
       for (const kw of productKeywords) {
         if (text.includes(kw)) {
           score += 2;
@@ -323,14 +455,14 @@ export async function POST(req: Request) {
         text.includes("click here") ||
         text.includes("buy my");
 
-      // Filter out irrelevant industries based on product
+      // Filter out irrelevant industries
       const isIrrelevant =
-        (descLower.includes("saas") &&
+        (industry === "ecommerce" &&
+          (text.includes("saas") || text.includes("software app"))) ||
+        (industry === "saas" &&
           (text.includes("lawn care") ||
-            text.includes("clothing") ||
-            text.includes("restaurant"))) ||
-        (descLower.includes("ecommerce") && text.includes("saas")) ||
-        false;
+            text.includes("clothing brand") ||
+            text.includes("restaurant")));
 
       if (
         score >= 3 &&
@@ -340,75 +472,68 @@ export async function POST(req: Request) {
       ) {
         seenUrls.add(post.url);
 
-        // Generate SPECIFIC AI explanation based on what they're actually asking
+        // Generate industry-specific AI explanation
         let aiExplanation = "";
 
-        // Check for specific scenarios
         if (
           text.includes("launch") ||
           text.includes("launched") ||
           text.includes("just released")
         ) {
-          aiExplanation = `This founder just launched their SaaS and needs their first customers - perfect for slip's Reddit discovery to get early adopters`;
+          aiExplanation = `This ${industryLabel} just launched and needs their first customers - perfect for ${projectName} to get early adopters`;
         } else if (
           text.includes("first customer") ||
           text.includes("first 100") ||
           text.includes("get customers") ||
           text.includes("find customers")
         ) {
-          aiExplanation = `This person is actively looking for customers RIGHT NOW - they need slip to find leads on Reddit immediately`;
+          aiExplanation = `This ${industryLabel} is actively looking for customers RIGHT NOW - they need ${projectName} to find leads immediately`;
         } else if (
           text.includes("MRR") ||
           text.includes("revenue") ||
           text.includes("grow") ||
           text.includes("scale")
         ) {
-          aiExplanation = `This SaaS is focused on growth and revenue - slip can help them find qualified leads to boost MRR`;
+          aiExplanation = `This ${industryLabel} is focused on growth - ${projectName} can help them find qualified leads to boost revenue`;
         } else if (
           text.includes("idea") ||
           text.includes("validate") ||
           text.includes("validation")
         ) {
-          aiExplanation = `This founder is validating their idea - they need slip to find potential customers for feedback and early sales`;
-        } else if (
-          text.includes("quit my job") ||
-          text.includes("full-time") ||
-          text.includes("all-in")
-        ) {
-          aiExplanation = `This founder went all-in on their SaaS - they're motivated and need slip to find customers fast`;
+          aiExplanation = `This ${industryLabel} is validating their idea - they need ${projectName} to find potential customers for feedback`;
         } else if (
           text.includes("struggling") ||
           text.includes("stuck") ||
           text.includes("lost") ||
           text.includes("don't know")
         ) {
-          aiExplanation = `This founder is struggling with growth - slip can give them a proven system to find customers on Reddit`;
+          aiExplanation = `This ${industryLabel} is struggling with growth - ${projectName} can give them a proven system to find customers`;
         } else if (
           text.includes("sales funnel") ||
           text.includes("conversion") ||
           text.includes("churn")
         ) {
-          aiExplanation = `This SaaS is optimizing their funnel - they need slip to bring in more qualified leads to test with`;
+          aiExplanation = `This ${industryLabel} is optimizing their funnel - they need ${projectName} to bring in more qualified leads`;
         } else if (
           text.includes("marketing") ||
           text.includes("promotion") ||
           text.includes("advertise")
         ) {
-          aiExplanation = `This founder needs marketing help - slip provides targeted lead discovery that's more effective than ads`;
+          aiExplanation = `This ${industryLabel} needs marketing help - ${projectName} provides targeted lead discovery`;
         } else if (
           text.includes("feedback") ||
           text.includes("users") ||
           text.includes("beta")
         ) {
-          aiExplanation = `This SaaS is looking for user feedback - slip can help them find engaged Reddit users to try their product`;
+          aiExplanation = `This ${industryLabel} is looking for user feedback - ${projectName} can help them find engaged people to try their product`;
         } else if (
           text.includes("how to") ||
           text.includes("advice") ||
           text.includes("recommend")
         ) {
-          aiExplanation = `This person is seeking business advice - they're open to trying new solutions like slip for customer discovery`;
+          aiExplanation = `This ${industryLabel} is seeking advice - they're open to trying new solutions like ${projectName}`;
         } else {
-          aiExplanation = `This person is discussing SaaS/business challenges - slip can help them find customers and grow their user base`;
+          aiExplanation = `This ${industryLabel} is discussing ${industry} challenges - ${projectName} can help them find customers and grow`;
         }
 
         potentialCustomers.push({

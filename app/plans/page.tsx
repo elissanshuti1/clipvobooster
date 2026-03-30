@@ -334,24 +334,22 @@ export default function PlansClient() {
                   AI email writing
                 </li>
                 <li>
-                  <CheckIcon />
-                  Gmail integration
+                  <CheckIcon />5 email templates
                 </li>
                 <li>
                   <CheckIcon />
-                  Basic templates
+                  Email support
                 </li>
                 <li>
                   <CheckIcon />
-                  Email opens & clicks tracking
+                  30-day lead storage
                 </li>
                 <li>
                   <CheckIcon />
-                  Basic dashboard
+                  Basic analytics
                 </li>
                 <li>
-                  <CheckIcon />
-                  Reddit scanning
+                  <CheckIcon />1 team member
                 </li>
               </ul>
               <button
@@ -407,31 +405,22 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Custom email templates
+                  Unlimited templates
                 </li>
                 <li>
                   <CheckIcon />
-                  Priority lead discovery
+                  Priority chat support
                 </li>
                 <li>
                   <CheckIcon />
-                  Save unlimited leads
+                  90-day lead storage
                 </li>
                 <li>
                   <CheckIcon />
-                  Real-time notifications
+                  Advanced analytics
                 </li>
                 <li>
-                  <CheckIcon />
-                  Advanced analytics dashboard
-                </li>
-                <li>
-                  <CheckIcon />
-                  Engagement scoring
-                </li>
-                <li>
-                  <CheckIcon />
-                  Priority email support
+                  <CheckIcon />3 team members
                 </li>
               </ul>
               <button
@@ -476,15 +465,19 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  5,000 emails/month
+                  2,000 emails/month
                 </li>
                 <li>
                   <CheckIcon />
-                  2,000 AI-discovered leads/month
+                  1,000 AI-discovered leads/month
                 </li>
                 <li>
                   <CheckIcon />
-                  Unlimited email storage
+                  Unlimited templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  Dedicated support
                 </li>
                 <li>
                   <CheckIcon />
@@ -492,27 +485,11 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  Team lead sharing
+                  Custom analytics
                 </li>
                 <li>
                   <CheckIcon />
-                  Custom lead filters
-                </li>
-                <li>
-                  <CheckIcon />
-                  Unlimited analytics
-                </li>
-                <li>
-                  <CheckIcon />
-                  Historical data (unlimited)
-                </li>
-                <li>
-                  <CheckIcon />
-                  Dedicated account manager
-                </li>
-                <li>
-                  <CheckIcon />
-                  24/7 priority support
+                  Unlimited team members
                 </li>
               </ul>
               <button
