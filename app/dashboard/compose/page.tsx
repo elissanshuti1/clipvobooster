@@ -7,60 +7,70 @@ import { useRouter, useSearchParams } from "next/navigation";
 function ComposeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState<'loading' | 'select' | 'preview'>('loading');
+  const [step, setStep] = useState<"loading" | "select" | "preview">("loading");
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [recipientEmail, setRecipientEmail] = useState(searchParams.get('email') || '');
-  const [recipientName, setRecipientName] = useState('');
-  const [tone, setTone] = useState('friendly');
-  const [generatedEmail, setGeneratedEmail] = useState({ subject: '', body: '' });
+  const [recipientEmail, setRecipientEmail] = useState(
+    searchParams.get("email") || "",
+  );
+  const [recipientName, setRecipientName] = useState("");
+  const [tone, setTone] = useState("friendly");
+  const [generatedEmail, setGeneratedEmail] = useState({
+    subject: "",
+    body: "",
+  });
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch('/api/profile')
-      .then(res => res.json())
-      .then(data => {
+    fetch("/api/profile")
+      .then((res) => res.json())
+      .then((data) => {
         if (data.hasProfile && data.profile) {
           setUserProfile(data.profile);
-          setStep('select');
+          setStep("select");
         } else {
-          router.push('/dashboard/profile');
+          router.push("/dashboard/profile");
         }
       })
       .catch(() => {
-        router.push('/login');
+        router.push("/login");
       });
   }, [router]);
 
   const generateEmail = async () => {
     setIsGenerating(true);
-    setMessage('');
-    
+    setMessage("");
+
     try {
-      const res = await fetch('/api/email/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/email/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           recipientName,
           recipientEmail,
           productName: userProfile?.projectName,
           productDescription: userProfile?.projectDescription,
           productUrl: userProfile?.projectUrl,
-          tone
-        })
+          tone,
+          // NEW: Pass lead data from URL params
+          leadTitle: searchParams.get("leadTitle"),
+          leadContent: searchParams.get("leadContent"),
+          leadSubreddit: searchParams.get("leadSubreddit"),
+          leadUrl: searchParams.get("leadUrl"),
+        }),
       });
-      
+
       const data = await res.json();
-      
+
       if (res.ok) {
         setGeneratedEmail(data);
-        setStep('preview');
+        setStep("preview");
       } else {
-        setMessage('❌ ' + data.error);
+        setMessage("❌ " + data.error);
       }
     } catch (err) {
-      setMessage('❌ Failed to generate email');
+      setMessage("❌ Failed to generate email");
     } finally {
       setIsGenerating(false);
     }
@@ -68,52 +78,52 @@ function ComposeContent() {
 
   const sendEmail = async () => {
     setIsSending(true);
-    setMessage('');
+    setMessage("");
 
     try {
-      const res = await fetch('/api/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: recipientEmail,
           subject: generatedEmail.subject,
-          body: generatedEmail.body
-        })
+          body: generatedEmail.body,
+        }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setMessage('✅ Email sent successfully!');
+        setMessage("✅ Email sent successfully!");
 
         // Create notification for the user
         try {
-          await fetch('/api/notifications', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          await fetch("/api/notifications", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              type: 'email_sent',
-              title: 'Email Sent Successfully',
-              message: `Your email to ${recipientEmail} has been delivered successfully`
-            })
+              type: "email_sent",
+              title: "Email Sent Successfully",
+              message: `Your email to ${recipientEmail} has been delivered successfully`,
+            }),
           });
         } catch (err) {
-          console.error('Failed to create notification:', err);
+          console.error("Failed to create notification:", err);
         }
 
         // Dispatch custom event to update overview
-        window.dispatchEvent(new CustomEvent('emailSent'));
+        window.dispatchEvent(new CustomEvent("emailSent"));
 
         // Redirect to overview after a short delay
         setTimeout(() => {
-          router.push('/dashboard/overview');
+          router.push("/dashboard/overview");
         }, 1500);
       } else {
-        setMessage('❌ ' + data.error);
+        setMessage("❌ " + data.error);
       }
     } catch (err) {
-      setMessage('❌ Failed to send email');
-      console.error('Send email error:', err);
+      setMessage("❌ Failed to send email");
+      console.error("Send email error:", err);
     } finally {
       setIsSending(false);
     }
@@ -254,32 +264,62 @@ function ComposeContent() {
 
       <div className="page-container">
         <div className="card">
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: 'var(--white)', marginBottom: 8 }}>
+          <h1
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              color: "var(--white)",
+              marginBottom: 8,
+            }}
+          >
             ✍️ Compose Email
           </h1>
-          <p style={{ fontSize: 14, color: 'var(--muted)', marginBottom: 24 }}>
+          <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 24 }}>
             AI will write personalized emails using your profile
           </p>
 
           {message && (
-            <div className={`message ${message.includes('✅') ? 'message-success' : 'message-error'}`}>
+            <div
+              className={`message ${message.includes("✅") ? "message-success" : "message-error"}`}
+            >
               {message}
             </div>
           )}
 
-          {step === 'loading' && (
-            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-              <div className="loading-spinner" style={{ width: 40, height: 40, margin: '0 auto 20px' }} />
-              <p style={{ color: 'var(--muted)' }}>Loading your profile...</p>
+          {step === "loading" && (
+            <div style={{ textAlign: "center", padding: "60px 20px" }}>
+              <div
+                className="loading-spinner"
+                style={{ width: 40, height: 40, margin: "0 auto 20px" }}
+              />
+              <p style={{ color: "var(--muted)" }}>Loading your profile...</p>
             </div>
           )}
 
-          {step === 'select' && (
+          {step === "select" && (
             <>
               <div className="profile-info">
-                <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 4 }}>Sending as:</div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--white)' }}>{userProfile?.projectName}</div>
-                <div style={{ fontSize: 13, color: 'var(--dim)' }}>{userProfile?.projectUrl}</div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--muted)",
+                    marginBottom: 4,
+                  }}
+                >
+                  Sending as:
+                </div>
+                <div
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: "var(--white)",
+                  }}
+                >
+                  {userProfile?.projectName}
+                </div>
+                <div style={{ fontSize: 13, color: "var(--dim)" }}>
+                  {userProfile?.projectUrl}
+                </div>
               </div>
 
               <div className="form-group">
@@ -336,26 +376,27 @@ function ComposeContent() {
             </>
           )}
 
-          {step === 'preview' && (
+          {step === "preview" && (
             <>
               <div className="form-group">
                 <label className="form-label">Subject</label>
-                <div className="email-preview" style={{ padding: 12, minHeight: 'auto', fontWeight: 600 }}>
+                <div
+                  className="email-preview"
+                  style={{ padding: 12, minHeight: "auto", fontWeight: 600 }}
+                >
                   {generatedEmail.subject}
                 </div>
               </div>
 
               <div className="form-group">
                 <label className="form-label">Email Body</label>
-                <div className="email-preview">
-                  {generatedEmail.body}
-                </div>
+                <div className="email-preview">{generatedEmail.body}</div>
               </div>
 
-              <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{ display: "flex", gap: 12 }}>
                 <button
                   className="btn btn-secondary"
-                  onClick={() => setStep('select')}
+                  onClick={() => setStep("select")}
                 >
                   ← Back
                 </button>
@@ -385,11 +426,15 @@ function ComposeContent() {
 // Main page component with Suspense boundary
 export default function ComposePage() {
   return (
-    <Suspense fallback={
-      <div style={{ padding: 32, color: 'var(--muted)', textAlign: 'center' }}>
-        Loading...
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div
+          style={{ padding: 32, color: "var(--muted)", textAlign: "center" }}
+        >
+          Loading...
+        </div>
+      }
+    >
       <ComposeContent />
     </Suspense>
   );

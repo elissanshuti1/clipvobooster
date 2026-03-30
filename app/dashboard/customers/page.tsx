@@ -56,7 +56,7 @@ export default function CustomersPage() {
         return;
       }
 
-      // Load leads
+      // Load leads (DON'T auto-generate - only generate when user clicks button)
       const leadsRes = await fetch("/api/leads");
       const leadsData = await leadsRes.json();
 
