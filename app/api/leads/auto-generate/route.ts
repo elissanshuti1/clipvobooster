@@ -340,10 +340,76 @@ export async function POST(req: Request) {
       ) {
         seenUrls.add(post.url);
 
-        // Generate AI explanation
-        const aiExplanation = bestMatch
-          ? `This person is ${bestMatch} - your ${projectName} app can help them solve this specific challenge.`
-          : `This person is discussing business challenges that your ${projectName} app could potentially help with.`;
+        // Generate SPECIFIC AI explanation based on what they're actually asking
+        let aiExplanation = "";
+
+        // Check for specific scenarios
+        if (
+          text.includes("launch") ||
+          text.includes("launched") ||
+          text.includes("just released")
+        ) {
+          aiExplanation = `This founder just launched their SaaS and needs their first customers - perfect for slip's Reddit discovery to get early adopters`;
+        } else if (
+          text.includes("first customer") ||
+          text.includes("first 100") ||
+          text.includes("get customers") ||
+          text.includes("find customers")
+        ) {
+          aiExplanation = `This person is actively looking for customers RIGHT NOW - they need slip to find leads on Reddit immediately`;
+        } else if (
+          text.includes("MRR") ||
+          text.includes("revenue") ||
+          text.includes("grow") ||
+          text.includes("scale")
+        ) {
+          aiExplanation = `This SaaS is focused on growth and revenue - slip can help them find qualified leads to boost MRR`;
+        } else if (
+          text.includes("idea") ||
+          text.includes("validate") ||
+          text.includes("validation")
+        ) {
+          aiExplanation = `This founder is validating their idea - they need slip to find potential customers for feedback and early sales`;
+        } else if (
+          text.includes("quit my job") ||
+          text.includes("full-time") ||
+          text.includes("all-in")
+        ) {
+          aiExplanation = `This founder went all-in on their SaaS - they're motivated and need slip to find customers fast`;
+        } else if (
+          text.includes("struggling") ||
+          text.includes("stuck") ||
+          text.includes("lost") ||
+          text.includes("don't know")
+        ) {
+          aiExplanation = `This founder is struggling with growth - slip can give them a proven system to find customers on Reddit`;
+        } else if (
+          text.includes("sales funnel") ||
+          text.includes("conversion") ||
+          text.includes("churn")
+        ) {
+          aiExplanation = `This SaaS is optimizing their funnel - they need slip to bring in more qualified leads to test with`;
+        } else if (
+          text.includes("marketing") ||
+          text.includes("promotion") ||
+          text.includes("advertise")
+        ) {
+          aiExplanation = `This founder needs marketing help - slip provides targeted lead discovery that's more effective than ads`;
+        } else if (
+          text.includes("feedback") ||
+          text.includes("users") ||
+          text.includes("beta")
+        ) {
+          aiExplanation = `This SaaS is looking for user feedback - slip can help them find engaged Reddit users to try their product`;
+        } else if (
+          text.includes("how to") ||
+          text.includes("advice") ||
+          text.includes("recommend")
+        ) {
+          aiExplanation = `This person is seeking business advice - they're open to trying new solutions like slip for customer discovery`;
+        } else {
+          aiExplanation = `This person is discussing SaaS/business challenges - slip can help them find customers and grow their user base`;
+        }
 
         potentialCustomers.push({
           userId,
