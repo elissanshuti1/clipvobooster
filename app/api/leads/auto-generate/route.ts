@@ -296,7 +296,19 @@ Return JSON array:
   }
 ]
 
-Be STRICT - only mark as relevant if the post clearly shows they need this type of product.`,
+Be VERY STRICT - ONLY mark as relevant if:
+1. The post EXPLICITLY mentions problems this product solves
+2. The person is actively asking for help or solutions
+3. The problem is a CORE use case (not a stretch)
+
+DO NOT mark as relevant if:
+- Post is about a different industry entirely
+- Post is about selling a business (not running one)
+- Post is about unrelated topics (SEO, accounting, rent, etc.)
+- The connection is weak or forced
+- Person is just sharing information (not asking for help)
+
+Quality over quantity - better to return 3 perfect leads than 10 mediocre ones.`,
           },
           {
             role: "user",
@@ -321,6 +333,12 @@ URL: ${post.url}
       const aiPostResponse = aiPostAnalysis.choices[0].message?.content || "[]";
       console.log(`🤖 AI analyzed batch ${Math.floor(i / batchSize) + 1}`);
 
+      // Update progress after each batch
+      updateProgress(userId, {
+        batchesAnalyzed: Math.floor(i / batchSize) + 1,
+        matchesFound: potentialCustomers.length,
+      });
+
       // Parse AI response
       let postAnalyses;
       try {
@@ -336,7 +354,7 @@ URL: ${post.url}
         if (!post) continue;
 
         // Skip if not relevant, low score, duplicate, or self-promo
-        if (!analysis.isRelevant || analysis.score < 7) continue;
+        if (!analysis.isRelevant || analysis.score < 8) continue;
         if (seenUrls.has(post.url) || existingUrlSet.has(post.url)) continue;
         if (
           post.content.toLowerCase().includes("check out my") ||
