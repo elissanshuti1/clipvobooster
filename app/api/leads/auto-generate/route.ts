@@ -2,11 +2,18 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import clientPromise from "@/lib/mongodb";
 import Parser from "rss-parser";
+import OpenAI from "openai";
 import { updateProgress } from "@/lib/progress-store";
 
 const parser = new Parser();
 
-// POST - SMART customer discovery (industry-aware, strict quality, no duplicates)
+// Initialize OpenRouter for AI analysis
+const openrouter = new OpenAI({
+  baseURL: "https://openrouter.ai/api/v1",
+  apiKey: process.env.OPENROUTER_API_KEY,
+});
+
+// POST - AI-POWERED customer discovery (AI analyzes product & finds relevant leads)
 export async function POST(req: Request) {
   try {
     const cookie = (req as any).headers.get("cookie") || "";
@@ -47,10 +54,9 @@ export async function POST(req: Request) {
     const { projectName, projectDescription, targetAudience } = user.profile;
     console.log(`🎯 Finding customers for: ${projectName}`);
     console.log(`📝 Description: ${projectDescription}`);
-    console.log(`👥 Target: ${targetAudience || "Not specified"}`);
 
     updateProgress(userId, {
-      stage: "fetching",
+      stage: "analyzing",
       postsFound: 0,
       batchesAnalyzed: 0,
       totalBatches: 1,
@@ -62,276 +68,83 @@ export async function POST(req: Request) {
     const existingUrlSet = new Set(existingLeads.map((l: any) => l.url));
     console.log(`📋 Existing leads in DB: ${existingLeads.length}`);
 
-    // Analyze product to determine industry
-    const descLower = (
-      projectDescription +
-      " " +
-      (targetAudience || "")
-    ).toLowerCase();
+    // STEP 1: Use AI to analyze product and extract relevant keywords/subreddits
+    console.log("🤖 AI: Analyzing product description...");
 
-    // Industry detection with comprehensive keyword lists
-    const industryConfig: Record<
-      string,
-      { subreddits: string[]; keywords: string[]; label: string }
-    > = {
-      saas: {
-        subreddits: [
-          "SaaS",
-          "entrepreneur",
-          "startups",
-          "indiehackers",
-          "sideproject",
-        ],
-        keywords: [
-          "saas",
-          "software",
-          "app",
-          "platform",
-          "tool",
-          "product",
-          "startup",
-          "founder",
-          "mvp",
-          "launch",
-        ],
-        label: "SaaS founder or developer",
-      },
-      ecommerce: {
-        subreddits: [
-          "ecommerce",
-          "shopify",
-          "retail",
-          "smallbusiness",
-          "entrepreneur",
-        ],
-        keywords: [
-          "inventory",
-          "stock",
-          "shopify",
-          "warehouse",
-          "order",
-          "shipping",
-          "product",
-          "seller",
-          "retail",
-          "oversell",
-          "restock",
-          "sku",
-        ],
-        label: "seller or retailer",
-      },
-      marketing: {
-        subreddits: [
-          "marketing",
-          "sales",
-          "digitalmarketing",
-          "smallbusiness",
-          "entrepreneur",
-        ],
-        keywords: [
-          "marketing",
-          "campaign",
-          "email",
-          "lead",
-          "conversion",
-          "funnel",
-          "outreach",
-          "prospect",
-          "client",
-        ],
-        label: "marketer or sales professional",
-      },
-      creator: {
-        subreddits: [
-          "NewTubers",
-          "youtube",
-          "ContentCreators",
-          "socialmedia",
-          "entrepreneur",
-        ],
-        keywords: [
-          "youtube",
-          "content",
-          "video",
-          "audience",
-          "subscriber",
-          "tiktok",
-          "creator",
-          "influencer",
-          "channel",
-        ],
-        label: "content creator",
-      },
-      realestate: {
-        subreddits: [
-          "realtors",
-          "realestate",
-          "realestateinvesting",
-          "smallbusiness",
-        ],
-        keywords: [
-          "property",
-          "real estate",
-          "rental",
-          "listing",
-          "buyer",
-          "tenant",
-          "agent",
-          "broker",
-        ],
-        label: "real estate professional",
-      },
-      finance: {
-        subreddits: [
-          "accounting",
-          "personalfinance",
-          "smallbusiness",
-          "entrepreneur",
-        ],
-        keywords: [
-          "invoice",
-          "payment",
-          "accounting",
-          "tax",
-          "billing",
-          "bookkeeping",
-          "finance",
-          "expense",
-        ],
-        label: "finance professional",
-      },
-      health: {
-        subreddits: [
-          "fitness",
-          "nutrition",
-          "health",
-          "smallbusiness",
-          "entrepreneur",
-        ],
-        keywords: [
-          "fitness",
-          "health",
-          "workout",
-          "nutrition",
-          "gym",
-          "diet",
-          "wellness",
-          "training",
-          "coach",
-        ],
-        label: "health or fitness professional",
-      },
-      education: {
-        subreddits: ["onlinebusiness", "teaching", "edtech", "entrepreneur"],
-        keywords: [
-          "course",
-          "teaching",
-          "student",
-          "learning",
-          "training",
-          "coach",
-          "education",
-          "curriculum",
-        ],
-        label: "educator or coach",
-      },
-    };
+    const aiAnalysis = await openrouter.chat.completions.create({
+      model: "google/gemma-2-9b-it",
+      messages: [
+        {
+          role: "system",
+          content: `You are an expert at matching products with potential customers on Reddit.
 
-    // Detect industry
-    let industry = "general";
-    let config = {
-      subreddits: ["smallbusiness", "entrepreneur"],
-      keywords: [
-        "business",
-        "customer",
-        "product",
-        "service",
-        "company",
-        "startup",
+Analyze the product description and return:
+1. Industry type (one of: saas, ecommerce, marketing, creator, realestate, finance, health, education, general)
+2. 10-15 specific keywords that potential customers would use when discussing problems this product solves
+3. 5 relevant subreddits where these people hang out
+4. What problems this product solves
+
+Return JSON format:
+{
+  "industry": "industry_name",
+  "industryLabel": "description of target user (e.g., 'seller or retailer')",
+  "keywords": ["keyword1", "keyword2", ...],
+  "subreddits": ["subreddit1", "subreddit2", ...],
+  "problemsSolved": ["problem1", "problem2", ...]
+}`,
+        },
+        {
+          role: "user",
+          content: `Product Name: ${projectName}
+Product Description: ${projectDescription}
+Target Audience: ${targetAudience || "Not specified"}
+
+Analyze this product and tell me what keywords to search for and which subreddits to find potential customers.`,
+        },
       ],
-      label: "business owner",
-    };
+      max_tokens: 500,
+      temperature: 0.3,
+    });
 
-    if (
-      descLower.includes("saas") ||
-      descLower.includes("software") ||
-      descLower.includes("app") ||
-      descLower.includes("platform") ||
-      descLower.includes("founder")
-    ) {
-      industry = "saas";
-      config = industryConfig.saas;
-    } else if (
-      descLower.includes("ecommerce") ||
-      descLower.includes("shopify") ||
-      descLower.includes("retail") ||
-      descLower.includes("shop") ||
-      descLower.includes("stock") ||
-      descLower.includes("inventory") ||
-      descLower.includes("seller") ||
-      descLower.includes("warehouse")
-    ) {
-      industry = "ecommerce";
-      config = industryConfig.ecommerce;
-    } else if (
-      descLower.includes("marketing") ||
-      descLower.includes("sales") ||
-      descLower.includes("email") ||
-      descLower.includes("lead") ||
-      descLower.includes("outreach")
-    ) {
-      industry = "marketing";
-      config = industryConfig.marketing;
-    } else if (
-      descLower.includes("creator") ||
-      descLower.includes("youtube") ||
-      descLower.includes("content") ||
-      descLower.includes("influencer") ||
-      descLower.includes("tiktok")
-    ) {
-      industry = "creator";
-      config = industryConfig.creator;
-    } else if (
-      descLower.includes("real estate") ||
-      descLower.includes("property") ||
-      descLower.includes("realtor") ||
-      descLower.includes("rental")
-    ) {
-      industry = "realestate";
-      config = industryConfig.realestate;
-    } else if (
-      descLower.includes("finance") ||
-      descLower.includes("accounting") ||
-      descLower.includes("invoice") ||
-      descLower.includes("tax") ||
-      descLower.includes("bookkeeping")
-    ) {
-      industry = "finance";
-      config = industryConfig.finance;
-    } else if (
-      descLower.includes("health") ||
-      descLower.includes("fitness") ||
-      descLower.includes("gym") ||
-      descLower.includes("wellness") ||
-      descLower.includes("nutrition")
-    ) {
-      industry = "health";
-      config = industryConfig.health;
-    } else if (
-      descLower.includes("education") ||
-      descLower.includes("course") ||
-      descLower.includes("teaching") ||
-      descLower.includes("training") ||
-      descLower.includes("coach")
-    ) {
-      industry = "education";
-      config = industryConfig.education;
+    const aiResponse = aiAnalysis.choices[0].message?.content || "{}";
+    console.log("🤖 AI Response:", aiResponse);
+
+    // Parse AI response
+    let aiData;
+    try {
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      aiData = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
+    } catch {
+      aiData = null;
     }
 
-    const uniqueSubreddits = [...new Set(config.subreddits)].slice(0, 5);
-    const productKeywords = config.keywords;
-    console.log(`📊 Industry: ${industry} (${config.label})`);
-    console.log(`📊 Subreddits: ${uniqueSubreddits.join(", ")}`);
+    // Fallback if AI fails
+    if (!aiData) {
+      aiData = {
+        industry: "general",
+        industryLabel: "business owner",
+        keywords: [
+          "business",
+          "customer",
+          "product",
+          "service",
+          "company",
+          "startup",
+          "help",
+          "need",
+          "looking for",
+        ],
+        subreddits: ["smallbusiness", "entrepreneur"],
+        problemsSolved: ["business challenges"],
+      };
+    }
+
+    const { industry, industryLabel, keywords, subreddits, problemsSolved } =
+      aiData;
+    console.log(`📊 Industry: ${industry} (${industryLabel})`);
+    console.log(`📊 Keywords: ${keywords.join(", ")}`);
+    console.log(`📊 Subreddits: ${subreddits.join(", ")}`);
+    console.log(`📊 Problems solved: ${problemsSolved.join(", ")}`);
 
     // Problem keywords (what people struggle with)
     const problemKeywords = [
@@ -380,8 +193,9 @@ export async function POST(req: Request) {
       "recommendation",
     ];
 
-    // Fetch posts from relevant subreddits
+    // Fetch posts from AI-selected subreddits
     const recentPosts: any[] = [];
+    const uniqueSubreddits = [...new Set(subreddits)].slice(0, 5);
 
     for (const subreddit of uniqueSubreddits) {
       try {
@@ -436,98 +250,103 @@ export async function POST(req: Request) {
       });
     }
 
-    // Score and filter posts with strict quality control
+    // STEP 2: Use AI to analyze each post and determine relevance
+    console.log("🤖 AI: Analyzing posts for relevance...");
+
     const potentialCustomers: any[] = [];
     const seenUrls = new Set<string>();
 
-    console.log("🔍 Analyzing posts with strict quality matching...");
+    // Batch posts for AI analysis (5 at a time to save API calls)
+    const batchSize = 5;
+    for (let i = 0; i < recentPosts.length; i += batchSize) {
+      const batch = recentPosts.slice(i, i + batchSize);
 
-    for (const post of recentPosts) {
-      const title = post.title.toLowerCase();
-      const content = post.content.toLowerCase();
-      const text = title + " " + content;
+      // Use AI to analyze this batch
+      const aiPostAnalysis = await openrouter.chat.completions.create({
+        model: "google/gemma-2-9b-it",
+        messages: [
+          {
+            role: "system",
+            content: `You are analyzing Reddit posts to find potential customers for a product.
 
-      let score = 0;
-      let matchedKeywords: string[] = [];
-      let matchedProblems: string[] = [];
+Product: ${projectName}
+Description: ${projectDescription}
+Target: ${targetAudience || "businesses who need this"}
+Problems it solves: ${problemsSolved.join(", ")}
 
-      // Check for REQUIRED industry keywords (must match at least 1)
-      for (const kw of productKeywords) {
-        if (text.includes(kw)) {
-          score += 5;
-          matchedKeywords.push(kw);
-        }
+For each post, determine:
+1. Is this person potentially needing this product? (yes/no)
+2. Score 1-10 (10 = perfect match)
+3. Why is it relevant or not relevant?
+4. What specific problem do they have that this product solves?
+
+Return JSON array:
+[
+  {
+    "title": "post title",
+    "url": "post url",
+    "isRelevant": true/false,
+    "score": 8,
+    "reason": "explanation of why relevant or not",
+    "problemTheyHave": "specific problem this product solves for them"
+  }
+]
+
+Be STRICT - only mark as relevant if the post clearly shows they need this type of product.`,
+          },
+          {
+            role: "user",
+            content: `Analyze these ${batch.length} Reddit posts:
+
+${batch
+  .map(
+    (post, idx) => `
+Post ${idx + 1}:
+Title: ${post.title}
+Content: ${post.content.substring(0, 500)}
+URL: ${post.url}
+---`,
+  )
+  .join("\n")}`,
+          },
+        ],
+        max_tokens: 1500,
+        temperature: 0.3,
+      });
+
+      const aiPostResponse = aiPostAnalysis.choices[0].message?.content || "[]";
+      console.log(`🤖 AI analyzed batch ${Math.floor(i / batchSize) + 1}`);
+
+      // Parse AI response
+      let postAnalyses;
+      try {
+        const jsonMatch = aiPostResponse.match(/\[[\s\S]*\]/);
+        postAnalyses = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      } catch {
+        postAnalyses = [];
       }
 
-      // If no required keywords, skip this post
-      if (matchedKeywords.length === 0) {
-        continue;
-      }
+      // Process relevant posts
+      for (const analysis of postAnalyses) {
+        const post = batch.find((p) => p.url === analysis.url);
+        if (!post) continue;
 
-      // Check for problem keywords
-      for (const kw of problemKeywords) {
-        if (text.includes(kw)) {
-          score += 3;
-          matchedProblems.push(kw);
-        }
-      }
+        // Skip if not relevant, low score, duplicate, or self-promo
+        if (!analysis.isRelevant || analysis.score < 7) continue;
+        if (seenUrls.has(post.url) || existingUrlSet.has(post.url)) continue;
+        if (
+          post.content.toLowerCase().includes("check out my") ||
+          post.content.toLowerCase().includes("visit my website") ||
+          post.content.toLowerCase().includes("click here") ||
+          post.content.toLowerCase().includes("buy my") ||
+          post.content.toLowerCase().includes("hire me")
+        )
+          continue;
 
-      // Check for target audience keywords
-      if (targetAudience) {
-        const audienceLower = targetAudience.toLowerCase();
-        const audienceWords = audienceLower.split(/[\s,]+/);
-        for (const word of audienceWords) {
-          if (word.length > 3 && text.includes(word)) {
-            score += 5;
-          }
-        }
-      }
-
-      // Bonus for asking questions
-      if (title.includes("?") || content.includes("?")) {
-        score += 2;
-      }
-
-      // Bonus for business context
-      if (
-        text.includes("business") ||
-        text.includes("startup") ||
-        text.includes("company") ||
-        text.includes("product") ||
-        text.includes("service")
-      ) {
-        score += 2;
-      }
-
-      // Filter out spam/self-promo
-      const isSelfPromo =
-        text.includes("check out my") ||
-        text.includes("visit my website") ||
-        text.includes("click here") ||
-        text.includes("buy my") ||
-        text.includes("hire me");
-
-      // Skip if self-promo or already seen
-      if (
-        isSelfPromo ||
-        seenUrls.has(post.url) ||
-        existingUrlSet.has(post.url)
-      ) {
-        continue;
-      }
-
-      // STRICT THRESHOLD: Must score >= 8
-      if (score >= 8) {
         seenUrls.add(post.url);
 
-        // Generate DYNAMIC AI explanation based on actual post content
-        const aiExplanation = generateAIExplanation(
-          post,
-          matchedKeywords,
-          matchedProblems,
-          projectName,
-          config.label,
-        );
+        // Generate dynamic AI explanation
+        const aiExplanation = `This ${industryLabel} ${analysis.problemTheyHave}. ${analysis.reason} ${projectName} can help them solve this specific challenge.`;
 
         potentialCustomers.push({
           userId,
@@ -537,7 +356,7 @@ export async function POST(req: Request) {
           url: post.url,
           content: post.content.slice(0, 800),
           publishedAt: post.publishedAt,
-          notes: `Match Score: ${score}/10 | Keywords: ${matchedKeywords.join(", ")}`,
+          notes: `AI Score: ${analysis.score}/10`,
           aiMatchReason: aiExplanation,
           status: "new",
           isAutoDiscovered: true,
@@ -548,6 +367,10 @@ export async function POST(req: Request) {
         if (potentialCustomers.length >= 10) {
           break;
         }
+      }
+
+      if (potentialCustomers.length >= 10) {
+        break;
       }
     }
 
@@ -616,71 +439,5 @@ export async function POST(req: Request) {
       { error: "Failed to find customers", details: error.message },
       { status: 500 },
     );
-  }
-}
-
-// Dynamic AI explanation generator - analyzes actual post content
-function generateAIExplanation(
-  post: any,
-  matchedKeywords: string[],
-  matchedProblems: string[],
-  projectName: string,
-  industryLabel: string,
-): string {
-  const title = post.title;
-  const content = post.content.slice(0, 300);
-
-  // Analyze what specific problem the person has
-  let problemType = "";
-  let needType = "";
-
-  if (title.includes("?") || title.toLowerCase().includes("how")) {
-    problemType = "asking for help";
-  } else if (
-    matchedProblems.some(
-      (p) => p.includes("struggling") || p.includes("need help"),
-    )
-  ) {
-    problemType = "struggling with a challenge";
-  } else if (
-    matchedProblems.some(
-      (p) => p.includes("looking for") || p.includes("want to"),
-    )
-  ) {
-    problemType = "actively looking for a solution";
-  } else if (
-    matchedProblems.some(
-      (p) => p.includes("first customer") || p.includes("get customers"),
-    )
-  ) {
-    problemType = "needs their first customers";
-  } else {
-    problemType = "discussing industry challenges";
-  }
-
-  // Generate specific explanation based on matched keywords
-  const keywordContext = matchedKeywords.slice(0, 2).join(" and ");
-
-  const explanations = [
-    `This ${industryLabel} is ${problemType} related to ${keywordContext}. They mentioned "${title.substring(0, 50)}..." - ${projectName} can help them solve this specific challenge.`,
-
-    `Found this ${industryLabel} discussing ${keywordContext}. Their post "${title.substring(0, 50)}..." shows they need help with this exact problem - ${projectName} is designed for this use case.`,
-
-    `This ${industryLabel} is ${problemType}. They're talking about ${keywordContext} and said "${content.substring(0, 80)}..." - ${projectName} directly addresses this pain point.`,
-
-    `Perfect match! This ${industryLabel} needs help with ${keywordContext}. Their post "${title.substring(0, 50)}..." indicates they're ready for a solution like ${projectName}.`,
-
-    `This ${industryLabel} is ${problemType} involving ${keywordContext}. From their post "${title.substring(0, 50)}...", they need exactly what ${projectName} provides.`,
-  ];
-
-  // Pick explanation based on post characteristics
-  if (problemType.includes("asking for help")) {
-    return explanations[0];
-  } else if (problemType.includes("actively looking")) {
-    return explanations[3];
-  } else if (problemType.includes("first customers")) {
-    return explanations[3];
-  } else {
-    return explanations[1];
   }
 }
