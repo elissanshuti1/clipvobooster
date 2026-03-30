@@ -31,6 +31,8 @@ export default function CustomersPage() {
     batchesAnalyzed: 0,
     totalBatches: 0,
     matchesFound: 0,
+    progressPercent: 0,
+    message: "Getting ready...",
   });
 
   // Load leads and check profile on mount
@@ -111,6 +113,8 @@ export default function CustomersPage() {
               batchesAnalyzed: data.batchesAnalyzed || 0,
               totalBatches: data.totalBatches || 0,
               matchesFound: data.matchesFound || 0,
+              progressPercent: data.progressPercent || 0,
+              message: data.message || "Working on it...",
             });
           }
         } catch (err) {
@@ -122,16 +126,13 @@ export default function CustomersPage() {
       setTimeout(() => clearInterval(interval), 120000);
     }, 500);
 
-    // Add timeout - if takes more than 90 seconds, show error
+    // Add timeout - if takes more than 2 minutes, show message
     const timeoutId = setTimeout(() => {
       clearTimeout(pollInterval);
       setGenerating(false);
       setLoading(false);
       console.error("⏱️ Lead generation timeout");
-      alert(
-        "⏱️ Customer discovery is taking too long. Please try again in a few minutes.",
-      );
-    }, 90000);
+    }, 120000);
 
     try {
       console.log("📡 Calling /api/leads/auto-generate...");
@@ -322,6 +323,8 @@ export default function CustomersPage() {
         batchesAnalyzed={progress.batchesAnalyzed}
         totalBatches={progress.totalBatches}
         matchesFound={progress.matchesFound}
+        progressPercent={progress.progressPercent}
+        message={progress.message}
       />
     );
   }

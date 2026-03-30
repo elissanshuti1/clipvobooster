@@ -193,9 +193,10 @@ Analyze this product and tell me what keywords to search for and which subreddit
       "recommendation",
     ];
 
-    // Fetch posts from AI-selected subreddits
+    // Fetch posts from AI-selected subreddits (limit to 50 posts for faster results)
     const recentPosts: any[] = [];
     const uniqueSubreddits = [...new Set(subreddits)].slice(0, 5);
+    const maxPostsPerSubreddit = 10; // Reduced from 20 to 10 for speed
 
     for (const subreddit of uniqueSubreddits) {
       try {
@@ -212,12 +213,14 @@ Analyze this product and tell me what keywords to search for and which subreddit
         const rssText = await response.text();
         const feed = await parser.parseString(rssText);
 
-        for (const item of feed.items?.slice(0, 20) || []) {
+        // Limit posts per subreddit for faster results
+        let postCount = 0;
+        for (const item of feed.items?.slice(0, maxPostsPerSubreddit) || []) {
           const postDate = new Date(item.pubDate || Date.now());
           const fiveDaysAgo = new Date();
           fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
 
-          if (postDate >= fiveDaysAgo) {
+          if (postDate >= fiveDaysAgo && postCount < maxPostsPerSubreddit) {
             recentPosts.push({
               title: item.title || "",
               content: (item.content || item.summary || "").slice(0, 1000),
@@ -226,6 +229,7 @@ Analyze this product and tell me what keywords to search for and which subreddit
               url: item.link || "",
               publishedAt: postDate.toISOString(),
             });
+            postCount++;
           }
         }
       } catch (err) {

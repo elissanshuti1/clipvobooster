@@ -6,14 +6,19 @@ export default function GenerationProgress({
   batchesAnalyzed,
   totalBatches,
   matchesFound,
+  progressPercent,
+  message,
 }: {
   stage: string;
   postsFound?: number;
   batchesAnalyzed?: number;
   totalBatches?: number;
   matchesFound?: number;
+  progressPercent?: number;
+  message?: string;
 }) {
   const getProgressText = () => {
+    if (message) return message;
     if (stage === "fetching") {
       return "📡 Fetching recent Reddit posts...";
     }
@@ -34,6 +39,7 @@ export default function GenerationProgress({
   };
 
   const getProgressPercent = () => {
+    if (progressPercent) return progressPercent;
     if (stage === "fetching") return 20;
     if (stage === "analyzing" && totalBatches) {
       return 20 + ((batchesAnalyzed || 0) / totalBatches) * 60;
@@ -49,13 +55,13 @@ export default function GenerationProgress({
       return "Reading recent posts from business subreddits...";
     }
     if (stage === "analyzing") {
-      return `AI is analyzing each post to see if they need your product...`;
+      return `🤖 AI is analyzing each post to see if they need your product. Being very selective - only perfect matches!`;
     }
     if (stage === "matching") {
-      return `Great! Found ${matchesFound} people who might need your product.`;
+      return `🎯 Great! Found ${matchesFound} people who might need your product.`;
     }
     if (stage === "saving") {
-      return "Almost done! Saving your customer list...";
+      return "💾 Almost done! Saving your customer list...";
     }
     return "";
   };
