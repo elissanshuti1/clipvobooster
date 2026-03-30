@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import NotificationBell from "@/app/components/NotificationBell";
+import SupportChat from "@/app/components/SupportChat";
 
 const NAV_ITEMS = [
   {
@@ -19,6 +20,11 @@ const NAV_ITEMS = [
   {
     id: "compose",
     label: "Compose",
+    icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+  },
+  {
+    id: "templates",
+    label: "Templates",
     icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
   },
   {
@@ -594,6 +600,10 @@ export default function DashboardLayout({
           <div className="dashboard-content">{children}</div>
         </div>
       </div>
+
+      {/* Support Chat Widget */}
+      <SupportChat />
+
       {/* Hidden element to pass user data to children */}
       <div
         id="user-data"

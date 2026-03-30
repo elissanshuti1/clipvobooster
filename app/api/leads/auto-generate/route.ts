@@ -438,6 +438,17 @@ export async function POST(req: Request) {
 
     if (potentialCustomers.length > 0) {
       await leads.insertMany(potentialCustomers);
+
+      // Update user's usage count
+      await users.updateOne(
+        { _id: new (require("mongodb").ObjectId)(payload.sub) },
+        {
+          $inc: { leadsFoundThisMonth: potentialCustomers.length },
+          $set: {
+            usageResetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          },
+        },
+      );
     }
 
     updateProgress(userId, {

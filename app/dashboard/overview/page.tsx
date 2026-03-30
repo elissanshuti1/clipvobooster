@@ -16,6 +16,11 @@ export default function DashboardOverview() {
     clicks: 0,
     leadsToday: 0,
   });
+  const [usage, setUsage] = useState({
+    leads: { used: 0, limit: 0 },
+    emails: { used: 0, limit: 0 },
+  });
+  const [showUsageWarning, setShowUsageWarning] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [projectName, setProjectName] = useState("");
   const [projectUrl, setProjectUrl] = useState("");
@@ -26,14 +31,14 @@ export default function DashboardOverview() {
   useEffect(() => {
     const initData = async () => {
       try {
-        const [userRes, profileRes, leadsRes, analyticsRes] = await Promise.all(
-          [
+        const [userRes, profileRes, leadsRes, analyticsRes, usageRes] =
+          await Promise.all([
             fetch("/api/auth/me", { cache: "no-store" }),
             fetch("/api/profile", { cache: "no-store" }),
             fetch("/api/leads", { cache: "no-store" }),
             fetch("/api/analytics", { cache: "no-store" }),
-          ],
-        );
+            fetch("/api/usage", { cache: "no-store" }),
+          ]);
 
         const userData = userRes.ok ? await userRes.json() : null;
         const profileData = profileRes.ok ? await profileRes.json() : null;
@@ -41,6 +46,7 @@ export default function DashboardOverview() {
         const analyticsData = analyticsRes.ok
           ? await analyticsRes.json()
           : null;
+        const usageData = usageRes.ok ? await usageRes.json() : null;
 
         if (!userData) {
           router.push("/login");
@@ -59,6 +65,17 @@ export default function DashboardOverview() {
         // Check if leads exist
         const hasLeadsData = Array.isArray(leadsData) && leadsData.length > 0;
         setHasLeads(hasLeadsData);
+
+        // Load usage
+        if (usageData) {
+          setUsage({ leads: usageData.leads, emails: usageData.emails });
+          // Show warning if near limit (80%)
+          const leadsNearLimit =
+            usageData.leads.used >= usageData.leads.limit * 0.8;
+          const emailsNearLimit =
+            usageData.emails.used >= usageData.emails.limit * 0.8;
+          setShowUsageWarning(leadsNearLimit || emailsNearLimit);
+        }
 
         if (hasProfileData) {
           setProjectName(profileData.profile.projectName || "");

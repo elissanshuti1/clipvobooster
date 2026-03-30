@@ -750,7 +750,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Gmail integration
+                  5 email templates
                 </li>
                 <li>
                   <svg
@@ -765,7 +765,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Basic templates
+                  Email support
                 </li>
                 <li>
                   <svg
@@ -780,7 +780,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Email opens & clicks tracking
+                  30-day lead storage
                 </li>
                 <li>
                   <svg
@@ -795,7 +795,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Basic dashboard
+                  Basic analytics
                 </li>
                 <li>
                   <svg
@@ -810,7 +810,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Reddit scanning
+                  1 team member
                 </li>
               </ul>
               {subscription?.plan === "starter" ? (
