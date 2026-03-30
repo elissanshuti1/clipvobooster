@@ -6,7 +6,7 @@ import { updateProgress } from "@/lib/progress-store";
 
 const parser = new Parser();
 
-// POST - FAST customer discovery with SMART AI explanations (20-30 seconds)
+// POST - SMART customer discovery (finds relevant leads for ANY product)
 export async function POST(req: Request) {
   try {
     const cookie = (req as any).headers.get("cookie") || "";
@@ -46,6 +46,8 @@ export async function POST(req: Request) {
 
     const { projectName, projectDescription, targetAudience } = user.profile;
     console.log(`🎯 Finding customers for: ${projectName}`);
+    console.log(`📝 Description: ${projectDescription}`);
+    console.log(`👥 Target: ${targetAudience || "Not specified"}`);
 
     await leads.deleteMany({ userId });
     updateProgress(userId, {
@@ -56,11 +58,158 @@ export async function POST(req: Request) {
       matchesFound: 0,
     });
 
-    // Fetch from 3 subreddits (FAST)
-    const recentPosts: any[] = [];
-    const subreddits = ["entrepreneur", "smallbusiness", "SaaS"];
+    // Analyze product to determine target subreddits and keywords
+    const descLower = (
+      projectDescription +
+      " " +
+      (targetAudience || "")
+    ).toLowerCase();
 
-    for (const subreddit of subreddits) {
+    // Determine relevant subreddits based on product
+    const subreddits = [];
+
+    // SaaS/Software products
+    if (
+      descLower.includes("saas") ||
+      descLower.includes("software") ||
+      descLower.includes("app") ||
+      descLower.includes("startup") ||
+      descLower.includes("founder")
+    ) {
+      subreddits.push(
+        "SaaS",
+        "entrepreneur",
+        "startups",
+        "indiehackers",
+        "sideproject",
+      );
+    }
+    // E-commerce/Retail
+    if (
+      descLower.includes("ecommerce") ||
+      descLower.includes("shopify") ||
+      descLower.includes("retail") ||
+      descLower.includes("store") ||
+      descLower.includes("shop")
+    ) {
+      subreddits.push("ecommerce", "shopify", "smallbusiness", "entrepreneur");
+    }
+    // Marketing/Sales tools
+    if (
+      descLower.includes("marketing") ||
+      descLower.includes("sales") ||
+      descLower.includes("lead") ||
+      descLower.includes("email")
+    ) {
+      subreddits.push("marketing", "sales", "smallbusiness", "entrepreneur");
+    }
+    // Inventory/Stock management
+    if (
+      descLower.includes("stock") ||
+      descLower.includes("inventory") ||
+      descLower.includes("warehouse")
+    ) {
+      subreddits.push("smallbusiness", "entrepreneur", "logistics");
+    }
+    // Content creators
+    if (
+      descLower.includes("creator") ||
+      descLower.includes("youtube") ||
+      descLower.includes("content") ||
+      descLower.includes("influencer")
+    ) {
+      subreddits.push(
+        "NewTubers",
+        "youtube",
+        "ContentCreators",
+        "entrepreneur",
+      );
+    }
+    // Real estate
+    if (
+      descLower.includes("real estate") ||
+      descLower.includes("property") ||
+      descLower.includes("realtor")
+    ) {
+      subreddits.push("realtors", "realestate", "smallbusiness");
+    }
+    // Finance/Accounting
+    if (
+      descLower.includes("finance") ||
+      descLower.includes("accounting") ||
+      descLower.includes("invoice") ||
+      descLower.includes("tax")
+    ) {
+      subreddits.push("smallbusiness", "entrepreneur", "accounting");
+    }
+    // Health/Fitness
+    if (
+      descLower.includes("health") ||
+      descLower.includes("fitness") ||
+      descLower.includes("gym") ||
+      descLower.includes("wellness")
+    ) {
+      subreddits.push("smallbusiness", "entrepreneur", "fitness");
+    }
+    // Default - general business
+    if (subreddits.length === 0) {
+      subreddits.push("smallbusiness", "entrepreneur");
+    }
+
+    // Remove duplicates and limit to 5
+    const uniqueSubreddits = [...new Set(subreddits)].slice(0, 5);
+    console.log(`📊 Searching subreddits: ${uniqueSubreddits.join(", ")}`);
+
+    // Extract keywords from product description
+    const productKeywords =
+      descLower.match(
+        /\b(saas|software|app|tool|platform|service|product|solution|system|inventory|stock|marketing|sales|email|lead|customer|client|business|startup|founder|creator|ecommerce|shop|store)\b/gi,
+      ) || [];
+
+    // Problem keywords (what people struggle with)
+    const problemKeywords = [
+      "looking for",
+      "need help",
+      "struggling",
+      "how to",
+      "advice",
+      "recommend",
+      "suggestions",
+      "trying to",
+      "want to",
+      "need to",
+      "can't find",
+      "can't get",
+      "don't know how",
+      "where to find",
+      "first customer",
+      "first client",
+      "get customers",
+      "find customers",
+      "get leads",
+      "find leads",
+      "get clients",
+      "find clients",
+      "customer acquisition",
+      "lead generation",
+      "marketing strategy",
+      "grow my business",
+      "scale my business",
+      "promote my",
+      "market my",
+      "waste time",
+      "time consuming",
+      "manual process",
+      "automate",
+      "spreadsheet",
+      "excel",
+      "google sheets",
+    ];
+
+    // Fetch posts from relevant subreddits
+    const recentPosts: any[] = [];
+
+    for (const subreddit of uniqueSubreddits) {
       try {
         const redditUrl = `https://www.reddit.com/r/${subreddit}/new.rss?limit=25`;
         const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(redditUrl)}`;
@@ -109,171 +258,44 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No posts found", newLeadsCount: 0 });
     }
 
-    // Analyze product description for smart matching
-    const descLower = (
-      projectDescription +
-      " " +
-      (targetAudience || "")
-    ).toLowerCase();
-
-    // Detect what the product does
-    const productType = {
-      isInventory:
-        descLower.includes("stock") || descLower.includes("inventory"),
-      isSales:
-        descLower.includes("sell") ||
-        descLower.includes("sales") ||
-        descLower.includes("seller"),
-      isCRM: descLower.includes("crm") || descLower.includes("customer"),
-      isAccounting:
-        descLower.includes("account") ||
-        descLower.includes("invoice") ||
-        descLower.includes("payment"),
-      isMarketing:
-        descLower.includes("marketing") || descLower.includes("promot"),
-    };
-
-    // Problem patterns with AI explanations
-    const problemPatterns = [
-      {
-        keywords: ["spreadsheet", "excel", "google sheets"],
-        reason:
-          "Currently using manual spreadsheets to manage their business - your app can automate this process and save them hours of work",
-      },
-      {
-        keywords: [
-          "managing inventory",
-          "track stock",
-          "inventory management",
-          "stock management",
-        ],
-        reason:
-          "Explicitly looking for inventory/stock management solution - this is exactly what your app does",
-      },
-      {
-        keywords: [
-          "accounts payable",
-          "invoice",
-          "billing",
-          "payment tracking",
-        ],
-        reason:
-          "Needs help with financial tracking and payment management - your app can streamline this",
-      },
-      {
-        keywords: [
-          "looking for customers",
-          "find customers",
-          "get customers",
-          "customer acquisition",
-        ],
-        reason:
-          "Actively searching for ways to find and acquire customers - your app helps sellers focus on this",
-      },
-      {
-        keywords: ["lead generation", "find leads", "get leads"],
-        reason:
-          "Needs help generating and tracking business leads - core functionality of your platform",
-      },
-      {
-        keywords: [
-          "struggling",
-          "having trouble",
-          "difficulty",
-          "challenge",
-          "problem",
-        ],
-        reason:
-          "Expressing specific business challenges that your product is designed to solve",
-      },
-      {
-        keywords: ["how to", "advice", "recommend", "suggestions", "tips"],
-        reason:
-          "Seeking business advice and recommendations - they're open to trying new solutions like yours",
-      },
-      {
-        keywords: [
-          "first customer",
-          "first client",
-          "first sale",
-          "new business",
-        ],
-        reason:
-          "New business owner who needs foundational tools to get started - perfect early adopter",
-      },
-      {
-        keywords: ["scale", "growing", "expand", "growth", "increasing"],
-        reason:
-          "Growing business that needs better systems to handle increased volume",
-      },
-      {
-        keywords: [
-          "switch from",
-          "migrating",
-          "looking for alternative",
-          "better solution",
-        ],
-        reason:
-          "Actively looking to switch from their current solution - high intent to buy",
-      },
-      {
-        keywords: [
-          "waste time",
-          "time consuming",
-          "manual process",
-          "automate",
-          "tedious",
-        ],
-        reason:
-          "Spending too much time on manual tasks - your automation can free up their time",
-      },
-      {
-        keywords: [
-          "lost money",
-          "losing money",
-          "costly mistake",
-          "expensive error",
-        ],
-        reason:
-          "Experiencing financial losses from poor systems - your app can prevent these losses",
-      },
-      {
-        keywords: ["crm", "customer management", "client management"],
-        reason:
-          "Looking for customer relationship management - your app helps manage seller-customer relationships",
-      },
-      {
-        keywords: ["report", "analytics", "dashboard", "insights"],
-        reason:
-          "Needs better visibility into their business performance - your app provides this",
-      },
-    ];
-
+    // Score and filter posts
     const potentialCustomers: any[] = [];
     const seenUrls = new Set<string>();
 
-    console.log("🔍 Analyzing posts with smart matching...");
+    console.log("🔍 Analyzing posts for relevance...");
 
     for (const post of recentPosts) {
       const title = post.title.toLowerCase();
       const content = post.content.toLowerCase();
       const text = title + " " + content;
 
-      // Score the post
       let score = 0;
       let bestMatch = null;
 
-      // Check each problem pattern
-      for (const pattern of problemPatterns) {
-        for (const kw of pattern.keywords) {
-          if (text.includes(kw)) {
-            score += 3;
-            if (
-              !bestMatch ||
-              pattern.keywords.length > bestMatch.keywords.length
-            ) {
-              bestMatch = pattern;
-            }
+      // Check for problem keywords
+      for (const kw of problemKeywords) {
+        if (text.includes(kw)) {
+          score += 3;
+          if (!bestMatch || kw.length > (bestMatch || "").length) {
+            bestMatch = kw;
+          }
+        }
+      }
+
+      // Check for product-related keywords
+      for (const kw of productKeywords) {
+        if (text.includes(kw)) {
+          score += 2;
+        }
+      }
+
+      // Check for target audience keywords
+      if (targetAudience) {
+        const audienceLower = targetAudience.toLowerCase();
+        const audienceWords = audienceLower.split(/[\s,]+/);
+        for (const word of audienceWords) {
+          if (word.length > 3 && text.includes(word)) {
+            score += 5;
           }
         }
       }
@@ -289,37 +311,10 @@ export async function POST(req: Request) {
         score += 2;
       }
 
-      // Bonus for asking questions (shows they want help)
+      // Bonus for asking questions
       if (title.includes("?") || content.includes("?")) {
         score += 1;
       }
-
-      // Bonus if matches product type
-      if (
-        productType.isInventory &&
-        (text.includes("inventory") || text.includes("stock"))
-      )
-        score += 5;
-      if (
-        productType.isSales &&
-        (text.includes("sell") || text.includes("sales"))
-      )
-        score += 5;
-      if (
-        productType.isCRM &&
-        (text.includes("customer") || text.includes("client"))
-      )
-        score += 5;
-      if (
-        productType.isAccounting &&
-        (text.includes("invoice") || text.includes("payment"))
-      )
-        score += 5;
-      if (
-        productType.isMarketing &&
-        (text.includes("marketing") || text.includes("promot"))
-      )
-        score += 5;
 
       // Filter out spam/self-promo
       const isSelfPromo =
@@ -328,12 +323,26 @@ export async function POST(req: Request) {
         text.includes("click here") ||
         text.includes("buy my");
 
-      if (score >= 3 && !isSelfPromo && !seenUrls.has(post.url)) {
+      // Filter out irrelevant industries based on product
+      const isIrrelevant =
+        (descLower.includes("saas") &&
+          (text.includes("lawn care") ||
+            text.includes("clothing") ||
+            text.includes("restaurant"))) ||
+        (descLower.includes("ecommerce") && text.includes("saas")) ||
+        false;
+
+      if (
+        score >= 3 &&
+        !isSelfPromo &&
+        !isIrrelevant &&
+        !seenUrls.has(post.url)
+      ) {
         seenUrls.add(post.url);
 
         // Generate AI explanation
         const aiExplanation = bestMatch
-          ? `This person is ${bestMatch.reason}. Your ${projectName} app ${descLower.includes("stock") ? "for stock management" : descLower.includes("sell") ? "for sellers" : "can help them"} by solving this specific pain point.`
+          ? `This person is ${bestMatch} - your ${projectName} app can help them solve this specific challenge.`
           : `This person is discussing business challenges that your ${projectName} app could potentially help with.`;
 
         potentialCustomers.push({
