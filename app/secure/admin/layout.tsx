@@ -4,7 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const [admin, setAdmin] = useState<any>(null);
@@ -64,6 +68,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/secure/admin/emails", label: "Email Campaigns", icon: "📧" },
     { href: "/secure/admin/analytics", label: "Analytics", icon: "📈" },
     { href: "/secure/admin/ai-insights", label: "AI Insights", icon: "🤖" },
+    { href: "/secure/admin/support", label: "Support Messages", icon: "💬" },
     { href: "/secure/admin/settings", label: "Settings", icon: "⚙️" },
   ];
 
@@ -195,7 +200,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         ))}
 
         <div className="nav-section">Account</div>
-        <button onClick={handleLogout} className="nav-item" style={{ width: "100%", textAlign: "left", background: "none", border: "none", cursor: "pointer" }}>
+        <button
+          onClick={handleLogout}
+          className="nav-item"
+          style={{
+            width: "100%",
+            textAlign: "left",
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+          }}
+        >
           <span>🚪</span>
           <span>Logout</span>
         </button>
@@ -205,16 +220,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="admin-main">
         <div className="admin-header">
           <div>
-            <h1 style={{ fontSize: "20px", fontWeight: 600, color: "var(--white)", margin: 0 }}>
+            <h1
+              style={{
+                fontSize: "20px",
+                fontWeight: 600,
+                color: "var(--white)",
+                margin: 0,
+              }}
+            >
               {navItems.find((n) => n.href === pathname)?.label || "Admin"}
             </h1>
-            <p style={{ fontSize: "13px", color: "var(--muted)", margin: "4px 0 0 0" }}>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--muted)",
+                margin: "4px 0 0 0",
+              }}
+            >
               Manage your ClipVoBooster platform
             </p>
           </div>
           <div className="admin-user">
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: "13px", fontWeight: 600, color: "var(--white)" }}>
+              <div
+                style={{
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  color: "var(--white)",
+                }}
+              >
                 {admin?.name}
               </div>
               <div style={{ fontSize: "12px", color: "var(--muted)" }}>
@@ -227,9 +261,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
         </div>
 
-        <div style={{ padding: "32px" }}>
-          {children}
-        </div>
+        <div style={{ padding: "32px" }}>{children}</div>
       </div>
     </div>
   );
