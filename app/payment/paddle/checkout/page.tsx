@@ -20,7 +20,10 @@ function CheckoutContent() {
   const plan = searchParams.get("plan");
   const customerEmail = searchParams.get("email");
 
-  const clientToken = "test_14360885662003008ab180a517a";
+  // Use environment variables (change in .env.local for testing, Vercel for production)
+  const clientToken = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN || "";
+  const paddleEnvironment =
+    process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "sandbox";
 
   useEffect(() => {
     console.log("🔍 Checkout params:", {
@@ -60,8 +63,9 @@ function CheckoutContent() {
     if (!isLoaded || !window.Paddle) return;
 
     console.log("🚀 Initializing Paddle...");
+    console.log("📋 Environment:", paddleEnvironment);
 
-    window.Paddle.Environment.set("sandbox");
+    window.Paddle.Environment.set(paddleEnvironment);
 
     window.Paddle.Initialize({
       token: clientToken,
