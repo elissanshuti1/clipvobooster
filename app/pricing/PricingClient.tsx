@@ -1035,18 +1035,27 @@ export default function PricingClient() {
             {/* Business Plan */}
             <div className="pricing-card">
               <h3 className="pricing-name">Business</h3>
-              <div className="pricing-price">$49<span>/month</span></div>
-              <p className="pricing-desc">For agencies and high-volume teams.</p>
+              <div className="pricing-price">
+                $49<span>/month</span>
+              </div>
+              <p className="pricing-desc">
+                For agencies and high-volume teams.
+              </p>
               <ul className="pricing-features">
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Everything in Professional</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>2,000 emails/month</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>1,000 AI-discovered leads/month</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Unlimited templates</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Dedicated support</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Unlimited lead storage</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Custom analytics</li>
-                <li><svg className="check-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12" /></svg>Unlimited team members</li>
-              </ul>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Everything in Professional
                 </li>
                 <li>
                   <svg
@@ -1061,7 +1070,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Team lead sharing
+                  2,000 emails/month
                 </li>
                 <li>
                   <svg
@@ -1076,7 +1085,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Custom lead filters
+                  1,000 AI-discovered leads/month
                 </li>
                 <li>
                   <svg
@@ -1091,7 +1100,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Unlimited analytics
+                  Unlimited templates
                 </li>
                 <li>
                   <svg
@@ -1106,7 +1115,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Historical data (unlimited)
+                  Dedicated support
                 </li>
                 <li>
                   <svg
@@ -1121,7 +1130,7 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  Dedicated account manager
+                  Unlimited lead storage
                 </li>
                 <li>
                   <svg
@@ -1136,7 +1145,22 @@ export default function PricingClient() {
                   >
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
-                  24/7 priority support
+                  Custom analytics
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Unlimited team members
                 </li>
               </ul>
               {subscription?.plan === "business" ? (
