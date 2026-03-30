@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import clientPromise from "@/lib/mongodb";
+import Parser from "rss-parser";
 import { updateProgress } from "@/lib/progress-store";
 
-// POST - FAST customer discovery (keyword-based, 10 seconds)
+const parser = new Parser();
+
+// POST - FAST customer discovery with REAL Reddit RSS (10-15 seconds)
 export async function POST(req: Request) {
   try {
     const cookie = (req as any).headers.get("cookie") || "";
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const { projectName, projectDescription } = user.profile;
+    const { projectName, projectDescription, targetAudience } = user.profile;
     console.log(`🎯 Finding customers for: ${projectName}`);
 
     // Clear old leads
@@ -56,92 +59,161 @@ export async function POST(req: Request) {
       matchesFound: 0,
     });
 
-    // Pre-defined high-quality leads (updated weekly - these are ALWAYS relevant)
-    // In production, you'd fetch from Reddit API or a curated database
-    const sampleLeads = [
-      {
-        title: "How do I find my first 10 customers for my SaaS?",
-        author: "u/StartupFounder23",
-        subreddit: "SaaS",
-        url: "https://reddit.com/r/SaaS/comments/example1",
-        content:
-          "I built a tool for email marketing but struggling to find customers. Where should I look?",
-        publishedAt: new Date().toISOString(),
-        notes: "Looking for first customers",
-        aiMatchReason: "Explicitly asking how to find customers for SaaS",
-      },
-      {
-        title: "Best ways to get B2B leads?",
-        author: "u/B2BMarketer",
-        subreddit: "entrepreneur",
-        url: "https://reddit.com/r/entrepreneur/comments/example2",
-        content:
-          "Running a B2B service and need consistent lead flow. What's worked for you?",
-        publishedAt: new Date().toISOString(),
-        notes: "Needs B2B leads",
-        aiMatchReason: "Asking for lead generation advice",
-      },
-      {
-        title: "Struggling to get customers despite having a great product",
-        author: "u/FrustratedFounder",
-        subreddit: "smallbusiness",
-        url: "https://reddit.com/r/smallbusiness/comments/example3",
-        content:
-          "Built an amazing product but can't seem to find customers. Any advice?",
-        publishedAt: new Date().toISOString(),
-        notes: "Has product, needs customers",
-        aiMatchReason: "Has product but struggling to find customers",
-      },
-      {
-        title: "Customer acquisition strategies for early stage startups?",
-        author: "u/EarlyStageCEO",
-        subreddit: "startup",
-        url: "https://reddit.com/r/startup/comments/example4",
-        content:
-          "What customer acquisition channels worked for you in the early days?",
-        publishedAt: new Date().toISOString(),
-        notes: "Early stage, needs acquisition",
-        aiMatchReason: "Asking about customer acquisition",
-      },
-      {
-        title: "How to validate demand before building?",
-        author: "u/WannabeFounder",
-        subreddit: "entrepreneur",
-        url: "https://reddit.com/r/entrepreneur/comments/example5",
-        content:
-          "Have an idea but want to make sure people will pay. How do I find potential customers to talk to?",
-        publishedAt: new Date().toISOString(),
-        notes: "Looking for potential customers",
-        aiMatchReason: "Wanting to find customers for validation",
-      },
+    // Fetch Reddit posts via CORS proxy (bypasses IP blocking)
+    const recentPosts: any[] = [];
+    const subreddits = [
+      "SaaS",
+      "entrepreneur",
+      "smallbusiness",
+      "startup",
+      "sideproject",
+      "indiehackers",
     ];
 
-    console.log(`📊 Found ${sampleLeads.length} potential customers`);
+    // Use multiple proxies for reliability
+    const proxies = [
+      (url: string) =>
+        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+      (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+      (url: string) =>
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+    ];
+
+    for (const subreddit of subreddits) {
+      try {
+        const redditUrl = `https://www.reddit.com/r/${subreddit}/search.rss?q=finding+customers+OR+need+customers+OR+looking+for+customers+OR+get+customers+OR+customer+acquisition+OR+lead+generation&sort=new&limit=20`;
+
+        // Try each proxy until one works
+        let rssText = "";
+        for (const proxyFn of proxies) {
+          const proxyUrl = proxyFn(redditUrl);
+          console.log(`📡 Trying proxy for r/${subreddit}...`);
+
+          const response = await fetch(proxyUrl, {
+            headers: { Accept: "application/rss+xml" },
+            cache: "no-store",
+          });
+
+          if (response.ok) {
+            rssText = await response.text();
+            console.log(`✅ Proxy worked for r/${subreddit}`);
+            break;
+          }
+        }
+
+        if (!rssText) {
+          console.log(`⚠️ All proxies failed for r/${subreddit}`);
+          continue;
+        }
+
+        const feed = await parser.parseString(rssText);
+        console.log(
+          `📦 Parsed ${feed.items?.length || 0} items from r/${subreddit}`,
+        );
+
+        for (const item of feed.items?.slice(0, 15) || []) {
+          const postDate = new Date(item.pubDate || Date.now());
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+          if (postDate >= sevenDaysAgo) {
+            recentPosts.push({
+              title: item.title || "",
+              content: (item.content || item.summary || "").slice(0, 800),
+              author: item.author || "Unknown",
+              subreddit,
+              url: item.link || "",
+              publishedAt: postDate.toISOString(),
+            });
+          }
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      } catch (err) {
+        console.error(`Failed r/${subreddit}:`, err);
+      }
+    }
+
+    console.log(`📊 Found ${recentPosts.length} posts to analyze`);
     updateProgress(userId, {
       stage: "analyzing",
-      postsFound: sampleLeads.length,
+      postsFound: recentPosts.length,
       totalBatches: 1,
-      batchesAnalyzed: 1,
-      matchesFound: sampleLeads.length,
+      batchesAnalyzed: 0,
+      matchesFound: 0,
+    });
+
+    if (recentPosts.length === 0) {
+      return NextResponse.json({
+        error: "No posts found. Try again.",
+        newLeadsCount: 0,
+      });
+    }
+
+    // Keyword matching for customer-seeking posts
+    const potentialCustomers: any[] = [];
+    const seenUrls = new Set<string>();
+
+    const customerKeywords = [
+      "looking for customers",
+      "need customers",
+      "find customers",
+      "get customers",
+      "customer acquisition",
+      "lead generation",
+      "get leads",
+      "find leads",
+      "struggling to find customers",
+      "how to get customers",
+      "where to find customers",
+      "first customers",
+      "get my first customer",
+      "need more clients",
+      "looking for clients",
+      "find clients",
+    ];
+
+    console.log("🔍 Matching posts with customer keywords...");
+
+    for (const post of recentPosts) {
+      const text = (post.title + " " + post.content).toLowerCase();
+
+      const matched = customerKeywords.find((kw) => text.includes(kw));
+      if (matched && !seenUrls.has(post.url)) {
+        seenUrls.add(post.url);
+        potentialCustomers.push({
+          userId,
+          title: post.title,
+          author: post.author,
+          subreddit: post.subreddit,
+          url: post.url,
+          content: post.content.slice(0, 800),
+          publishedAt: post.publishedAt,
+          notes: `Looking for customers`,
+          aiMatchReason: `Post mentions: ${matched}`,
+          status: "new",
+          isAutoDiscovered: true,
+          createdAt: new Date(),
+        });
+        console.log(`✅ Match: ${post.title.slice(0, 50)}...`);
+      }
+    }
+
+    console.log(`🎯 Total leads found: ${potentialCustomers.length}`);
+    updateProgress(userId, {
+      stage: "saving",
+      matchesFound: potentialCustomers.length,
     });
 
     // Save leads
-    const leadsToSave = sampleLeads.map((lead) => ({
-      userId,
-      ...lead,
-      status: "new",
-      isAutoDiscovered: true,
-      createdAt: new Date(),
-    }));
-
-    if (leadsToSave.length > 0) {
-      await leads.insertMany(leadsToSave);
-      console.log(`✅ Saved ${leadsToSave.length} leads`);
+    if (potentialCustomers.length > 0) {
+      await leads.insertMany(potentialCustomers);
+      console.log(`✅ Saved ${potentialCustomers.length} leads`);
     }
 
     updateProgress(userId, {
       stage: "complete",
-      matchesFound: leadsToSave.length,
+      matchesFound: potentialCustomers.length,
     });
 
     const today = new Date();
@@ -160,7 +232,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       message: "Customer discovery complete",
-      newLeadsCount: leadsToSave.length,
+      newLeadsCount: potentialCustomers.length,
       totalToday: todayCount,
     });
   } catch (error: any) {
