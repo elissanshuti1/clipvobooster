@@ -9,12 +9,12 @@ const JWT_SECRET = process.env.JWT_SECRET || "";
 // Get price ID based on plan
 function getPriceId(plan: string): string {
   switch (plan) {
+    case "free-trial":
+      return process.env.PADDLE_PRICE_ID_FREE_TRIAL || "";
     case "starter":
       return process.env.PADDLE_PRICE_ID_STARTER || "";
     case "professional":
       return process.env.PADDLE_PRICE_ID_PROFESSIONAL || "";
-    case "business":
-      return process.env.PADDLE_PRICE_ID_BUSINESS || "";
     default:
       return process.env.PADDLE_PRICE_ID_STARTER || "";
   }
@@ -23,12 +23,12 @@ function getPriceId(plan: string): string {
 // Get product ID based on plan
 function getProductId(plan: string): string {
   switch (plan) {
+    case "free-trial":
+      return process.env.PADDLE_PRODUCT_ID_FREE_TRIAL || "";
     case "starter":
       return process.env.PADDLE_PRODUCT_ID_STARTER || "";
     case "professional":
       return process.env.PADDLE_PRODUCT_ID_PROFESSIONAL || "";
-    case "business":
-      return process.env.PADDLE_PRODUCT_ID_BUSINESS || "";
     default:
       return process.env.PADDLE_PRODUCT_ID_STARTER || "";
   }
@@ -41,12 +41,12 @@ function getPlanDetails(plan: string): {
   interval: string;
 } {
   switch (plan) {
+    case "free-trial":
+      return { name: "Free Trial", price: 15, interval: "month" };
     case "starter":
       return { name: "Starter", price: 15, interval: "month" };
     case "professional":
       return { name: "Professional", price: 29, interval: "month" };
-    case "business":
-      return { name: "Business", price: 49, interval: "month" };
     default:
       return { name: "Starter", price: 15, interval: "month" };
   }
@@ -67,6 +67,10 @@ export async function POST(request: NextRequest) {
     console.log(
       "  - PADDLE_PRICE_ID_BUSINESS:",
       process.env.PADDLE_PRICE_ID_BUSINESS || "❌ NOT SET",
+    );
+    console.log(
+      "  - PADDLE_PRICE_ID_FREE_TRIAL:",
+      process.env.PADDLE_PRICE_ID_FREE_TRIAL || "❌ NOT SET",
     );
 
     const cookies = cookie.parse(request.headers.get("cookie") || "");
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
     const { plan } = await request.json();
     console.log("📦 Plan requested:", plan);
 
-    if (!plan || !["starter", "professional", "business"].includes(plan)) {
+    if (!plan || !["free-trial", "starter", "professional"].includes(plan)) {
       return NextResponse.json(
         { error: "Invalid plan selected" },
         { status: 400 },

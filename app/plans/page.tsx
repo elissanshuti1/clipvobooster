@@ -151,8 +151,11 @@ export default function PlansClient() {
         }
         .plans-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 24px; margin-top: 64px;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px; margin-top: 64px;
+        }
+        @media (min-width: 960px) {
+          .plans-grid { grid-template-columns: repeat(3, 1fr); }
         }
         .plans-card {
           background: var(--bg2);
@@ -311,6 +314,96 @@ export default function PlansClient() {
           )}
 
           <div className="plans-grid">
+            {/* Free Trial */}
+            <div className="plans-card featured">
+              <div className="plans-badge">🔥 Try Free for 3 Days</div>
+              <h3 className="plans-name">Free Trial</h3>
+              <div
+                className="plans-price"
+                style={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 2,
+                }}
+              >
+                <span
+                  style={{ fontSize: 48, fontWeight: 700, color: "#4ade80" }}
+                >
+                  FREE
+                </span>
+                <span
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 400,
+                    color: "var(--muted)",
+                  }}
+                >
+                  Then $15/month after
+                </span>
+              </div>
+              <p className="plans-desc">
+                Start free for 3 days, then $15/month. Cancel anytime.
+              </p>
+              <ul className="plans-features">
+                <li>
+                  <CheckIcon />
+                  300 emails/month
+                </li>
+                <li>
+                  <CheckIcon />
+                  100 AI-discovered leads/month
+                </li>
+                <li>
+                  <CheckIcon />
+                  AI email writing
+                </li>
+                <li>
+                  <CheckIcon />5 email templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  Email support
+                </li>
+                <li>
+                  <CheckIcon />
+                  30-day lead storage
+                </li>
+                <li>
+                  <CheckIcon />
+                  Basic analytics
+                </li>
+                <li>
+                  <CheckIcon />1 team member
+                </li>
+              </ul>
+              <button
+                className="plans-btn primary"
+                onClick={() => handlePurchase("free-trial")}
+                disabled={!!subscription || isProcessing === "free-trial"}
+              >
+                {isProcessing === "free-trial" ? (
+                  <>
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        border: "2px solid rgba(255,255,255,0.3)",
+                        borderTop: "2px solid white",
+                        borderRadius: "50%",
+                        animation: "spin 1s linear infinite",
+                      }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ArrowIcon />
+                    Start Free Trial
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Starter */}
             <div className="plans-card">
               <h3 className="plans-name">Starter</h3>
@@ -429,75 +522,6 @@ export default function PlansClient() {
                 disabled={!!subscription || isProcessing === "professional"}
               >
                 {isProcessing === "professional" ? (
-                  <>
-                    <div
-                      style={{
-                        width: 16,
-                        height: 16,
-                        border: "2px solid rgba(255,255,255,0.3)",
-                        borderTop: "2px solid white",
-                        borderRadius: "50%",
-                        animation: "spin 1s linear infinite",
-                      }}
-                    />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <ArrowIcon />
-                    Get Started
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Business */}
-            <div className="plans-card">
-              <h3 className="plans-name">Business</h3>
-              <div className="plans-price">
-                $49<span>/month</span>
-              </div>
-              <p className="plans-desc">For agencies and high-volume teams.</p>
-              <ul className="plans-features">
-                <li>
-                  <CheckIcon />
-                  Everything in Professional
-                </li>
-                <li>
-                  <CheckIcon />
-                  2,000 emails/month
-                </li>
-                <li>
-                  <CheckIcon />
-                  1,000 AI-discovered leads/month
-                </li>
-                <li>
-                  <CheckIcon />
-                  Unlimited templates
-                </li>
-                <li>
-                  <CheckIcon />
-                  Dedicated support
-                </li>
-                <li>
-                  <CheckIcon />
-                  Unlimited lead storage
-                </li>
-                <li>
-                  <CheckIcon />
-                  Custom analytics
-                </li>
-                <li>
-                  <CheckIcon />
-                  Unlimited team members
-                </li>
-              </ul>
-              <button
-                className="plans-btn primary"
-                onClick={() => handlePurchase("business")}
-                disabled={!!subscription || isProcessing === "business"}
-              >
-                {isProcessing === "business" ? (
                   <>
                     <div
                       style={{

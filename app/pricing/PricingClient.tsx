@@ -326,9 +326,12 @@ export default function PricingClient() {
         /* Pricing Cards */
         .pricing-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 24px;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
           margin-top: 64px;
+        }
+        @media (min-width: 960px) {
+          .pricing-grid { grid-template-columns: repeat(3, 1fr); }
         }
         .pricing-card {
           background: var(--bg2);
@@ -681,6 +684,201 @@ export default function PricingClient() {
 
           {/* Pricing Cards */}
           <div className="pricing-grid">
+            {/* Free Trial */}
+            <div className="pricing-card featured">
+              <div className="pricing-badge">🔥 Try Free for 3 Days</div>
+              <h3 className="pricing-name">Free Trial</h3>
+              <div
+                className="pricing-price"
+                style={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 2,
+                }}
+              >
+                <span
+                  style={{ fontSize: 48, fontWeight: 700, color: "#4ade80" }}
+                >
+                  FREE
+                </span>
+                <span
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 400,
+                    color: "var(--muted)",
+                  }}
+                >
+                  Then $15/month after
+                </span>
+              </div>
+              <p className="pricing-desc">
+                Start free for 3 days, then $15/month. Cancel anytime.
+              </p>
+              <ul className="pricing-features">
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  300 emails/month
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  100 AI-discovered leads/month
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  AI email writing
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  5 email templates
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Email support
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  30-day lead storage
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Basic analytics
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  1 team member
+                </li>
+              </ul>
+              {subscription?.plan === "free-trial" ? (
+                <div className="current-plan-badge">Current Plan</div>
+              ) : (
+                <button
+                  className="pricing-btn primary"
+                  onClick={() => handlePurchase("free-trial")}
+                  disabled={!!subscription || isProcessing === "free-trial"}
+                >
+                  {isProcessing === "free-trial" ? (
+                    <>
+                      <div
+                        style={{
+                          width: 16,
+                          height: 16,
+                          border: "2px solid rgba(255,255,255,0.3)",
+                          borderTop: "2px solid white",
+                          borderRadius: "50%",
+                          animation: "spin 1s linear infinite",
+                        }}
+                      />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                      </svg>
+                      Start Free Trial
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
             {/* Starter Plan */}
             <div className="pricing-card">
               <h3 className="pricing-name">Starter</h3>
@@ -813,7 +1011,8 @@ export default function PricingClient() {
                   1 team member
                 </li>
               </ul>
-              {subscription?.plan === "starter" ? (
+              {subscription?.plan === "starter" ||
+              subscription?.plan === "free-trial" ? (
                 <div className="current-plan-badge">Current Plan</div>
               ) : (
                 <button
@@ -998,180 +1197,6 @@ export default function PricingClient() {
                   disabled={!!subscription || isProcessing === "professional"}
                 >
                   {isProcessing === "professional" ? (
-                    <>
-                      <div
-                        style={{
-                          width: 16,
-                          height: 16,
-                          border: "2px solid rgba(255,255,255,0.3)",
-                          borderTop: "2px solid white",
-                          borderRadius: "50%",
-                          animation: "spin 1s linear infinite",
-                        }}
-                      />
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <svg
-                        width="18"
-                        height="18"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M5 12h14M13 6l6 6-6 6" />
-                      </svg>
-                      Get Started
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-
-            {/* Business Plan */}
-            <div className="pricing-card">
-              <h3 className="pricing-name">Business</h3>
-              <div className="pricing-price">
-                $49<span>/month</span>
-              </div>
-              <p className="pricing-desc">
-                For agencies and high-volume teams.
-              </p>
-              <ul className="pricing-features">
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Everything in Professional
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  2,000 emails/month
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  1,000 AI-discovered leads/month
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited templates
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Dedicated support
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited lead storage
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Custom analytics
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited team members
-                </li>
-              </ul>
-              {subscription?.plan === "business" ? (
-                <div className="current-plan-badge">Current Plan</div>
-              ) : (
-                <button
-                  className="pricing-btn primary"
-                  onClick={() => handlePurchase("business")}
-                  disabled={!!subscription || isProcessing === "business"}
-                >
-                  {isProcessing === "business" ? (
                     <>
                       <div
                         style={{

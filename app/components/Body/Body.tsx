@@ -276,9 +276,15 @@ export default function Body() {
         /* ── Pricing ── */
         .landing-root .pricing-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-          gap: 24px;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 20px;
           margin-top: 64px;
+        }
+        @media (min-width: 960px) {
+          .landing-root .pricing-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 959px) {
+          .landing-root .pricing-grid { grid-template-columns: 1fr; }
         }
         .landing-root .pricing-card {
           background: var(--bg2);
@@ -596,6 +602,179 @@ export default function Body() {
             customer discovery and email tracking.
           </p>
           <div className="pricing-grid">
+            {/* Free Trial */}
+            <div className="pricing-card featured">
+              <div className="pricing-badge">🔥 Try Free for 3 Days</div>
+              <div className="pricing-name">Free Trial</div>
+              <div
+                className="pricing-price"
+                style={{
+                  flexDirection: "column",
+                  alignItems: "flex-start",
+                  gap: 2,
+                }}
+              >
+                <span
+                  style={{ fontSize: 48, fontWeight: 700, color: "#4ade80" }}
+                >
+                  FREE
+                </span>
+                <span
+                  style={{
+                    fontSize: 16,
+                    fontWeight: 400,
+                    color: "var(--muted)",
+                  }}
+                >
+                  Then $15/month after
+                </span>
+              </div>
+              <p className="pricing-desc">
+                Start free for 3 days, then $15/month. Cancel anytime.
+              </p>
+              <ul className="pricing-features">
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  300 emails/month
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  100 AI-discovered leads/month
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  AI email writing
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  5 email templates
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Email support
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  30-day lead storage
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  Basic analytics
+                </li>
+                <li>
+                  <svg
+                    className="check-icon"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4ade80"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  1 team member
+                </li>
+              </ul>
+              <a
+                href="/signup"
+                className="pricing-btn primary"
+                style={{ textDecoration: "none" }}
+              >
+                Start Free Trial
+                <svg
+                  viewBox="0 0 24 24"
+                  width="12"
+                  height="12"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  style={{ marginLeft: 4 }}
+                >
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </a>
+            </div>
+
             {/* Starter Plan */}
             <div className="pricing-card">
               <div className="pricing-name">Starter</div>
@@ -878,158 +1057,6 @@ export default function Body() {
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                   3 team members
-                </li>
-              </ul>
-              <a
-                href="/api/auth/google"
-                className="pricing-btn primary"
-                style={{ textDecoration: "none" }}
-              >
-                Get Started
-                <svg
-                  viewBox="0 0 24 24"
-                  width="12"
-                  height="12"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  style={{ marginLeft: 4 }}
-                >
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </a>
-            </div>
-
-            {/* Business Plan */}
-            <div className="pricing-card">
-              <div className="pricing-name">Business</div>
-              <div className="pricing-price">
-                $49<span>/month</span>
-              </div>
-              <p className="pricing-desc">
-                For agencies and high-volume teams.
-              </p>
-              <ul className="pricing-features">
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Everything in Professional
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  2,000 emails/month
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  1,000 AI-discovered leads/month
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited templates
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Dedicated support
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited lead storage
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Custom analytics
-                </li>
-                <li>
-                  <svg
-                    className="check-icon"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#4ade80"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  Unlimited team members
                 </li>
               </ul>
               <a
