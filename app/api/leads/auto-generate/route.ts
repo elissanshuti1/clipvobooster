@@ -4,6 +4,8 @@ import clientPromise from "@/lib/mongodb";
 import { Groq } from "groq-sdk";
 import { ObjectId } from "mongodb";
 
+export const runtime = 'edge';
+
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
