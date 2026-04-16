@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
-import OpenAI from 'openai';
+import { Groq } from 'groq-sdk';
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(req: Request) {
   try {
@@ -20,11 +24,6 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { prompt, type } = body;
 
-    const openai = new OpenAI({
-      baseURL: 'https://openrouter.ai/api/v1',
-      apiKey: process.env.OPENROUTER_API_KEY,
-    });
-
     const typeInstructions: Record<string, string> = {
       advertising: 'Write a promotional email advertising ClipVoBooster features. Be persuasive but professional.',
       tutorial: 'Write an educational email explaining how to use ClipVoBooster effectively. Include step-by-step instructions.',
@@ -32,8 +31,8 @@ export async function POST(req: Request) {
       custom: 'Write a professional email for ClipVoBooster users.',
     };
 
-    const completion = await openai.chat.completions.create({
-      model: 'mistralai/mistral-7b-instruct:free',
+    const completion = await groq.chat.completions.create({
+      model: 'llama-3.1-8b-instant',
       messages: [
         {
           role: 'system',

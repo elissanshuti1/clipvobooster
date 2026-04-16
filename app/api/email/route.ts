@@ -2,6 +2,11 @@ import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { Groq } from 'groq-sdk';
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 // POST - Generate email draft using AI
 export async function POST(req: Request) {
@@ -71,24 +76,16 @@ export async function POST(req: Request) {
     let emailData = { subject: '', body: '' };
 
     try {
-      const aiResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'https://clipvobooster.com',
-          'X-Title': 'ClipVoBooster'
-        },
-        body: JSON.stringify({
-          model: 'mistralai/mistral-7b-instruct:free',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional email copywriter. Write personalized, effective outreach emails.`
-            },
-            {
-              role: 'user',
-              content: `Write a personalized outreach email:
+      const completion = await groq.chat.completions.create({
+        model: 'llama-3.1-8b-instant',
+        messages: [
+          {
+            role: 'system',
+            content: `You are a professional email copywriter. Write personalized, effective outreach emails.`
+          },
+          {
+            role: 'user',
+            content: `Write a personalized outreach email:
 
 RECIPIENT: ${contact.name} from ${contact.company || 'their company'}
 
@@ -97,25 +94,21 @@ DESCRIPTION: ${product.description}
 URL: ${product.url || 'https://example.com'}
 
 Format as JSON: {"subject": "...", "body": "..."}`
-            }
-          ],
-          max_tokens: 600,
-          temperature: 0.7
-        })
+          }
+        ],
+        max_tokens: 600,
+        temperature: 0.7
       });
 
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        const aiContent = aiData.choices?.[0]?.message?.content || '';
+      const aiContent = completion.choices[0]?.message?.content || '';
 
-        try {
-          const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
-          if (jsonMatch) {
-            emailData = JSON.parse(jsonMatch[0]);
-          }
-        } catch (e) {
-          console.error('AI parse error:', e);
+      try {
+        const jsonMatch = aiContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          emailData = JSON.parse(jsonMatch[0]);
         }
+      } catch (e) {
+        console.error('AI parse error:', e);
       }
     } catch (aiError) {
       console.error('AI generation error:', aiError);

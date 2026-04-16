@@ -1,16 +1,10 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import OpenAI from "openai";
+import { Groq } from "groq-sdk";
 import clientPromise from "@/lib/mongodb";
 
-// Initialize OpenRouter client
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  defaultHeaders: {
-    "HTTP-Referer": "https://clipvo.site",
-    "X-OpenRouter-Title": "ClipVo Email",
-  },
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 export async function POST(req: Request) {
@@ -103,9 +97,9 @@ RULES:
 
 Write a COMPLETE, PROFESSIONAL email that sounds human and gets results.`;
 
-    // Call OpenRouter API
-    const completion = await openrouter.chat.completions.create({
-      model: "google/gemma-2-9b-it",
+    // Call Groq API
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
       messages: [{ role: "user", content: emailPrompt }],
       max_tokens: 400,
       temperature: 0.7,
