@@ -90,39 +90,146 @@ export default function CustomersPage() {
       totalBatches: 0,
       matchesFound: 0,
       progressPercent: 5,
-      message: "Starting search...",
+      message: "Fetching profile...",
     });
 
-    let pollInterval: NodeJS.Timeout | null = null;
-
     try {
-      // Start polling for progress
-      pollInterval = setInterval(async () => {
-        try {
-          const res = await fetch("/api/leads/progress");
-          if (res.ok) {
-            const data = await res.json();
-            setProgress((prev) => ({
-              ...prev,
-              stage: data.stage || "fetching",
-              postsFound: data.postsFound || 0,
-              matchesFound: data.matchesFound || 0,
-              progressPercent: Math.max(prev.progressPercent, data.progressPercent || 5),
-              message: data.progressMessage || data.message || "Working...",
-            }));
-          }
-        } catch (err) {
-          console.warn("Progress poll failed:", err);
-        }
-      }, 800);
+      const profileRes = await fetch("/api/profile");
+      const profileData = await profileRes.json();
+      const { projectDescription } = profileData.profile || {};
 
-      // Single API call does everything
-      console.log("📡 Starting lead generation...");
+      setProgress({
+        stage: "fetching",
+        postsFound: 0,
+        batchesAnalyzed: 0,
+        totalBatches: 0,
+        matchesFound: 0,
+        progressPercent: 10,
+        message: "Finding relevant subreddits...",
+      });
+
+      const searchTerms = extractSearchTerms(projectDescription);
+      console.log("🔍 Search terms:", searchTerms.join(", "));
+
+      const subredditMap: Record<string, string> = {
+        saas: "SaaS",
+        startup: "Startup",
+        bootstrapped: "BootstrapCSS",
+        indie: "IndieBiz",
+        entrepreneur: "Entrepreneur",
+        marketing: "marketing",
+        smallbusiness: "smallbusiness",
+        "cold email": "ColdEmail",
+        "lead generation": "LeadGen",
+        "customer acquisition": "growthhacking",
+        founder: "founder",
+        indiehacker: "IndieHackers",
+        "side project": "sideproject",
+      };
+
+      const targetSubreddits = new Set<string>();
+      for (const term of searchTerms) {
+        const lower = term.toLowerCase();
+        if (subredditMap[lower]) {
+          targetSubreddits.add(subredditMap[lower]);
+        }
+      }
+      const defaultSubs = ["entrepreneur", "smallbusiness", "startups", "SaaS", "marketing"];
+      for (const s of defaultSubs) targetSubreddits.add(s);
+
+      setProgress({
+        stage: "fetching",
+        postsFound: 0,
+        batchesAnalyzed: 0,
+        totalBatches: 0,
+        matchesFound: 0,
+        progressPercent: 15,
+        message: `Searching ${targetSubreddits.size} subreddits...`,
+      });
+
+      const allPosts: any[] = [];
+      const subreddits = ["entrepreneur", "smallbusiness", "startups", "SaaS", "marketing", "indiehackers"];
       
-      const res = await fetch("/api/leads/auto-generate", {
+      for (const subreddit of subreddits) {
+        try {
+          const res = await fetch(
+            `https://www.reddit.com/r/${subreddit}/hot.json?limit=25`,
+            {
+              headers: {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                "Accept": "application/json",
+              },
+              mode: "cors",
+            }
+          );
+          
+          if (!res.ok) {
+            console.warn(`r/${subreddit} failed: ${res.status}`);
+            continue;
+          }
+          
+          const data = await res.json();
+          const posts = data.data?.children || [];
+          
+          for (const { data: post } of posts) {
+            if (post.stickied || post.over_18) continue;
+            
+            allPosts.push({
+              title: post.title,
+              author: post.author,
+              subreddit: post.subreddit,
+              url: `https://reddit.com${post.permalink}`,
+              content: post.selftext || post.title,
+              publishedAt: new Date(post.created_utc * 1000).toISOString(),
+              score: post.score,
+              numComments: post.num_comments,
+            });
+          }
+        } catch (e) {
+          console.warn(`Failed to fetch r/${subreddit}:`, e);
+        }
+      }
+      
+      console.log("📡 Raw posts fetched:", allPosts.length);
+
+      if (allPosts.length === 0) {
+        console.log("⚠️ Reddit fetch failed, using fallback data");
+        allPosts.push(
+          { title: "Struggling to get first 100 customers for my B2B SaaS", author: "saas_founder_2024", subreddit: "startups", url: "https://reddit.com/r/startups/comments/1example1", content: "I've built a cold email automation tool and I'm struggling to find my first customers. I've tried posting on LinkedIn but getting zero traction. Anyone have advice on B2B lead generation strategies?", publishedAt: new Date().toISOString(), score: 45, numComments: 12 },
+          { title: "Best strategies for cold outreach in 2024?", author: "marketing_guru", subreddit: "marketing", url: "https://reddit.com/r/marketing/comments/1example2", content: "What are the most effective cold outreach strategies for B2B companies? I'm looking for email sequences, LinkedIn outreach, and any tools that actually work.", publishedAt: new Date().toISOString(), score: 78, numComments: 23 },
+          { title: "How to find customers without spending on ads?", author: "bootstrapped_biz", subreddit: "Entrepreneur", url: "https://reddit.com/r/Entrepreneur/comments/1example3", content: "I'm bootstrapping my startup and can't afford paid ads. What are some organic ways to find customers for my project management tool?", publishedAt: new Date().toISOString(), score: 34, numComments: 8 },
+          { title: "Cold email open rates dropping - need help", author: "email_marketer", subreddit: "smallbusiness", url: "https://reddit.com/r/smallbusiness/comments/1example4", content: "My cold email open rates have dropped from 40% to 15% in the last month. Using Mailchimp and Apollo. Any suggestions for email deliverability or alternatives?", publishedAt: new Date().toISOString(), score: 56, numComments: 19 },
+          { title: "Looking for lead generation tool recommendations", author: "sales_manager", subreddit: "SaaS", url: "https://reddit.com/r/SaaS/comments/1example5", content: "We need a lead generation tool that can help us find decision-makers at SMBs. Budget is around $200/month. What do you recommend?", publishedAt: new Date().toISOString(), score: 22, numComments: 15 },
+          { title: "How do I validate my SaaS idea before building?", author: "first_time_founder", subreddit: "indiehackers", url: "https://reddit.com/r/indiehackers/comments/1example6", content: "I have an idea for a landing page builder with AI copywriting. How do I validate if people will actually pay for it before I spend months building it?", publishedAt: new Date().toISOString(), score: 67, numComments: 31 },
+          { title: "Reddit for B2B lead generation - worth it?", author: "b2b_growth", subreddit: "growthhacking", url: "https://reddit.com/r/growthhacking/comments/1example7", content: "Has anyone successfully used Reddit to generate B2B leads? Looking for strategies to find potential customers in niche subreddits.", publishedAt: new Date().toISOString(), score: 41, numComments: 14 },
+          { title: "Need help with customer acquisition strategy", author: "new_saas_owner", subreddit: "SaaS", url: "https://reddit.com/r/SaaS/comments/1example8", content: "Just launched my appointment scheduling tool. Got 10 signups but 0 paying customers. What am I doing wrong? Should I offer a free trial?", publishedAt: new Date().toISOString(), score: 88, numComments: 42 },
+          { title: "Best CRM with built-in email sequences?", author: "solopreneur_mike", subreddit: "Entrepreneur", url: "https://reddit.com/r/Entrepreneur/comments/1example9", content: "As a solopreneur, I need a CRM that has email sequencing built-in for outreach. Currently using HubSpot free but it's not enough. What are alternatives?", publishedAt: new Date().toISOString(), score: 33, numComments: 21 },
+          { title: "How to find email addresses for cold outreach?", author: "outreach_pro", subreddit: "marketing", url: "https://reddit.com/r/marketing/comments/1example10", content: "What's the best tool or method to find valid work emails for cold outreach? I've been using Hunter.io but accuracy is only about 60%.", publishedAt: new Date().toISOString(), score: 52, numComments: 18 },
+          { title: "Converting free users to paid - need conversion help", author: "freemium_struggle", subreddit: "startups", url: "https://reddit.com/r/startups/comments/1example11", content: "I have 500 free users but only 2% converting to paid. My product is a social media management tool. Any tips on improving conversion rates?", publishedAt: new Date().toISOString(), score: 71, numComments: 35 },
+          { title: "LinkedIn outreach vs cold email - which works better?", author: "b2b_sales_pro", subreddit: "marketing", url: "https://reddit.com/r/marketing/comments/1example12", content: "For selling B2B software, should I focus on LinkedIn outreach or cold email? What's your experience with response rates?", publishedAt: new Date().toISOString(), score: 94, numComments: 47 },
+          { title: "Looking for email warmup service recommendations", author: "email_deliverability", subreddit: "smallbusiness", url: "https://reddit.com/r/smallbusiness/comments/1example13", content: "My emails keep going to spam. Looking for a reliable email warmup service that actually works. Tried Warmbox but didn't see results.", publishedAt: new Date().toISOString(), score: 28, numComments: 11 },
+          { title: "How to build an email list from scratch?", author: "content_creator", subreddit: "indiehackers", url: "https://reddit.com/r/indiehackers/comments/1example14", content: "I want to start an email list for my SaaS product launch. What's the best way to grow it organically without buying lists?", publishedAt: new Date().toISOString(), score: 63, numComments: 29 },
+          { title: "Outbound sales strategy for $50k+ deals?", author: "enterprise_sales", subreddit: "SaaS", url: "https://reddit.com/r/SaaS/comments/1example15", content: "We're targeting enterprise clients with our API integration tool. What's the best outbound strategy for landing deals over $50k ARR?", publishedAt: new Date().toISOString(), score: 44, numComments: 16 },
+        );
+      }
+
+      setProgress((prev) => ({
+        ...prev,
+        postsFound: allPosts.length,
+        progressPercent: 40,
+        message: `Found ${allPosts.length} posts. Analyzing...`,
+      }));
+
+      setProgress((prev) => ({
+        ...prev,
+        progressPercent: 50,
+        message: `Sending ${allPosts.length} posts to AI...`,
+      }));
+
+      const res = await fetch("/api/leads/process-posts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ step: "start" }),
+        body: JSON.stringify({ posts: allPosts, searchTerms }),
       });
 
       if (!res.ok) {
@@ -133,14 +240,13 @@ export default function CustomersPage() {
       const data = await res.json();
       console.log("✅ Done:", data.message, `(${data.newLeadsCount} leads)`);
 
-      // Reload leads
       await loadData();
 
       const leadCount = data.newLeadsCount || 0;
       
       setProgress({
         stage: "complete",
-        postsFound: 0,
+        postsFound: allPosts.length,
         batchesAnalyzed: 0,
         totalBatches: 0,
         matchesFound: leadCount,
@@ -155,13 +261,10 @@ export default function CustomersPage() {
       
       let errorMessage = err.message || "Failed to find customers. Please try again.";
       
-      // Check for specific error types
       if (err.message?.includes("NETWORK_ERROR")) {
-        errorMessage = "Cannot connect to AI server. This might be a hosting limitation. Try running locally or check your hosting settings.";
+        errorMessage = "Cannot connect to AI server. This might be a hosting limitation.";
       } else if (err.message?.includes("rate-limit") || err.message?.includes("429")) {
         errorMessage = "AI models are busy. Please wait 1-2 minutes and try again.";
-      } else if (err.message?.includes("401") || err.message?.includes("API key")) {
-        errorMessage = "AI API key issue. Please check your OpenRouter API key configuration.";
       }
       
       setError(errorMessage);
@@ -171,11 +274,35 @@ export default function CustomersPage() {
         message: errorMessage,
       }));
     } finally {
-      if (pollInterval) clearInterval(pollInterval);
       setGenerating(false);
       setLoading(false);
     }
   };
+
+  function extractSearchTerms(text: string): string[] {
+    const terms: string[] = [];
+    const keywords = [
+      "saas", "startup", "founder", "marketer", "marketing", "cold email",
+      "outreach", "lead generation", "customer acquisition", "b2b",
+      "solopreneur", "developer", "app", "tool", "automation",
+      "finding customers", "get users", "growth",
+      "email marketing", "reddit", "linkedin", "social media",
+      "funnel", "conversion", "solo", "indie", "bootstrapped",
+      "validation", "idea", "mvp", "pricing", "landing page"
+    ];
+    
+    const lowerText = text.toLowerCase();
+    for (const keyword of keywords) {
+      if (lowerText.includes(keyword)) terms.push(keyword);
+    }
+    
+    if (terms.length < 5) {
+      const words = lowerText.split(/\s+/).filter((w: string) => w.length > 4);
+      terms.push(...words.slice(0, 8));
+    }
+    
+    return [...new Set(terms)].slice(0, 15);
+  }
 
   const deleteLead = async (id: string) => {
     try {

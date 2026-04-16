@@ -92,31 +92,22 @@ function extractSearchTerms(text: string): string[] {
 
 async function searchReddit(keyword: string, limit: number = 20): Promise<any[]> {
   try {
-    const redditUrl = `https://old.reddit.com/search.json?q=${encodeURIComponent(keyword)}&sort=new&restrict_sr=&limit=${limit}&raw_json=1`;
+    const url = `https://old.reddit.com/search.json?q=${encodeURIComponent(keyword)}&sort=new&restrict_sr=&limit=${limit}&raw_json=1`;
     console.log(`🔍 Searching Reddit: ${keyword}`);
     
-    // Use Google Apps Script as proxy (bypasses Vercel block)
-    const proxyUrl = `https://script.google.com/macros/s/AKfycbxz34nJb_WoS578mokXzFPA37TnKlIruiyuWseiQjCsUmOj2ENoATcpzbnZ9JGBZDbRNQ/exec?url=${encodeURIComponent(redditUrl)}`;
-    
-    const response = await fetch(proxyUrl, {
-      signal: AbortSignal.timeout(15000),
+    const response = await fetch(url, {
+      headers: REDDIT_HEADERS,
+      signal: AbortSignal.timeout(8000),
     });
 
-    console.log(`📡 Proxy response status: ${response.status}`);
+    console.log(`📡 Reddit response status: ${response.status}`);
 
     if (!response.ok) {
-      console.error(`❌ Proxy fetch failed: ${response.status}`);
+      console.error(`❌ Reddit fetch failed: ${response.status} ${response.statusText}`);
       return [];
     }
 
     const data = await response.json();
-    
-    // If proxy returns error
-    if (data.error) {
-      console.error(`❌ Proxy error: ${data.error}`);
-      return [];
-    }
-
     const posts = data.data?.children || [];
     console.log(`✅ Found ${posts.length} posts for "${keyword}"`);
 

@@ -1,0 +1,4 @@
+# Test Google Script Proxy
+# Copy the URL below and open it in your browser
+
+https://script.google.com/macros/s/AKfycbxz34nJb_WoS578mokXzFPA37TnKlIruiyuWseiQjCsUmOj2ENoATcpzbnZ9JGBZDbRNQ/exec?url=https://old.reddit.com/search.json?q=test&limit=1
