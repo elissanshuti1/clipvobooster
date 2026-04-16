@@ -93,16 +93,23 @@ function extractSearchTerms(text: string): string[] {
 async function searchReddit(keyword: string, limit: number = 20): Promise<any[]> {
   try {
     const url = `https://old.reddit.com/search.json?q=${encodeURIComponent(keyword)}&sort=new&restrict_sr=&limit=${limit}&raw_json=1`;
+    console.log(`🔍 Searching Reddit: ${keyword}`);
     
     const response = await fetch(url, {
       headers: REDDIT_HEADERS,
-      signal: AbortSignal.timeout(6000),
+      signal: AbortSignal.timeout(8000),
     });
 
-    if (!response.ok) return [];
+    console.log(`📡 Reddit response status: ${response.status}`);
+
+    if (!response.ok) {
+      console.error(`❌ Reddit fetch failed: ${response.status} ${response.statusText}`);
+      return [];
+    }
 
     const data = await response.json();
     const posts = data.data?.children || [];
+    console.log(`✅ Found ${posts.length} posts for "${keyword}"`);
 
     return posts.map((child: any) => {
       const p = child.data;
@@ -117,7 +124,8 @@ async function searchReddit(keyword: string, limit: number = 20): Promise<any[]>
         numComments: p.num_comments || 0,
       };
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error(`❌ Reddit search error for "${keyword}":`, error?.message || error);
     return [];
   }
 }
