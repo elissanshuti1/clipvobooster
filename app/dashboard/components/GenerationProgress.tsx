@@ -1,5 +1,37 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
+interface GenerationProgressProps {
+  stage: string;
+  postsFound?: number;
+  batchesAnalyzed?: number;
+  totalBatches?: number;
+  matchesFound?: number;
+  progressPercent?: number;
+  message?: string;
+}
+
+const ENCOURAGING_MESSAGES = [
+  "We're finding people who need your product...",
+  "Great things take time - we're analyzing thoroughly...",
+  "Your next customers might be right here...",
+  "Each match is carefully vetted for quality...",
+  "Finding the perfect fit for your product...",
+  "Almost there - great leads take a moment...",
+  "Scanning communities for potential customers...",
+  "Quality leads are worth the wait...",
+  "Your AI assistant is working hard...",
+  "Discovering hidden opportunities...",
+];
+
+const TIPS_MESSAGES = [
+  "💡 Tip: The more specific your product description, the better matches you'll find.",
+  "💡 Tip: Include what problem your product solves for better results.",
+  "💡 Tip: People on Reddit are actively looking for solutions like yours.",
+  "💡 Tip: High-quality leads take time but convert better.",
+];
+
 export default function GenerationProgress({
   stage,
   postsFound,
@@ -8,68 +40,71 @@ export default function GenerationProgress({
   matchesFound,
   progressPercent,
   message,
-}: {
-  stage: string;
-  postsFound?: number;
-  batchesAnalyzed?: number;
-  totalBatches?: number;
-  matchesFound?: number;
-  progressPercent?: number;
-  message?: string;
-}) {
+}: GenerationProgressProps) {
+  const [displayMessage, setDisplayMessage] = useState(ENCOURAGING_MESSAGES[0]);
+  const [tipMessage, setTipMessage] = useState(TIPS_MESSAGES[0]);
+  const [dots, setDots] = useState("");
+
+  useEffect(() => {
+    const dotsInterval = setInterval(() => {
+      setDots((prev) => {
+        if (prev.length >= 3) return "";
+        return prev + ".";
+      });
+    }, 400);
+
+    const messageInterval = setInterval(() => {
+      setDisplayMessage(
+        ENCOURAGING_MESSAGES[Math.floor(Math.random() * ENCOURAGING_MESSAGES.length)]
+      );
+      setTipMessage(
+        TIPS_MESSAGES[Math.floor(Math.random() * TIPS_MESSAGES.length)]
+      );
+    }, 5000);
+
+    return () => {
+      clearInterval(dotsInterval);
+      clearInterval(messageInterval);
+    };
+  }, []);
+
   const getProgressText = () => {
     if (message) return message;
     if (stage === "fetching") {
-      return "📡 Fetching recent Reddit posts...";
+      return "Scanning communities for potential customers...";
     }
     if (stage === "analyzing" && totalBatches) {
-      const percent = Math.round((batchesAnalyzed / totalBatches) * 100);
-      return `🔍 Analyzing posts... ${batchesAnalyzed}/${totalBatches} (${percent}%) - Found ${matchesFound} potential customers`;
-    }
-    if (stage === "matching") {
-      return `🎯 Found ${matchesFound} potential customers so far...`;
-    }
-    if (stage === "saving") {
-      return "💾 Saving your customers...";
+      return `AI is analyzing posts for your product...`;
     }
     if (stage === "complete") {
-      return `✅ Done! Found ${matchesFound} potential customers!`;
+      return `Found ${matchesFound} potential customers!`;
     }
-    return "⏳ Starting...";
+    return "Finding your perfect customers...";
   };
 
   const getProgressPercent = () => {
     if (progressPercent) return progressPercent;
-    if (stage === "fetching") return 20;
+    if (stage === "fetching") return 25;
     if (stage === "analyzing" && totalBatches) {
-      return 20 + ((batchesAnalyzed || 0) / totalBatches) * 60;
+      return 25 + ((batchesAnalyzed || 0) / totalBatches) * 60;
     }
-    if (stage === "matching") return 85;
-    if (stage === "saving") return 95;
     if (stage === "complete") return 100;
-    return 0;
+    return 10;
   };
 
-  const getDetails = () => {
-    if (stage === "fetching") {
-      return "Reading recent posts from business subreddits...";
-    }
-    if (stage === "analyzing") {
-      return `🤖 AI is analyzing each post to see if they need your product. Being very selective - only perfect matches!`;
-    }
-    if (stage === "matching") {
-      return `🎯 Great! Found ${matchesFound} people who might need your product.`;
-    }
-    if (stage === "saving") {
-      return "💾 Almost done! Saving your customer list...";
-    }
-    return "";
+  const getStageEmoji = () => {
+    if (stage === "complete") return "🎉";
+    if (stage === "analyzing") return "🤖";
+    if (stage === "fetching") return "📡";
+    return "🎯";
   };
+
+  const currentProgress = getProgressPercent();
 
   return (
     <div
       style={{
-        maxWidth: 600,
+        maxWidth: 650,
         margin: "40px auto",
         padding: 32,
         textAlign: "center",
@@ -78,8 +113,8 @@ export default function GenerationProgress({
       {/* Animated Logo */}
       <div
         style={{
-          width: 80,
-          height: 80,
+          width: 100,
+          height: 100,
           margin: "0 auto 24px",
           position: "relative",
         }}
@@ -90,111 +125,243 @@ export default function GenerationProgress({
             position: "absolute",
             width: "100%",
             height: "100%",
-            border: "3px solid rgba(99, 102, 241, 0.2)",
-            borderTop: "3px solid #6366f1",
+            border: "4px solid rgba(99, 102, 241, 0.15)",
+            borderTop: "4px solid #6366f1",
+            borderRight: "4px solid #8b5cf6",
             borderRadius: "50%",
-            animation: "spin 1s linear infinite",
+            animation: "spin 1.5s linear infinite",
           }}
         />
+
+        {/* Progress arc */}
+        <svg
+          style={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            transform: "rotate(-90deg)",
+          }}
+        >
+          <circle
+            cx="50"
+            cy="50"
+            r="46"
+            fill="none"
+            stroke="rgba(99, 102, 241, 0.3)"
+            strokeWidth="4"
+          />
+          <circle
+            cx="50"
+            cy="50"
+            r="46"
+            fill="none"
+            stroke="url(#gradient)"
+            strokeWidth="4"
+            strokeDasharray={`${currentProgress * 2.89} 289`}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dasharray 0.5s ease" }}
+          />
+          <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#6366f1" />
+              <stop offset="100%" stopColor="#8b5cf6" />
+            </linearGradient>
+          </defs>
+        </svg>
 
         {/* Inner pulsing circle */}
         <div
           style={{
             position: "absolute",
-            width: "60%",
-            height: "60%",
-            top: "20%",
-            left: "20%",
+            width: "70%",
+            height: "70%",
+            top: "15%",
+            left: "15%",
             background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
             borderRadius: "50%",
-            animation: "pulse 1.5s ease-in-out infinite",
-          }}
-        />
-
-        {/* Center icon */}
-        <div
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            display: "grid",
-            placeItems: "center",
-            fontSize: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            animation: "pulse 2s ease-in-out infinite",
+            boxShadow: "0 0 30px rgba(99, 102, 241, 0.4)",
           }}
         >
-          🎯
+          <span style={{ fontSize: 36 }}>{getStageEmoji()}</span>
         </div>
       </div>
 
-      {/* Progress Text */}
+      {/* Main Progress Text */}
       <h2
         style={{
-          fontSize: 18,
-          fontWeight: 600,
-          color: "var(--white)",
+          fontSize: 22,
+          fontWeight: 700,
+          color: "#ffffff",
           marginBottom: 8,
+          fontFamily: "'DM Sans', sans-serif",
         }}
       >
-        {getProgressText()}
+        {getProgressText()}{dots}
       </h2>
 
-      {/* Details */}
-      <p style={{ fontSize: 13, color: "var(--muted)", marginBottom: 24 }}>
-        {getDetails()}
-      </p>
+      {/* Percentage */}
+      <div
+        style={{
+          fontSize: 48,
+          fontWeight: 800,
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          marginBottom: 16,
+          fontFamily: "'Instrument Serif', serif",
+        }}
+      >
+        {Math.round(currentProgress)}%
+      </div>
+
+      {/* Rotating Encouraging Message */}
+      <div
+        style={{
+          fontSize: 15,
+          color: "#a5b4fc",
+          marginBottom: 8,
+          minHeight: 24,
+          fontStyle: "italic",
+        }}
+      >
+        {displayMessage}
+      </div>
 
       {/* Progress Bar */}
       <div
         style={{
           width: "100%",
-          height: 6,
+          height: 8,
           background: "rgba(255,255,255,0.1)",
-          borderRadius: 3,
+          borderRadius: 4,
           marginTop: 24,
+          marginBottom: 8,
           overflow: "hidden",
         }}
       >
         <div
           style={{
-            width: `${getProgressPercent()}%`,
+            width: `${currentProgress}%`,
             height: "100%",
             background: "linear-gradient(90deg, #6366f1, #8b5cf6)",
-            transition: "width 0.3s ease",
+            borderRadius: 4,
+            transition: "width 0.5s ease",
+            boxShadow: "0 0 10px rgba(99, 102, 241, 0.5)",
           }}
         />
       </div>
 
-      {/* Stats */}
+      {/* Stats Cards */}
       <div
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, 1fr)",
           gap: 16,
-          marginTop: 24,
-          padding: "16px",
-          background: "rgba(255,255,255,0.03)",
-          borderRadius: 12,
+          marginTop: 32,
+          marginBottom: 24,
         }}
       >
-        <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--white)" }}>
+        <div
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16,
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#ffffff",
+              fontFamily: "'Instrument Serif', serif",
+            }}
+          >
             {postsFound || 0}
           </div>
-          <div style={{ fontSize: 11, color: "var(--muted)" }}>Posts Found</div>
+          <div style={{ fontSize: 12, color: "#8b95a5", marginTop: 4 }}>
+            Posts Scanned
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "var(--white)" }}>
+
+        <div
+          style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16,
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#ffffff",
+              fontFamily: "'Instrument Serif', serif",
+            }}
+          >
             {batchesAnalyzed || 0}/{totalBatches || "?"}
           </div>
-          <div style={{ fontSize: 11, color: "var(--muted)" }}>Analyzed</div>
+          <div style={{ fontSize: 12, color: "#8b95a5", marginTop: 4 }}>
+            Batches Analyzed
+          </div>
         </div>
-        <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#22c55e" }}>
+
+        <div
+          style={{
+            background: "rgba(34, 197, 94, 0.1)",
+            border: "1px solid rgba(34, 197, 94, 0.3)",
+            borderRadius: 16,
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 32,
+              fontWeight: 700,
+              color: "#22c55e",
+              fontFamily: "'Instrument Serif', serif",
+            }}
+          >
             {matchesFound || 0}
           </div>
-          <div style={{ fontSize: 11, color: "var(--muted)" }}>Matches</div>
+          <div style={{ fontSize: 12, color: "#8b95a5", marginTop: 4 }}>
+            Matches Found
+          </div>
         </div>
       </div>
+
+      {/* Tip Box */}
+      <div
+        style={{
+          background: "rgba(99, 102, 241, 0.08)",
+          border: "1px solid rgba(99, 102, 241, 0.2)",
+          borderRadius: 12,
+          padding: 16,
+          fontSize: 13,
+          color: "#8b95a5",
+          lineHeight: 1.6,
+        }}
+      >
+        {tipMessage}
+      </div>
+
+      {/* Why this takes time */}
+      {stage !== "complete" && (
+        <div
+          style={{
+            marginTop: 24,
+            fontSize: 12,
+            color: "#5a6373",
+          }}
+        >
+          ⚡ This uses free AI models which may take longer but keeps your costs at zero
+        </div>
+      )}
 
       {/* CSS Animations */}
       <style>{`
@@ -204,20 +371,10 @@ export default function GenerationProgress({
         @keyframes pulse {
           0%, 100% { 
             transform: scale(1);
-            opacity: 1;
           }
           50% { 
-            transform: scale(1.1);
-            opacity: 0.8;
+            transform: scale(1.05);
           }
-        }
-        :root {
-          --bg: #08090d;
-          --bg1: #0e1018;
-          --line: rgba(255,255,255,0.07);
-          --text: #dde1e9;
-          --muted: #5a6373;
-          --white: #ffffff;
         }
       `}</style>
     </div>

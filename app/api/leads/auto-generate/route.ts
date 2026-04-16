@@ -1,46 +1,233 @@
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import clientPromise from "@/lib/mongodb";
-import Parser from "rss-parser";
-import OpenAI from "openai";
-import { updateProgress } from "@/lib/progress-store";
+import { Groq } from "groq-sdk";
+import { ObjectId } from "mongodb";
 
-const parser = new Parser();
-
-// Initialize OpenRouter for AI analysis
-const openrouter = new OpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
 });
 
-// POST - AI-POWERED customer discovery (AI analyzes product & finds relevant leads)
-export async function POST(req: Request) {
+const REDDIT_HEADERS = {
+  "User-Agent": "ClipVoBooster/1.0 (contact support@clipvo.site)",
+  Accept: "application/json",
+  "Accept-Language": "en-US,en;q=0.9",
+  "Cache-Control": "no-cache",
+};
+
+async function authenticate(req: Request) {
+  const cookie = (req as any).headers.get("cookie") || "";
+  const m = cookie.split(";").map((s: string) => s.trim()).find((s: string) => s.startsWith("token="));
+  const token = m ? m.split("=")[1] : null;
+
+  if (!token) return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+
   try {
-    const cookie = (req as any).headers.get("cookie") || "";
-    const m = cookie
-      .split(";")
-      .map((s: string) => s.trim())
-      .find((s: string) => s.startsWith("token="));
-    const token = m ? m.split("=")[1] : null;
+    const payload = jwt.verify(token, process.env.JWT_SECRET as string);
+    return { userId: String((payload as any).sub) };
+  } catch {
+    return { error: NextResponse.json({ error: "Invalid token" }, { status: 401 }) };
+  }
+}
 
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+async function getJob(db: any, userId: string) {
+  return await db.collection("lead_jobs").findOne({ userId });
+}
 
-    let payload;
-    try {
-      payload = jwt.verify(token, process.env.JWT_SECRET as string);
-    } catch {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
+async function updateJob(db: any, userId: string, data: any) {
+  await db.collection("lead_jobs").updateOne(
+    { userId },
+    { $set: { ...data, updatedAt: new Date() } },
+    { upsert: true },
+  );
+}
+
+function extractSearchTerms(text: string): string[] {
+  const terms: string[] = [];
+  
+  // Extract problem phrases
+  const patterns = [
+    /need\s+([a-z\s]+?)(?:\s+for|\s+to|\s+my|$)/gi,
+    /looking\s+for\s+([a-z\s]+?)(?:\s+to|\s+my|$)/gi,
+    /can't\s+find\s+([a-z\s]+?)(?:\s+to|\s+my|$)/gi,
+    /struggling\s+(?:with|to)\s+([a-z\s]+?)(?:\s+to|\s+my|$)/gi,
+    /how\s+(?:do\s+I|to)\s+([a-z\s]+?)(?:\s+for|$)/gi,
+    /where\s+(?:can\s+I|to)\s+([a-z\s]+?)(?:\s+for|$)/gi,
+    /find\s+([a-z\s]+?)(?:\s+for|\s+to|$)/gi,
+    /get\s+([a-z\s]+?)(?:\s+for|\s+to|$)/gi,
+  ];
+  
+  for (const pattern of patterns) {
+    const matches = text.match(pattern);
+    if (matches) {
+      terms.push(...matches.map(m => m.replace(/\s+/g, ' ').trim().toLowerCase()));
     }
+  }
+  
+  // Extract key words (excluding common words)
+  const stopWords = new Set([
+    'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
+    'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were', 'be', 'been',
+    'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+    'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that',
+    'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my',
+    'your', 'his', 'her', 'its', 'our', 'their', 'what', 'which', 'who',
+    'when', 'where', 'why', 'how', 'all', 'each', 'every', 'both', 'few',
+    'more', 'most', 'other', 'some', 'such', 'no', 'not', 'only', 'same',
+    'so', 'than', 'too', 'very', 'just', 'now', 'then', 'here', 'there',
+    'product', 'service', 'business', 'company', 'startup', 'founder', 'owner',
+    'help', 'need', 'want', 'looking', 'find', 'get', 'make', 'like', 'using'
+  ]);
+  
+  const words = text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !stopWords.has(w) && !terms.some(t => t.includes(w)));
+  
+  terms.push(...words);
+  
+  return [...new Set(terms)].slice(0, 15);
+}
 
-    const userId = String(payload.sub);
+async function searchReddit(keyword: string, limit: number = 20): Promise<any[]> {
+  try {
+    const url = `https://old.reddit.com/search.json?q=${encodeURIComponent(keyword)}&sort=new&restrict_sr=&limit=${limit}&raw_json=1`;
+    
+    const response = await fetch(url, {
+      headers: REDDIT_HEADERS,
+      signal: AbortSignal.timeout(6000),
+    });
+
+    if (!response.ok) return [];
+
+    const data = await response.json();
+    const posts = data.data?.children || [];
+
+    return posts.map((child: any) => {
+      const p = child.data;
+      return {
+        title: p.title || "",
+        content: (p.selftext || "").slice(0, 600),
+        author: p.author || "Anonymous",
+        subreddit: p.subreddit || "unknown",
+        url: `https://reddit.com${p.permalink || ""}`,
+        publishedAt: new Date((p.created_utc || Date.now() / 1000) * 1000).toISOString(),
+        score: p.score || 0,
+        numComments: p.num_comments || 0,
+      };
+    });
+  } catch (error) {
+    return [];
+  }
+}
+
+function scorePost(post: any, searchTerms: string[]): number {
+  const text = (post.title + " " + post.content).toLowerCase();
+  let score = 0;
+  
+  for (const term of searchTerms) {
+    const termLower = term.toLowerCase();
+    if (text.includes(termLower)) {
+      score += 3;
+      if (post.title.toLowerCase().includes(termLower)) {
+        score += 5; // Bonus if in title
+      }
+    }
+  }
+  
+  // Boost posts with engagement
+  score += Math.min(post.numComments / 10, 5);
+  
+  return score;
+}
+
+function isGoodLead(post: any): boolean {
+  const text = (post.title + " " + post.content).toLowerCase();
+  const subreddit = post.subreddit?.toLowerCase() || "";
+  const title = post.title?.toLowerCase() || "";
+  
+  // Skip if promotional
+  if (text.includes("check out my") || text.includes("visit my website") ||
+      text.includes("click here") || text.includes("buy my") ||
+      text.includes("hire me") || text.includes("my product") ||
+      text.includes("my service") || text.includes("i made this") ||
+      text.includes("feedback on my") || text.includes("shameless") ||
+      text.includes("follow my journey") || text.includes("here's what i built") ||
+      text.includes("need testers") || text.includes("test my app") ||
+      text.includes("referral code") || text.includes("refer a friend") ||
+      text.includes("sign up bonus")) {
+    return false;
+  }
+  
+  // Skip if just sharing/announcing without a question
+  if ((text.includes("i launched") || text.includes("just launched") || 
+       text.includes("we built") || text.includes("i built") ||
+       text.includes("analyzed how") || text.includes("here's my") ||
+       text.includes("what are people using") || text.includes("what's people using") ||
+       text.includes("this is one of the most") || text.includes("reduced our"))) {
+    return false;
+  }
+  
+  // Skip wrong subreddit topics
+  if (subreddit.includes("indiegaming") || subreddit.includes("indiedev") ||
+      subreddit.includes("gaming") || subreddit.includes("cyberpunk") ||
+      subreddit.includes("webtoon") || subreddit.includes("games") ||
+      subreddit.includes("steampunk") || subreddit.includes("webgames") ||
+      subreddit.includes("android") || subreddit.includes("ios") ||
+      subreddit.includes("apple") || subreddit.includes("google") ||
+      subreddit.includes("3dprinting") || subreddit.includes("3dprint") ||
+      subreddit.includes("referral") || subreddit.includes("dubai") ||
+      subreddit.includes("dubai") || subreddit.includes("canada") ||
+      subreddit.includes("compare") || subreddit.includes("claw")) {
+    return false;
+  }
+  
+  // Skip wrong industries
+  if (text.includes("crypto") || text.includes("nft") || 
+      text.includes("flat hunting") || text.includes("game dev") ||
+      text.includes("flipping ") || text.includes("investing") ||
+      text.includes("resin print") || text.includes("3d print") ||
+      text.includes("cloud cost") || text.includes("devops")) {
+    return false;
+  }
+  
+  // Skip general discussions not seeking help
+  if (title.includes("what's working") || title.includes("whats working") ||
+      title.includes("discussion") || title.includes("design advice") ||
+      title.includes("directory") || title.includes("wrapper") ||
+      title.includes("control which senders") || title.includes("how to control")) {
+    return false;
+  }
+  
+  // Must have minimum content
+  if (post.title.length < 15) return false;
+  
+  // Must have some substance
+  if (post.content.length < 50 && post.numComments < 2) return false;
+  
+  return true;
+}
+
+export async function POST(req: Request) {
+  const startTime = Date.now();
+  
+  try {
+    const auth = await authenticate(req);
+    if ("error" in auth) return auth.error;
+    const { userId } = auth;
+
     const client = await clientPromise;
     const db = client.db("clipvobooster");
     const users = db.collection("users");
     const leads = db.collection("leads");
 
+    let body: any = {};
+    try { body = await req.json(); } catch {}
+    const { step } = body;
+
     const user = await users.findOne(
-      { _id: new (require("mongodb").ObjectId)(payload.sub) },
+      { _id: new ObjectId(userId) },
       { projection: { profile: 1 } },
     );
 
@@ -52,413 +239,209 @@ export async function POST(req: Request) {
     }
 
     const { projectName, projectDescription, targetAudience } = user.profile;
-    console.log(`🎯 Finding customers for: ${projectName}`);
-    console.log(`📝 Description: ${projectDescription}`);
 
-    updateProgress(userId, {
-      stage: "analyzing",
-      postsFound: 0,
-      batchesAnalyzed: 0,
-      totalBatches: 1,
-      matchesFound: 0,
-    });
+    // STEP 1: Analyze product and search
+    if (step === "start" || !step) {
+      console.log(`🎯 [${userId}] Starting lead gen for: ${projectName}`);
+      
+      await updateJob(db, userId, {
+        stage: "analyzing",
+        progressPercent: 5,
+        progressMessage: "Analyzing your product...",
+        progressEmoji: "🔍",
+        postsFound: 0,
+        matchesFound: 0,
+      });
 
-    // Get existing lead URLs to prevent duplicates
-    const existingLeads = await leads.find({ userId }).toArray();
-    const existingUrlSet = new Set(existingLeads.map((l: any) => l.url));
-    console.log(`📋 Existing leads in DB: ${existingLeads.length}`);
+      // Extract search terms from product description
+      const searchTerms = extractSearchTerms(projectDescription + " " + (targetAudience || ""));
+      
+      console.log(`📝 Search terms: ${searchTerms.slice(0, 8).join(", ")}`);
 
-    // STEP 1: Use AI to analyze product and extract relevant keywords/subreddits
-    console.log("🤖 AI: Analyzing product description...");
+      await updateJob(db, userId, {
+        progressPercent: 15,
+        progressMessage: `Searching for customers...`,
+        searchTerms,
+      });
 
-    const aiAnalysis = await openrouter.chat.completions.create({
-      model: "google/gemma-2-9b-it",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert at matching products with potential customers on Reddit.
-
-Analyze the product description and return:
-1. Industry type (one of: saas, ecommerce, marketing, creator, realestate, finance, health, education, general)
-2. 10-15 specific keywords that potential customers would use when discussing problems this product solves
-3. 5 relevant subreddits where these people hang out
-4. What problems this product solves
-
-Return JSON format:
-{
-  "industry": "industry_name",
-  "industryLabel": "description of target user (e.g., 'seller or retailer')",
-  "keywords": ["keyword1", "keyword2", ...],
-  "subreddits": ["subreddit1", "subreddit2", ...],
-  "problemsSolved": ["problem1", "problem2", ...]
-}`,
-        },
-        {
-          role: "user",
-          content: `Product Name: ${projectName}
-Product Description: ${projectDescription}
-Target Audience: ${targetAudience || "Not specified"}
-
-Analyze this product and tell me what keywords to search for and which subreddits to find potential customers.`,
-        },
-      ],
-      max_tokens: 500,
-      temperature: 0.3,
-    });
-
-    const aiResponse = aiAnalysis.choices[0].message?.content || "{}";
-    console.log("🤖 AI Response:", aiResponse);
-
-    // Parse AI response
-    let aiData;
-    try {
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      aiData = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
-    } catch {
-      aiData = null;
-    }
-
-    // Fallback if AI fails
-    if (!aiData) {
-      aiData = {
-        industry: "general",
-        industryLabel: "business owner",
-        keywords: [
-          "business",
-          "customer",
-          "product",
-          "service",
-          "company",
-          "startup",
-          "help",
-          "need",
-          "looking for",
-        ],
-        subreddits: ["smallbusiness", "entrepreneur"],
-        problemsSolved: ["business challenges"],
-      };
-    }
-
-    const { industry, industryLabel, keywords, subreddits, problemsSolved } =
-      aiData;
-    console.log(`📊 Industry: ${industry} (${industryLabel})`);
-    console.log(`📊 Keywords: ${keywords.join(", ")}`);
-    console.log(`📊 Subreddits: ${subreddits.join(", ")}`);
-    console.log(`📊 Problems solved: ${problemsSolved.join(", ")}`);
-
-    // Problem keywords (what people struggle with)
-    const problemKeywords = [
-      "looking for",
-      "need help",
-      "struggling",
-      "how to",
-      "advice",
-      "recommend",
-      "suggestions",
-      "trying to",
-      "want to",
-      "need to",
-      "can't find",
-      "can't get",
-      "don't know how",
-      "where to find",
-      "first customer",
-      "first client",
-      "get customers",
-      "find customers",
-      "get leads",
-      "find leads",
-      "get clients",
-      "find clients",
-      "customer acquisition",
-      "lead generation",
-      "marketing strategy",
-      "grow my business",
-      "scale my business",
-      "promote my",
-      "market my",
-      "waste time",
-      "time consuming",
-      "manual process",
-      "automate",
-      "spreadsheet",
-      "excel",
-      "google sheets",
-      "hiring",
-      "looking for",
-      "best software",
-      "best tool",
-      "what software",
-      "what tool",
-      "recommendation",
-    ];
-
-    // Fetch posts from AI-selected subreddits (limit to 50 posts for faster results)
-    const recentPosts: any[] = [];
-    const uniqueSubreddits = [...new Set(subreddits)].slice(0, 5);
-    const maxPostsPerSubreddit = 10; // Reduced from 20 to 10 for speed
-
-    for (const subreddit of uniqueSubreddits) {
-      try {
-        const redditUrl = `https://www.reddit.com/r/${subreddit}/new.rss?limit=25`;
-        const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(redditUrl)}`;
-
-        const response = await fetch(proxyUrl, {
-          headers: { Accept: "application/rss+xml" },
-          cache: "no-store",
+      // Search by all terms
+      const allPosts = new Map<string, any>();
+      const maxTerms = 15;
+      const postsPerTerm = 35;
+      
+      for (let i = 0; i < Math.min(searchTerms.length, maxTerms); i++) {
+        const term = searchTerms[i];
+        
+        await updateJob(db, userId, {
+          progressPercent: 15 + Math.round((i / Math.min(searchTerms.length, maxTerms)) * 30),
+          progressMessage: `Searching Reddit: "${term}"...`,
         });
-
-        if (!response.ok) continue;
-
-        const rssText = await response.text();
-        const feed = await parser.parseString(rssText);
-
-        // Limit posts per subreddit for faster results
-        let postCount = 0;
-        for (const item of feed.items?.slice(0, maxPostsPerSubreddit) || []) {
-          const postDate = new Date(item.pubDate || Date.now());
-          const fiveDaysAgo = new Date();
-          fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
-
-          if (postDate >= fiveDaysAgo && postCount < maxPostsPerSubreddit) {
-            recentPosts.push({
-              title: item.title || "",
-              content: (item.content || item.summary || "").slice(0, 1000),
-              author: item.author || "Unknown",
-              subreddit,
-              url: item.link || "",
-              publishedAt: postDate.toISOString(),
-            });
-            postCount++;
+        
+        const posts = await searchReddit(term, postsPerTerm);
+        
+        for (const post of posts) {
+          if (!allPosts.has(post.url)) {
+            allPosts.set(post.url, post);
           }
         }
-      } catch (err) {
-        console.error(`Failed r/${subreddit}:`, err);
+        
+        await new Promise(r => setTimeout(r, 200));
       }
-    }
 
-    console.log(`📊 Found ${recentPosts.length} posts to analyze`);
-    updateProgress(userId, {
-      stage: "analyzing",
-      postsFound: recentPosts.length,
-      totalBatches: 1,
-      batchesAnalyzed: 0,
-      matchesFound: 0,
-    });
+      console.log(`📊 Found ${allPosts.size} posts from searches`);
 
-    if (recentPosts.length === 0) {
-      return NextResponse.json({
-        message: "No recent posts found. Check back in a few days!",
-        newLeadsCount: 0,
-        totalToday: existingLeads.length,
+      // Score and filter posts
+      const scoredPosts = Array.from(allPosts.values())
+        .map(post => ({ ...post, relevanceScore: scorePost(post, searchTerms) }))
+        .filter(post => isGoodLead(post) && post.relevanceScore >= 4)
+        .sort((a, b) => b.relevanceScore - a.relevanceScore)
+        .slice(0, 40);
+
+      console.log(`📊 Scored ${scoredPosts.length} relevant posts`);
+
+      await updateJob(db, userId, {
+        progressPercent: 50,
+        progressMessage: `Found ${scoredPosts.length} potential matches. AI analyzing...`,
+        posts: scoredPosts,
+        postsFound: scoredPosts.length,
       });
-    }
 
-    // STEP 2: Use AI to analyze each post and determine relevance
-    console.log("🤖 AI: Analyzing posts for relevance...");
+      if (scoredPosts.length === 0) {
+        await db.collection("lead_jobs").deleteOne({ userId });
+        return NextResponse.json({
+          step: "complete",
+          message: "No matching posts found",
+          newLeadsCount: 0,
+        });
+      }
 
-    const potentialCustomers: any[] = [];
-    const seenUrls = new Set<string>();
+      // Use AI to select best matches (single call for all posts)
+      await updateJob(db, userId, {
+        progressPercent: 60,
+        progressMessage: "AI selecting best matches...",
+      });
 
-    // Batch posts for AI analysis (5 at a time to save API calls)
-    const batchSize = 5;
-    for (let i = 0; i < recentPosts.length; i += batchSize) {
-      const batch = recentPosts.slice(i, i + batchSize);
-
-      // Use AI to analyze this batch
-      const aiPostAnalysis = await openrouter.chat.completions.create({
-        model: "google/gemma-2-9b-it",
+      const aiAnalysis = await groq.chat.completions.create({
+        model: "llama-3.1-8b-instant",
         messages: [
           {
             role: "system",
-            content: `You are analyzing Reddit posts to find potential customers for a product.
+            content: `You are finding REAL customers for: ${projectName}
+Product: ${projectDescription}
 
-Product: ${projectName}
-Description: ${projectDescription}
-Target: ${targetAudience || "businesses who need this"}
-Problems it solves: ${problemsSolved.join(", ")}
+A PERFECT customer post must have ALL:
+1. Person is ASKING for a SOLUTION (direct question)
+2. Person has a BUSINESS/STARTUP need
+3. Problem relates to: getting customers, marketing, outreach, cold email, finding leads
 
-For each post, determine:
-1. Is this person potentially needing this product? (yes/no)
-2. Score 1-10 (10 = perfect match)
-3. Why is it relevant or not relevant?
-4. What specific problem do they have that this product solves?
+EXCLUDE (NOT customers):
+- Developers building AI agents (not looking for customers)
+- General "what are people using" discussions
+- Sharing their own products/projects
+- Referral codes, spam
 
-Return JSON array:
-[
-  {
-    "title": "post title",
-    "url": "post url",
-    "isRelevant": true/false,
-    "score": 8,
-    "reason": "explanation of why relevant or not",
-    "problemTheyHave": "specific problem this product solves for them"
-  }
-]
-
-Be VERY STRICT - ONLY mark as relevant if:
-1. The post EXPLICITLY mentions problems this product solves
-2. The person is actively asking for help or solutions
-3. The problem is a CORE use case (not a stretch)
-
-DO NOT mark as relevant if:
-- Post is about a different industry entirely
-- Post is about selling a business (not running one)
-- Post is about unrelated topics (SEO, accounting, rent, etc.)
-- The connection is weak or forced
-- Person is just sharing information (not asking for help)
-
-Quality over quantity - better to return 3 perfect leads than 10 mediocre ones.`,
+Select EXACTLY 12-15 posts. Return JSON:
+[{"url": "post url", "reason": "exact problem needing solution"}]`
           },
           {
             role: "user",
-            content: `Analyze these ${batch.length} Reddit posts:
-
-${batch
-  .map(
-    (post, idx) => `
-Post ${idx + 1}:
-Title: ${post.title}
-Content: ${post.content.substring(0, 500)}
-URL: ${post.url}
----`,
-  )
-  .join("\n")}`,
-          },
+            content: scoredPosts.map(p => 
+              `Post: ${p.title}\nContent: ${p.content.slice(0, 200)}\nURL: ${p.url}\nScore: ${p.relevanceScore}`
+            ).join("\n\n---\n\n")
+          }
         ],
         max_tokens: 1500,
-        temperature: 0.3,
+        temperature: 0.4,
       });
 
-      const aiPostResponse = aiPostAnalysis.choices[0].message?.content || "[]";
-      console.log(`🤖 AI analyzed batch ${Math.floor(i / batchSize) + 1}`);
-
-      // Update progress after each batch
-      updateProgress(userId, {
-        batchesAnalyzed: Math.floor(i / batchSize) + 1,
-        matchesFound: potentialCustomers.length,
-      });
-
-      // Parse AI response
-      let postAnalyses;
-      try {
-        const jsonMatch = aiPostResponse.match(/\[[\s\S]*\]/);
-        postAnalyses = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
-      } catch {
-        postAnalyses = [];
+      const aiResponse = aiAnalysis.choices[0]?.message?.content || "[]";
+      
+      let selectedUrls: {url: string, reason: string}[] = [];
+      const match = aiResponse.match(/\[[\s\S]*\]/);
+      if (match) {
+        selectedUrls = JSON.parse(match[0]);
       }
 
-      // Process relevant posts
-      for (const analysis of postAnalyses) {
-        const post = batch.find((p) => p.url === analysis.url);
+      // Deduplicate selected posts by URL
+      const seenUrls = new Set<string>();
+      selectedUrls = selectedUrls.filter(s => {
+        if (seenUrls.has(s.url)) return false;
+        seenUrls.add(s.url);
+        return true;
+      });
+
+      console.log(`🎯 AI selected ${selectedUrls.length} unique posts`);
+
+      await updateJob(db, userId, {
+        progressPercent: 80,
+        progressMessage: `Saving ${selectedUrls.length} customers...`,
+      });
+
+      // Get existing leads to avoid duplicates
+      const existingLeads = await leads.find({ userId }).toArray();
+      const existingUrls = new Set(existingLeads.map((l: any) => l.url));
+      const existingTitles = new Set(existingLeads.map((l: any) => l.title?.toLowerCase()));
+
+      // Save selected leads
+      const newLeads: any[] = [];
+      for (const selected of selectedUrls) {
+        if (existingUrls.has(selected.url)) continue;
+        
+        const post = scoredPosts.find(p => p.url === selected.url);
         if (!post) continue;
 
-        // Skip if not relevant, low score, duplicate, or self-promo
-        if (!analysis.isRelevant || analysis.score < 8) continue;
-        if (seenUrls.has(post.url) || existingUrlSet.has(post.url)) continue;
-        if (
-          post.content.toLowerCase().includes("check out my") ||
-          post.content.toLowerCase().includes("visit my website") ||
-          post.content.toLowerCase().includes("click here") ||
-          post.content.toLowerCase().includes("buy my") ||
-          post.content.toLowerCase().includes("hire me")
-        )
-          continue;
+        // Skip if same title already exists
+        if (existingTitles.has(post.title?.toLowerCase())) continue;
+        existingTitles.add(post.title?.toLowerCase());
 
-        seenUrls.add(post.url);
-
-        // Generate dynamic AI explanation
-        const aiExplanation = `This ${industryLabel} ${analysis.problemTheyHave}. ${analysis.reason} ${projectName} can help them solve this specific challenge.`;
-
-        potentialCustomers.push({
+        newLeads.push({
           userId,
           title: post.title,
           author: post.author,
           subreddit: post.subreddit,
           url: post.url,
-          content: post.content.slice(0, 800),
+          content: post.content,
           publishedAt: post.publishedAt,
-          notes: `AI Score: ${analysis.score}/10`,
-          aiMatchReason: aiExplanation,
+          notes: `AI Match`,
+          aiMatchReason: selected.reason,
+          source: "reddit",
           status: "new",
           isAutoDiscovered: true,
           createdAt: new Date(),
         });
-
-        // Limit to 10 high-quality leads per search
-        if (potentialCustomers.length >= 10) {
-          break;
-        }
       }
 
-      if (potentialCustomers.length >= 10) {
-        break;
-      }
-    }
-
-    console.log(`🎯 Found ${potentialCustomers.length} qualified leads`);
-    updateProgress(userId, {
-      stage: "saving",
-      matchesFound: potentialCustomers.length,
-    });
-
-    if (potentialCustomers.length > 0) {
-      await leads.insertMany(potentialCustomers);
-
-      // Update user's usage count
-      await users.updateOne(
-        { _id: new (require("mongodb").ObjectId)(payload.sub) },
-        {
-          $inc: { leadsFoundThisMonth: potentialCustomers.length },
-          $set: {
-            usageResetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      if (newLeads.length > 0) {
+        await leads.insertMany(newLeads);
+        
+        await users.updateOne(
+          { _id: new ObjectId(userId) },
+          {
+            $inc: { leadsFoundThisMonth: newLeads.length },
+            $set: { usageResetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
           },
-        },
-      );
-    }
+        );
+      }
 
-    updateProgress(userId, {
-      stage: "complete",
-      matchesFound: potentialCustomers.length,
-    });
+      await db.collection("lead_jobs").deleteOne({ userId });
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayCount = await leads.countDocuments({
-      userId,
-      createdAt: { $gte: today },
-    });
+      const elapsed = Date.now() - startTime;
+      console.log(`✅ [${userId}] Done! ${newLeads.length} leads in ${elapsed}ms`);
 
-    console.log(
-      `✅ Saved ${potentialCustomers.length} new leads. Total today: ${todayCount}`,
-    );
-
-    setTimeout(
-      () => updateProgress(userId, { stage: "complete", clear: true }),
-      5000,
-    );
-
-    // Return appropriate message
-    if (potentialCustomers.length === 0) {
       return NextResponse.json({
-        message:
-          "No new quality leads found this week. We searched " +
-          recentPosts.length +
-          "+ recent posts but all relevant matches are already in your list. Check back in 2-3 days for new posts!",
-        newLeadsCount: 0,
-        totalToday: todayCount,
+        step: "complete",
+        message: "Complete!",
+        newLeadsCount: newLeads.length,
+        totalToday: newLeads.length,
+        elapsedMs: elapsed,
       });
     }
 
-    return NextResponse.json({
-      message: `Found ${potentialCustomers.length} new potential customers!`,
-      newLeadsCount: potentialCustomers.length,
-      totalToday: todayCount,
-    });
+    return NextResponse.json({ error: "Unknown step" }, { status: 400 });
   } catch (error: any) {
-    console.error("Error:", error);
+    console.error("Lead generation error:", error);
     return NextResponse.json(
-      { error: "Failed to find customers", details: error.message },
+      { error: error.message || "Failed to find customers" },
       { status: 500 },
     );
   }
