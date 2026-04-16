@@ -1,0 +1,26 @@
+// Google Apps Script - Reddit Proxy
+// Copy this code to your Google Apps Script project
+
+function doGet(e) {
+  const url = e.parameter.url;
+  if (!url) {
+    return ContentService.createTextOutput(JSON.stringify({error: 'No URL provided'}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  
+  try {
+    const response = UrlFetchApp.fetch(url, {
+      headers: {
+        'User-Agent': 'ClipVoBooster/1.0 (contact support@clipvo.site)',
+        'Accept': 'application/json'
+      },
+      muteHttpExceptions: true
+    });
+    
+    return ContentService.createTextOutput(response.getContentText())
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({error: error.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
