@@ -39,12 +39,57 @@ export async function POST(req: Request) {
     const db = client.db("clipvobooster");
     const users = db.collection("users");
 
+    // Plan limits
+    const PLAN_LIMITS: Record<string, { emails: number, dailyEmails: number }> = {
+      'free-trial': { emails: 50, dailyEmails: 20 },
+      starter: { emails: 300, dailyEmails: 50 },
+      professional: { emails: 1000, dailyEmails: 200 },
+    };
+
     const user = await users.findOne({
       _id: new (require("mongodb").ObjectId)(payload.sub),
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Check if user is blocked due to payment failure
+    if (user.isBlocked) {
+      return NextResponse.json({
+        error: "Your account is blocked due to payment issues. Please update your payment method.",
+        action: "update_payment",
+        redirectUrl: "/plans?blocked=true"
+      }, { status: 403 });
+    }
+
+    // Check email limits
+    const plan = user.subscription?.plan || 'free-trial';
+    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free-trial'];
+    const emailsUsed = user.emailsSentThisMonth || 0;
+    const emailsSentToday = user.emailsSentToday || 0;
+
+    // Check monthly limit
+    if (emailsUsed >= limits.emails) {
+      return NextResponse.json({
+        error: `You've reached your monthly email limit (${limits.emails}). Upgrade to send more emails!`,
+        code: 'EMAIL_LIMIT_REACHED',
+        plan,
+        emailsUsed,
+        emailsLimit: limits.emails,
+        upgradeUrl: '/plans'
+      }, { status: 403 });
+    }
+
+    // Check daily limit
+    if (emailsSentToday >= limits.dailyEmails) {
+      return NextResponse.json({
+        error: `You've reached your daily email limit (${limits.dailyEmails}). Come back tomorrow!`,
+        code: 'DAILY_LIMIT_REACHED',
+        plan,
+        emailsSentToday,
+        dailyLimit: limits.dailyEmails,
+      }, { status: 403 });
     }
 
     // Generate tracking ID for click tracking
@@ -198,13 +243,17 @@ export async function POST(req: Request) {
 
     console.log("Saved to DB with ID:", insertResult.insertedId);
 
-    // Update user's email usage count
+    // Update user's email usage count (both monthly and daily)
     await users.updateOne(
       { _id: new (require("mongodb").ObjectId)(payload.sub) },
       {
-        $inc: { emailsSentThisMonth: 1 },
+        $inc: { 
+          emailsSentThisMonth: 1,
+          emailsSentToday: 1
+        },
         $set: {
           usageResetDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          lastEmailResetDate: new Date(),
         },
       },
     );

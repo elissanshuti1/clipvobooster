@@ -338,16 +338,16 @@ export default function PlansClient() {
                     color: "var(--muted)",
                   }}
                 >
-                  Then $15/month after
+                  Then $19/month after
                 </span>
               </div>
               <p className="plans-desc">
-                Start free for 3 days, then $15/month. Cancel anytime.
+                Start free for 3 days, then $19/month. Cancel anytime before free trial ends.
               </p>
               <ul className="plans-features">
                 <li>
                   <CheckIcon />
-                  300 emails/month
+                  50 emails/month
                 </li>
                 <li>
                   <CheckIcon />
@@ -355,25 +355,27 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  AI email writing
-                </li>
-                <li>
-                  <CheckIcon />5 email templates
+                  AI customer matching
                 </li>
                 <li>
                   <CheckIcon />
-                  Email support
+                  AI email generation
                 </li>
                 <li>
                   <CheckIcon />
-                  30-day lead storage
+                  3 email templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  20 emails/day limit
                 </li>
                 <li>
                   <CheckIcon />
                   Basic analytics
                 </li>
                 <li>
-                  <CheckIcon />1 team member
+                  <CheckIcon />
+                  3-day free trial
                 </li>
               </ul>
               <button
@@ -408,7 +410,7 @@ export default function PlansClient() {
             <div className="plans-card">
               <h3 className="plans-name">Starter</h3>
               <div className="plans-price">
-                $15<span>/month</span>
+                $29<span>/month</span>
               </div>
               <p className="plans-desc">
                 For solopreneurs finding their first customers.
@@ -420,14 +422,27 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
-                  100 AI-discovered leads/month
+                  300 AI-discovered leads/month
                 </li>
                 <li>
                   <CheckIcon />
-                  AI email writing
+                  AI customer matching
                 </li>
                 <li>
-                  <CheckIcon />5 email templates
+                  <CheckIcon />
+                  AI email generation
+                </li>
+                <li>
+                  <CheckIcon />
+                  10 email templates
+                </li>
+                <li>
+                  <CheckIcon />
+                  50 emails/day limit
+                </li>
+                <li>
+                  <CheckIcon />
+                  Full analytics
                 </li>
                 <li>
                   <CheckIcon />
@@ -436,13 +451,6 @@ export default function PlansClient() {
                 <li>
                   <CheckIcon />
                   30-day lead storage
-                </li>
-                <li>
-                  <CheckIcon />
-                  Basic analytics
-                </li>
-                <li>
-                  <CheckIcon />1 team member
                 </li>
               </ul>
               <button
@@ -478,7 +486,7 @@ export default function PlansClient() {
               <div className="plans-badge">Most Popular</div>
               <h3 className="plans-name">Professional</h3>
               <div className="plans-price">
-                $29<span>/month</span>
+                $49<span>/month</span>
               </div>
               <p className="plans-desc">
                 For growing businesses serious about sales.
@@ -486,11 +494,7 @@ export default function PlansClient() {
               <ul className="plans-features">
                 <li>
                   <CheckIcon />
-                  Everything in Starter
-                </li>
-                <li>
-                  <CheckIcon />
-                  1,000 emails/month
+                  1000 emails/month
                 </li>
                 <li>
                   <CheckIcon />
@@ -498,22 +502,31 @@ export default function PlansClient() {
                 </li>
                 <li>
                   <CheckIcon />
+                  AI customer matching
+                </li>
+                <li>
+                  <CheckIcon />
+                  AI email generation
+                </li>
+                <li>
+                  <CheckIcon />
                   Unlimited templates
                 </li>
                 <li>
                   <CheckIcon />
-                  Priority chat support
+                  200 emails/day limit
+                </li>
+                <li>
+                  <CheckIcon />
+                  Full analytics + exports
+                </li>
+                <li>
+                  <CheckIcon />
+                  Priority support
                 </li>
                 <li>
                   <CheckIcon />
                   90-day lead storage
-                </li>
-                <li>
-                  <CheckIcon />
-                  Advanced analytics
-                </li>
-                <li>
-                  <CheckIcon />3 team members
                 </li>
               </ul>
               <button

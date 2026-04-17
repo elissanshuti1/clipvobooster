@@ -105,12 +105,12 @@ export default function RefundPage() {
             <div className="legal-section">
               <h2 className="legal-heading">2. Paid Subscription Plans</h2>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.1 Starter Plan ($15/month)</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.1 Starter Plan ($29/month)</h3>
               <p className="legal-text">
                 The Starter Plan is billed monthly and includes 100 emails per month. You can cancel at any time, and your subscription will remain active until the end of the current billing period.
               </p>
 
-              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.2 Professional Plan ($29/month)</h3>
+              <h3 style={{ fontSize: 18, color: 'var(--white)', marginTop: 24, marginBottom: 12 }}>2.2 Professional Plan ($49/month)</h3>
               <p className="legal-text">
                 The Professional Plan is billed monthly and includes 500 emails per month. You can cancel at any time, and your subscription will remain active until the end of the current billing period.
               </p>

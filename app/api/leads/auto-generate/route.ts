@@ -234,15 +234,41 @@ export async function POST(req: Request) {
     try { body = await req.json(); } catch {}
     const { step } = body;
 
+    // Plan limits
+    const PLAN_LIMITS: Record<string, { leads: number }> = {
+      'free-trial': { leads: 100 },
+      starter: { leads: 300 },
+      professional: { leads: 500 },
+    };
+
     const user = await users.findOne(
       { _id: new ObjectId(userId) },
-      { projection: { profile: 1 } },
+      { projection: { profile: 1, subscription: 1, leadsFoundThisMonth: 1 } },
     );
 
     if (!user?.profile?.projectDescription) {
       return NextResponse.json(
         { error: "Complete profile first", hasProfile: false },
         { status: 400 },
+      );
+    }
+
+    // Check lead limit
+    const plan = user.subscription?.plan || 'free-trial';
+    const limits = PLAN_LIMITS[plan] || PLAN_LIMITS['free-trial'];
+    const leadsUsed = user.leadsFoundThisMonth || 0;
+    
+    if (leadsUsed >= limits.leads) {
+      return NextResponse.json(
+        { 
+          error: `You've reached your monthly lead limit (${limits.leads}). Upgrade to get more leads!`,
+          code: 'LEAD_LIMIT_REACHED',
+          plan,
+          leadsUsed,
+          leadsLimit: limits.leads,
+          upgradeUrl: '/plans'
+        },
+        { status: 403 },
       );
     }
 
@@ -390,9 +416,15 @@ Select EXACTLY 12-15 posts. Return JSON:
       const existingUrls = new Set(existingLeads.map((l: any) => l.url));
       const existingTitles = new Set(existingLeads.map((l: any) => l.title?.toLowerCase()));
 
-      // Save selected leads
+      // Calculate remaining quota
+      const remainingQuota = limits.leads - leadsUsed;
+      console.log(`📊 Leads used: ${leadsUsed}/${limits.leads}, remaining: ${remainingQuota}`);
+
+      // Save selected leads (but not more than remaining quota)
       const newLeads: any[] = [];
+      let leadsSaved = 0;
       for (const selected of selectedUrls) {
+        if (leadsSaved >= remainingQuota) break;
         if (existingUrls.has(selected.url)) continue;
         
         const post = scoredPosts.find(p => p.url === selected.url);
@@ -417,6 +449,7 @@ Select EXACTLY 12-15 posts. Return JSON:
           isAutoDiscovered: true,
           createdAt: new Date(),
         });
+        leadsSaved++;
       }
 
       if (newLeads.length > 0) {
