@@ -81,42 +81,53 @@ export async function POST(req: Request) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fa;">
-  <div style="max-width: 600px; margin: 0 auto; background: #ffffff;">
-    <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; text-align: center;">
-      <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 700;">🚀 ClipVoBooster</h1>
-      <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Find Customers on Reddit • Automate Your Outreach</p>
-    </div>
-    
-    <div style="padding: 32px 24px;">
-      <p style="font-size: 16px; color: #1f2937; line-height: 1.7; margin: 0 0 24px 0;">
-        Hi ${recipient.name || 'there'},
-      </p>
-      
-      <div style="font-size: 16px; color: #374151; line-height: 1.8; margin-bottom: 32px;">
-        ${personalizedBody.replace(/\n/g, '<br>')}
-      </div>
-      
-      <div style="text-align: center; margin: 32px 0;">
-        <a href="${clickUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1, #8b5cf6); color: #ffffff; text-decoration: none; padding: 16px 32px; border-radius: 12px; font-size: 16px; font-weight: 600;">
-          ${ctaText || 'Get Started'} →
-        </a>
-      </div>
-      
-      <p style="font-size: 14px; color: #6b7280; text-align: center; margin-top: 24px;">
-        Join thousands of founders using ClipVoBooster to grow their business
-      </p>
-    </div>
-    
-    <div style="background: #f3f4f6; padding: 24px; text-align: center;">
-      <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-        © 2024 ClipVoBooster. All rights reserved.<br>
-        <a href="${appUrl}/unsubscribe" style="color: #6b7280; text-decoration: underline;">Unsubscribe</a>
-      </p>
-    </div>
-    
-    <img src="${openUrl}" alt="" style="display: block; width: 1px; height: 1px; opacity: 0;" />
-  </div>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background: #ffffff; border-radius: 8px; overflow: hidden;">
+          <tr>
+            <td style="padding: 24px 28px; border-bottom: 1px solid #e5e5e5;">
+              <p style="margin: 0; font-size: 15px; font-weight: 600; color: #333333;">ClipVoBooster</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 28px 28px 24px;">
+              <p style="margin: 0 0 16px 0; font-size: 15px; color: #333333; line-height: 1.6;">
+                Hi ${recipient.name || 'there'},
+              </p>
+              <div style="font-size: 15px; color: #444444; line-height: 1.7; white-space: pre-wrap;">
+${personalizedBody}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 28px 24px;">
+              <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="border-radius: 6px; background: #333333;">
+                    <a href="${clickUrl}" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">
+                      ${ctaText || 'View'}
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 20px 28px; background: #f9f9f9; border-top: 1px solid #e5e5e5;">
+              <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
+                You received this email because you're a ClipVoBooster user.<br>
+                <a href="${appUrl}" style="color: #666666; text-decoration: underline;">Visit website</a> &nbsp;|&nbsp; 
+                <a href="${appUrl}/unsubscribe" style="color: #666666; text-decoration: underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <img src="${openUrl}" alt="" width="1" height="1" style="display: block; opacity: 0;" />
 </body>
 </html>`;
 

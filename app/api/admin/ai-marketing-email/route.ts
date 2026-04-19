@@ -26,56 +26,51 @@ export async function POST(req: Request) {
 
     const emailTypes: Record<string, { subject: string; focus: string }> = {
       welcome: {
-        subject: 'Welcome to ClipVoBooster - Your New Secret Weapon for Growing Your Business',
-        focus: 'Welcome new users, excite them about the app, show them the key features that will help them find customers on Reddit and automate their outreach. Include a clear call-to-action to get started.'
+        subject: 'Quick start with ClipVoBooster',
+        focus: 'Welcome new users. Keep it simple: thank them, briefly mention one key thing they can do, wish them well. Very short, genuine.'
       },
       upgrade: {
-        subject: 'Unlock Full Potential - Upgrade Your ClipVoBooster Experience',
-        focus: 'Persuade free users to upgrade to a paid plan. Highlight the benefits they are missing out on: more leads, more emails, advanced features. Create urgency and excitement.'
+        subject: 'About your plan',
+        focus: 'For free trial users. Keep it simple: let them know their trial is ending, mention one feature they might miss, genuine offer to help.'
       },
       feature: {
-        subject: 'New Feature Alert - {feature_name} Is Here!',
-        focus: 'Announce a new feature or update. Explain how it helps them, why it matters, and how to use it. Make them feel they are missing out if they do not try it.'
+        subject: 'New in ClipVoBooster',
+        focus: 'Announce one feature. Brief: what it is, who its for, how to use. No hype.'
       },
       reengage: {
-        subject: 'We Miss You! Here Is Something Special Just for You',
-        focus: 'Re-engage inactive users. Remind them what they are missing, offer an incentive to come back. Make them feel valued and wanted.'
+        subject: 'Checking in',
+        focus: 'For inactive users. Keep it simple: we miss you, one update, offer to help if needed. Genuine, not pushy.'
       },
       custom: {
-        subject: customPrompt || 'Important Update from ClipVoBooster',
-        focus: customPrompt || 'Custom marketing email for ClipVoBooster users.'
+        subject: 'Update from ClipVoBooster',
+        focus: customPrompt || 'Your message to users.'
       }
     };
 
     const emailConfig = emailTypes[type] || emailTypes.custom;
 
-    const systemPrompt = `You are an expert email marketer for ClipVoBooster - an AI-powered tool designed for solo founders and marketers to find customers on Reddit, do email marketing, and automate outreach.
+    const systemPrompt = `You are writing a PERSONAL email from the founder of ClipVoBooster to your existing users.
 
-CLIPVOBOOSTER KEY FEATURES:
-- Find customers on Reddit using AI - search and identify potential customers in relevant subreddits
-- AI-powered email writer - generate personalized emails that convert
-- Email automation - sequence and automate follow-ups
-- Lead management - organize and track your leads
-- Analytics - track open rates, clicks, and conversions
+ClipVoBooster helps you find customers on Reddit and send outreach emails.
 
-YOUR TASK: Write a HIGH-CONVERTING marketing email that makes users fall in love with ClipVoBooster and compel them to take action.
+YOUR TASK: Write a genuine email that feels real. Not salesy. Not spammy.
 
-CRITICAL REQUIREMENTS:
-1. NO placeholders like [Name], [testimonial 1], [success story] - use REALISTIC content
-2. Use specific fake but realistic testimonials like "Sarah, founder of TechFlow" or "Mike, growth at StartupX"
-3. Use specific numbers like "347 new customers last month" or "3x ROI in 30 days"
-4. Subject line should be compelling and curiosity-inducing
-5. Email body should be 150-250 words - substantial but not overwhelming
-6. Make it personal, warm, and conversational - like a founder reaching out
-7. Focus on RESULTS and TRANSFORMATION - what they will achieve
-8. Include social proof with real-sounding examples
-9. Clear call-to-action with button/link to https://clipvo.site
-10. NO spammy phrases or pushy language
-11. Make even non-paying users feel they NEED this app
-12. Write in first person as if YOU are the founder
+CRITICAL RULES:
+1. NO spam words: "game-changer", "lifesaver", "secret", "guarantee", "3x", "breakthrough", "amazing", "proven", "exclusive", "instant"
+2. NO hype: "revolutionized", "totally", "you must", "don't miss"
+3. NO emojis
+4. Write like you genuinely care about your users
+5. Subject: short, specific, UNDER 50 chars
+6. Body: 80-150 words, 2-3 short paragraphs
+7. NO exclamation marks anywhere
+8. One real benefit or update
+9. Sign off: "Thanks" or "Best" only
+10. NO brackets, NO placeholders
+11. No fancy formatting - plain and simple
+12. Tone: "checking in", "quick update", not "exciting news!"
 
-Format ONLY as valid JSON, no markdown:
-{"subject":"compelling subject line","body":"full email body - write naturally without any [brackets] or placeholders - use specific examples instead","cta":"text for button"}`;
+Format ONLY as JSON:
+{"subject":"short subject","body":"email body","cta":"button text"}`;
 
     const userPrompt = `Generate a ${type} marketing email for ClipVoBooster users. Focus: ${emailConfig.focus}`;
 
