@@ -144,8 +144,9 @@ function ConfirmModal({
 }
 
 function getPlanBadge(plan: string | undefined) {
-  if (!plan) return { label: "No Plan", class: "plan-none" };
+  if (!plan || plan === "no plan") return { label: "No Plan", class: "plan-none" };
   const planLower = plan.toLowerCase();
+  if (planLower === "free-trial") return { label: "Free Trial", class: "plan-trial" };
   if (planLower === "starter") return { label: "Starter", class: "plan-starter" };
   if (planLower === "professional") return { label: "Professional", class: "plan-pro" };
   if (planLower === "business") return { label: "Business", class: "plan-business" };
@@ -434,6 +435,10 @@ export default function AdminUsers() {
         .plan-business {
           background: rgba(16, 185, 129, 0.1);
           color: #10b981;
+        }
+        .plan-trial {
+          background: rgba(245, 158, 11, 0.1);
+          color: #f59e0b;
         }
         .plan-none {
           background: rgba(107, 114, 128, 0.1);

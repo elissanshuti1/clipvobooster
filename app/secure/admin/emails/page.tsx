@@ -385,6 +385,7 @@ export default function AdminEmailCampaigns() {
               <select className="form-select" value={targetPlan} onChange={(e) => setTargetPlan(e.target.value)}>
                 <option value="all">All Users</option>
                 <option value="no plan">No Plan</option>
+                <option value="free-trial">Free Trial</option>
                 <option value="starter">Starter Plan</option>
                 <option value="professional">Professional Plan</option>
                 <option value="business">Business Plan</option>

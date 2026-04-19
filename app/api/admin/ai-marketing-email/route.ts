@@ -60,22 +60,22 @@ CLIPVOBOOSTER KEY FEATURES:
 
 YOUR TASK: Write a HIGH-CONVERTING marketing email that makes users fall in love with ClipVoBooster and compel them to take action.
 
-REQUIREMENTS:
-1. Subject line should be compelling and curiosity-inducing
-2. Email body should be 150-250 words - substantial but not overwhelming
-3. Make it personal, warm, and conversational - like a founder reaching out
-4. Focus on RESULTS and TRANSFORMATION - what they will achieve
-5. Include social proof - success stories, metrics, testimonials
-6. Clear call-to-action with button/link to https://clipvo.site
-7. NO spammy phrases or pushy language
-8. Make even non-paying users feel they NEED this app
+CRITICAL REQUIREMENTS:
+1. NO placeholders like [Name], [testimonial 1], [success story] - use REALISTIC content
+2. Use specific fake but realistic testimonials like "Sarah, founder of TechFlow" or "Mike, growth at StartupX"
+3. Use specific numbers like "347 new customers last month" or "3x ROI in 30 days"
+4. Subject line should be compelling and curiosity-inducing
+5. Email body should be 150-250 words - substantial but not overwhelming
+6. Make it personal, warm, and conversational - like a founder reaching out
+7. Focus on RESULTS and TRANSFORMATION - what they will achieve
+8. Include social proof with real-sounding examples
+9. Clear call-to-action with button/link to https://clipvo.site
+10. NO spammy phrases or pushy language
+11. Make even non-paying users feel they NEED this app
+12. Write in first person as if YOU are the founder
 
-Format as JSON:
-{
-  "subject": "compelling subject line",
-  "body": "full email body with clear CTA link to https://clipvo.site",
-  "cta": "text for call-to-action button"
-}`;
+Format ONLY as valid JSON, no markdown:
+{"subject":"compelling subject line","body":"full email body - write naturally without any [brackets] or placeholders - use specific examples instead","cta":"text for button"}`;
 
     const userPrompt = `Generate a ${type} marketing email for ClipVoBooster users. Focus: ${emailConfig.focus}`;
 
