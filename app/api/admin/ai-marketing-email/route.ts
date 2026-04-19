@@ -26,51 +26,60 @@ export async function POST(req: Request) {
 
     const emailTypes: Record<string, { subject: string; focus: string }> = {
       welcome: {
-        subject: 'Quick start with ClipVoBooster',
-        focus: 'Welcome new users. Keep it simple: thank them, briefly mention one key thing they can do, wish them well. Very short, genuine.'
+        subject: 'Get your first Reddit customer today',
+        focus: 'Welcome new users. Be direct: tell them exactly what to do to get customers. Give one specific action they can take right now. Make them feel they can get results fast.'
       },
       upgrade: {
-        subject: 'About your plan',
-        focus: 'For free trial users. Keep it simple: let them know their trial is ending, mention one feature they might miss, genuine offer to help.'
+        subject: 'Get more customers with paid features',
+        focus: 'For free users. Be direct: tell them what they are missing. More leads, more emails, better outreach. Give them one reason to upgrade.'
       },
       feature: {
-        subject: 'New in ClipVoBooster',
-        focus: 'Announce one feature. Brief: what it is, who its for, how to use. No hype.'
+        subject: 'New feature to get more customers',
+        focus: 'Announce a feature. Be direct: what it does, how it helps them get more customers or sales. Keep it short.'
       },
       reengage: {
-        subject: 'Checking in',
-        focus: 'For inactive users. Keep it simple: we miss you, one update, offer to help if needed. Genuine, not pushy.'
+        subject: 'Come back - you are missing customers',
+        focus: 'For inactive users. Be direct: tell them what they are missing. Remind them what the tool does - gets customers on Reddit.'
       },
       custom: {
-        subject: 'Update from ClipVoBooster',
-        focus: customPrompt || 'Your message to users.'
+        subject: 'Get more customers with ClipVoBooster',
+        focus: customPrompt || 'Write about getting customers, Reddit outreach, or email marketing.'
       }
     };
 
     const emailConfig = emailTypes[type] || emailTypes.custom;
 
-    const systemPrompt = `You are writing a PERSONAL email from the founder of ClipVoBooster to your existing users.
+    const systemPrompt = `You are writing an email from ClipVoBooster founder to users. Be DIRECT. Be USEFUL. Get to the point.
 
-ClipVoBooster helps you find customers on Reddit and send outreach emails.
+WHAT CLIPVOBOOSTER DOES:
+- Find customers on Reddit
+- Send outreach emails  
+- Get more sales
 
-YOUR TASK: Write a genuine email that feels real. Not salesy. Not spammy.
+YOUR JOB: Write an email that makes users want to use the app RIGHT NOW.
 
-CRITICAL RULES:
-1. NO spam words: "game-changer", "lifesaver", "secret", "guarantee", "3x", "breakthrough", "amazing", "proven", "exclusive", "instant"
-2. NO hype: "revolutionized", "totally", "you must", "don't miss"
-3. NO emojis
-4. Write like you genuinely care about your users
-5. Subject: short, specific, UNDER 50 chars
-6. Body: 80-150 words, 2-3 short paragraphs
-7. NO exclamation marks anywhere
-8. One real benefit or update
-9. Sign off: "Thanks" or "Best" only
-10. NO brackets, NO placeholders
-11. No fancy formatting - plain and simple
-12. Tone: "checking in", "quick update", not "exciting news!"
+RULES:
+1. NO spam trigger words: no "guarantee", no "secret", no "instant"
+2. NO emojis
+3. Be DIRECT - tell them what to do
+4. Subject: 4-6 words, action-oriented
+5. Body: 3-4 short paragraphs, 150-200 words total
+6. Give ONE specific action they can take
+7. Mention RESULTS they can get
+8. NO brackets, NO placeholders
+9. Sign off with name: "Alex" or "The ClipVoBooster Team"
 
-Format ONLY as JSON:
-{"subject":"short subject","body":"email body","cta":"button text"}`;
+BAD: "Hey [Name], check out our cool feature!!!"
+GOOD: "Hey, want more customers? Here's how to find them on Reddit today."
+
+Write email that makes them think "I should try that now" - not "another sales email."
+
+Format as clean text, NOT JSON:
+Subject: [your subject]
+
+[your email body]
+
+Button text: [2-4 words]`;
 
     const userPrompt = `Generate a ${type} marketing email for ClipVoBooster users. Focus: ${emailConfig.focus}`;
 
@@ -86,21 +95,32 @@ Format ONLY as JSON:
 
     let content = completion.choices[0]?.message?.content || '';
 
-    let emailData = { subject: emailConfig.subject, body: content, cta: 'Get Started' };
+    // Parse the new format (Subject: ... \n\n Body... \n\n Button text: ...)
+    let emailSubject = emailConfig.subject;
+    let emailBody = content;
+    let emailCta = 'Try It Free';
 
-    try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        emailData = JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      emailData.body = content;
+    // Try to extract subject
+    const subjectMatch = content.match(/Subject:\s*(.+?)(?:\n|$)/i);
+    if (subjectMatch) {
+      emailSubject = subjectMatch[1].trim();
+      emailBody = emailBody.replace(/Subject:\s*.+?\n*/i, '');
     }
 
+    // Try to extract button text
+    const ctaMatch = content.match(/Button text:\s*(.+?)(?:\n|$)/i);
+    if (ctaMatch) {
+      emailCta = ctaMatch[1].trim();
+      emailBody = emailBody.replace(/Button text:\s*.+?\n*/i, '');
+    }
+
+    // Clean up body
+    emailBody = emailBody.trim();
+
     return NextResponse.json({
-      subject: emailData.subject,
-      body: emailData.body,
-      cta: emailData.cta || 'Try It Free',
+      subject: emailSubject,
+      body: emailBody,
+      cta: emailCta,
       type
     });
 
