@@ -2,23 +2,55 @@
 
 import { useState, useEffect } from "react";
 
+interface Campaign {
+  _id: string;
+  subject: string;
+  type: string;
+  sentCount: number;
+  opens: number;
+  clicks: number;
+  createdAt: string;
+}
+
 export default function AdminEmailCampaigns() {
-  const [users, setUsers] = useState([]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
-  const [sendToAll, setSendToAll] = useState(false);
+  const [tab, setTab] = useState<"create" | "campaigns">("create");
+  const [emailType, setEmailType] = useState("welcome");
   const [subject, setSubject] = useState("");
-  const [emailType, setEmailType] = useState("custom");
-  const [aiPrompt, setAiPrompt] = useState("");
   const [emailBody, setEmailBody] = useState("");
+  const [ctaText, setCtaText] = useState("Try It Free");
+  const [customPrompt, setCustomPrompt] = useState("");
+  const [targetPlan, setTargetPlan] = useState("all");
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [dailyLimit, setDailyLimit] = useState(100);
-  const [sentToday, setSentToday] = useState(0);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [loadingCampaigns, setLoadingCampaigns] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [sendToAll, setSendToAll] = useState(true);
+  const [stats, setStats] = useState({ sent: 0, opens: 0, clicks: 0 });
 
   useEffect(() => {
+    loadCampaigns();
     loadUsers();
-    loadEmailStats();
   }, []);
+
+  const loadCampaigns = async () => {
+    setLoadingCampaigns(true);
+    try {
+      const res = await fetch("/api/admin/marketing-campaigns");
+      const data = await res.json();
+      setCampaigns(data.campaigns || []);
+      
+      const totalSent = data.campaigns?.reduce((acc: number, c: Campaign) => acc + (c.sentCount || 0), 0) || 0;
+      const totalOpens = data.campaigns?.reduce((acc: number, c: Campaign) => acc + (c.opens || 0), 0) || 0;
+      const totalClicks = data.campaigns?.reduce((acc: number, c: Campaign) => acc + (c.clicks || 0), 0) || 0;
+      setStats({ sent: totalSent, opens: totalOpens, clicks: totalClicks });
+    } catch (error) {
+      console.error("Failed to load campaigns:", error);
+    } finally {
+      setLoadingCampaigns(false);
+    }
+  };
 
   const loadUsers = async () => {
     try {
@@ -30,96 +62,70 @@ export default function AdminEmailCampaigns() {
     }
   };
 
-  const loadEmailStats = async () => {
-    try {
-      const res = await fetch("/api/admin/email-stats");
-      const data = await res.json();
-      setSentToday(data.sentToday || 0);
-      setDailyLimit(data.dailyLimit || 100);
-    } catch (error) {
-      console.error("Failed to load email stats:", error);
-    }
-  };
-
   const handleGenerateWithAI = async () => {
-    if (!aiPrompt.trim()) {
-      alert("Please enter a prompt for the AI");
-      return;
-    }
-
     setIsGenerating(true);
     try {
-      const res = await fetch("/api/admin/ai-generate-email", {
+      const res = await fetch("/api/admin/ai-marketing-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt: aiPrompt,
-          type: emailType,
-        }),
+        body: JSON.stringify({ type: emailType, customPrompt }),
       });
 
       const data = await res.json();
-      if (data.email) {
-        setEmailBody(data.email);
-        if (!subject) setSubject(data.subject || "Generated Email");
+      if (data.subject) {
+        setSubject(data.subject);
+        setEmailBody(data.body);
+        setCtaText(data.cta || "Try It Free");
       }
     } catch (error) {
-      alert("Failed to generate email with AI");
+      console.error("Failed to generate:", error);
     } finally {
       setIsGenerating(false);
     }
   };
 
   const handleSend = async () => {
-    if (!subject.trim()) {
-      alert("Please enter a subject");
-      return;
-    }
-    if (!emailBody.trim() && emailType !== "template") {
-      alert("Please enter or generate email content");
-      return;
-    }
-
     const recipientCount = sendToAll ? users.length : selectedUsers.length;
     if (recipientCount === 0) {
-      alert("Please select at least one recipient");
+      alert("Please select recipients");
+      return;
+    }
+    if (!subject.trim() || !emailBody.trim()) {
+      alert("Please generate or enter email content");
       return;
     }
 
-    if (sentToday + recipientCount > dailyLimit) {
-      alert(`Daily sending limit exceeded. You can send ${dailyLimit - sentToday} more emails today.`);
-      return;
-    }
-
-    if (!confirm(`Send email to ${recipientCount} user(s)?`)) return;
+    if (!confirm(`Send to ${recipientCount} users?`)) return;
 
     setIsSending(true);
     try {
-      const res = await fetch("/api/admin/send-broadcast", {
+      const res = await fetch("/api/admin/send-marketing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subject,
           body: emailBody,
+          ctaText,
           type: emailType,
           sendToAll,
           userIds: selectedUsers,
+          targetPlan,
         }),
       });
 
       const data = await res.json();
       if (data.success) {
-        alert(`Email sent to ${data.sentCount} users!`);
-        setSentToday(prev => prev + data.sentCount);
+        alert(`Sent to ${data.sentCount} users!`);
         setSubject("");
         setEmailBody("");
+        setCtaText("Try It Free");
         setSelectedUsers([]);
-        setSendToAll(false);
+        loadCampaigns();
       } else {
-        alert(data.error || "Failed to send email");
+        alert(data.error || "Failed to send");
       }
     } catch (error) {
-      alert("Failed to send email");
+      alert("Failed to send");
     } finally {
       setIsSending(false);
     }
@@ -133,9 +139,59 @@ export default function AdminEmailCampaigns() {
     );
   };
 
+  const filteredUsers = targetPlan === "all" 
+    ? users 
+    : users.filter((u: any) => u.subscription?.plan === targetPlan);
+
   return (
     <div>
       <style>{`
+        .page-tabs {
+          display: flex;
+          gap: 8px;
+          margin-bottom: 24px;
+          border-bottom: 1px solid rgba(255,255,255,0.07);
+          padding-bottom: 16px;
+        }
+        .tab {
+          padding: 10px 20px;
+          background: #12151f;
+          border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 8px;
+          color: #8b95a5;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          transition: all 0.2s;
+        }
+        .tab.active {
+          background: #6366f1;
+          border-color: #6366f1;
+          color: white;
+        }
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+        .stat-card {
+          background: #0e1018;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 12px;
+          padding: 20px;
+          text-align: center;
+        }
+        .stat-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: #fff;
+        }
+        .stat-label {
+          font-size: 13px;
+          color: #5a6373;
+          margin-top: 4px;
+        }
         .campaign-container {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -151,7 +207,7 @@ export default function AdminEmailCampaigns() {
           font-size: 16px;
           font-weight: 600;
           color: #ffffff;
-          margin-bottom: 16px;
+          margin-bottom: 20px;
         }
         .form-group {
           margin-bottom: 16px;
@@ -165,20 +221,25 @@ export default function AdminEmailCampaigns() {
         }
         .form-input, .form-select, .form-textarea {
           width: 100%;
-          padding: 10px 14px;
+          padding: 12px 14px;
           background: #12151f;
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 8px;
           color: #ffffff;
           font-size: 14px;
           font-family: inherit;
+          box-sizing: border-box;
         }
         .form-textarea {
-          min-height: 200px;
+          min-height: 180px;
           resize: vertical;
         }
+        .form-select:focus, .form-input:focus, .form-textarea:focus {
+          outline: none;
+          border-color: #6366f1;
+        }
         .btn {
-          padding: 12px 24px;
+          padding: 12px 20px;
           border-radius: 8px;
           font-size: 14px;
           font-weight: 600;
@@ -190,16 +251,35 @@ export default function AdminEmailCampaigns() {
           background: linear-gradient(135deg, #6366f1, #8b5cf6);
           color: white;
         }
+        .btn-primary:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
         .btn-secondary {
-          background: #12151f;
+          background: #1a1d29;
           color: #dde1e9;
           border: 1px solid rgba(255,255,255,0.1);
         }
+        .btn-secondary:hover {
+          background: #242838;
+        }
+        .check-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 0;
+        }
+        .checkbox {
+          width: 18px;
+          height: 18px;
+          accent-color: #6366f1;
+        }
         .user-list {
-          max-height: 400px;
+          max-height: 300px;
           overflow-y: auto;
           border: 1px solid rgba(255,255,255,0.1);
           border-radius: 8px;
+          margin-top: 8px;
         }
         .user-item {
           display: flex;
@@ -210,173 +290,201 @@ export default function AdminEmailCampaigns() {
           transition: background 0.2s;
         }
         .user-item:hover {
-          background: #12151f;
+          background: #1a1d29;
         }
         .user-item.selected {
-          background: rgba(99, 102, 241, 0.1);
+          background: rgba(99, 102, 241, 0.15);
         }
-        .checkbox {
-          width: 18px;
-          height: 18px;
-          margin-right: 12px;
-          accent-color: #6366f1;
+        .campaign-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
         }
-        .limit-info {
-          background: #12151f;
-          padding: 12px;
-          border-radius: 8px;
-          margin-bottom: 16px;
+        .campaign-item {
+          background: #0e1018;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 12px;
+          padding: 16px;
+        }
+        .campaign-header {
           display: flex;
           justify-content: space-between;
-          align-items: center;
+          align-items: flex-start;
+          margin-bottom: 12px;
         }
-        .limit-progress {
-          flex: 1;
-          height: 8px;
-          background: rgba(255,255,255,0.1);
+        .campaign-subject {
+          font-weight: 600;
+          color: #fff;
+          font-size: 15px;
+        }
+        .campaign-type {
+          font-size: 11px;
+          padding: 4px 8px;
+          background: rgba(99, 102, 241, 0.1);
+          color: #6366f1;
           border-radius: 4px;
-          margin: 0 16px;
-          overflow: hidden;
         }
-        .limit-bar {
-          height: 100%;
-          background: linear-gradient(90deg, #6366f1, #8b5cf6);
-          transition: width 0.3s;
+        .campaign-stats {
+          display: flex;
+          gap: 16px;
+          font-size: 13px;
+          color: #5a6373;
         }
-        @media (max-width: 1024px) {
+        .campaign-stat {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+        .campaign-stat.sent { color: #6366f1; }
+        .campaign-stat.opens { color: #10b981; }
+        .campaign-stat.clicks { color: #f59e0b; }
+        @media (max-width: 768px) {
+          .stats-grid {
+            grid-template-columns: 1fr;
+          }
           .campaign-container {
             grid-template-columns: 1fr;
+          }
+          .page-tabs {
+            flex-wrap: wrap;
           }
         }
       `}</style>
 
-      <div className="limit-info">
-        <span style={{ color: "#8b95a5", fontSize: 13 }}>Daily Limit</span>
-        <div className="limit-progress">
-          <div
-            className="limit-bar"
-            style={{ width: `${Math.min((sentToday / dailyLimit) * 100, 100)}%` }}
-          />
-        </div>
-        <span style={{ color: "#fff", fontSize: 14 }}>
-          {sentToday} / {dailyLimit} sent
-        </span>
+      <div className="page-tabs">
+        <button className={`tab ${tab === "create" ? "active" : ""}`} onClick={() => setTab("create")}>
+          📧 Create Campaign
+        </button>
+        <button className={`tab ${tab === "campaigns" ? "active" : ""}`} onClick={() => setTab("campaigns")}>
+          📊 Campaign History
+        </button>
       </div>
 
-      <div className="campaign-container">
-        {/* Left: Recipients & Settings */}
-        <div className="card">
-          <h2 className="card-title">📧 Recipients</h2>
+      <div className="stats-grid">
+        <div className="stat-card">
+          <div className="stat-value">{stats.sent}</div>
+          <div className="stat-label">Emails Sent</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{stats.opens}</div>
+          <div className="stat-label">Opens</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value">{stats.clicks}</div>
+          <div className="stat-label">Clicks</div>
+        </div>
+      </div>
 
-          <div className="form-group">
-            <label className="form-label">
-              <input
-                type="checkbox"
-                checked={sendToAll}
-                onChange={(e) => setSendToAll(e.target.checked)}
-                style={{ marginRight: 8 }}
-              />
-              Send to ALL users ({users.length})
-            </label>
+      {tab === "create" && (
+        <div className="campaign-container">
+          <div className="card">
+            <h2 className="card-title">📬 Recipients</h2>
+
+            <div className="form-group">
+              <label className="form-label">Target Plan</label>
+              <select className="form-select" value={targetPlan} onChange={(e) => setTargetPlan(e.target.value)}>
+                <option value="all">All Users</option>
+                <option value="no plan">No Plan</option>
+                <option value="starter">Starter Plan</option>
+                <option value="professional">Professional Plan</option>
+                <option value="business">Business Plan</option>
+              </select>
+            </div>
+
+            <div className="check-row">
+              <input type="checkbox" className="checkbox" checked={sendToAll} onChange={(e) => setSendToAll(e.target.checked)} />
+              <span style={{ color: "#dde1e9" }}>Send to ALL {targetPlan === "all" ? "" : `${targetPlan} `}({filteredUsers.length})</span>
+            </div>
+
+            {!sendToAll && (
+              <div className="user-list">
+                {filteredUsers.slice(0, 50).map((user: any) => (
+                  <label key={user._id} className={`user-item ${selectedUsers.includes(user._id) ? "selected" : ""}`}>
+                    <input type="checkbox" className="checkbox" checked={selectedUsers.includes(user._id)} onChange={() => toggleUser(user._id)} />
+                    <div>
+                      <div style={{ color: "#fff", fontSize: 14 }}>{user.name || "User"}</div>
+                      <div style={{ color: "#5a6373", fontSize: 12 }}>{user.email}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+
+            <div style={{ marginTop: 12, color: "#5a6373", fontSize: 13 }}>
+              Will send to: <span style={{ color: "#fff" }}>{sendToAll ? filteredUsers.length : selectedUsers.length} users</span>
+            </div>
           </div>
 
-          {!sendToAll && (
-            <div className="user-list">
-              {users.map((user: any) => (
-                <label
-                  key={user._id}
-                  className={`user-item ${selectedUsers.includes(user._id) ? "selected" : ""}`}
-                >
-                  <input
-                    type="checkbox"
-                    className="checkbox"
-                    checked={selectedUsers.includes(user._id)}
-                    onChange={() => toggleUser(user._id)}
-                  />
-                  <div>
-                    <div style={{ color: "#fff", fontSize: 14 }}>{user.name || "User"}</div>
-                    <div style={{ color: "#5a6373", fontSize: 12 }}>{user.email}</div>
+          <div className="card">
+            <h2 className="card-title">✉️ Email Content</h2>
+
+            <div className="form-group">
+              <label className="form-label">Email Type</label>
+              <select className="form-select" value={emailType} onChange={(e) => setEmailType(e.target.value)}>
+                <option value="welcome">👋 Welcome Email</option>
+                <option value="upgrade">⬆️ Upgrade to Pro</option>
+                <option value="feature">🚀 New Feature Alert</option>
+                <option value="reengage">💫 We Miss You</option>
+                <option value="custom">📝 Custom Email</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Custom Prompt (optional)</label>
+              <input className="form-input" value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} placeholder="Describe what you want in the email..." />
+            </div>
+
+            <button className="btn btn-secondary" style={{ width: "100%", marginBottom: 16 }} onClick={handleGenerateWithAI} disabled={isGenerating}>
+              {isGenerating ? "🤖 Generating..." : "🤖 Generate with AI"}
+            </button>
+
+            <div className="form-group">
+              <label className="form-label">Subject</label>
+              <input className="form-input" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Email subject" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">CTA Button Text</label>
+              <input className="form-input" value={ctaText} onChange={(e) => setCtaText(e.target.value)} placeholder="Try It Free" />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Email Body</label>
+              <textarea className="form-textarea" value={emailBody} onChange={(e) => setEmailBody(e.target.value)} placeholder="Write your email or generate with AI..." />
+            </div>
+
+            <button className="btn btn-primary" style={{ width: "100%" }} onClick={handleSend} disabled={isSending}>
+              {isSending ? "Sending..." : `📤 Send to ${sendToAll ? filteredUsers.length : selectedUsers.length} Users`}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {tab === "campaigns" && (
+        <div>
+          {loadingCampaigns ? (
+            <div style={{ color: "#fff", textAlign: "center", padding: 40 }}>Loading...</div>
+          ) : campaigns.length === 0 ? (
+            <div style={{ color: "#5a6373", textAlign: "center", padding: 40 }}>No campaigns yet. Create your first one!</div>
+          ) : (
+            <div className="campaign-list">
+              {campaigns.map((campaign) => (
+                <div key={campaign._id} className="campaign-item">
+                  <div className="campaign-header">
+                    <div className="campaign-subject">{campaign.subject}</div>
+                    <span className="campaign-type">{campaign.type}</span>
                   </div>
-                </label>
+                  <div className="campaign-stats">
+                    <span className="campaign-stat sent">📤 {campaign.sentCount || 0} sent</span>
+                    <span className="campaign-stat opens">👁️ {campaign.opens || 0} opens</span>
+                    <span className="campaign-stat clicks">🖱️ {campaign.clicks || 0} clicks</span>
+                  </div>
+                </div>
               ))}
             </div>
           )}
-
-          <div style={{ marginTop: 16, color: "#5a6373", fontSize: 13 }}>
-            Selected: {sendToAll ? users.length : selectedUsers.length} users
-          </div>
         </div>
-
-        {/* Right: Email Content */}
-        <div className="card">
-          <h2 className="card-title">✉️ Email Content</h2>
-
-          <div className="form-group">
-            <label className="form-label">Email Type</label>
-            <select
-              className="form-select"
-              value={emailType}
-              onChange={(e) => setEmailType(e.target.value)}
-            >
-              <option value="custom">📝 Custom Email</option>
-              <option value="advertising">📢 Advertising/Promotion</option>
-              <option value="tutorial">📖 How It Works</option>
-              <option value="social-proof">⭐ Success Stories</option>
-              <option value="ai-generated">🤖 AI Generated</option>
-            </select>
-          </div>
-
-          {emailType === "ai-generated" && (
-            <div className="form-group">
-              <label className="form-label">AI Prompt</label>
-              <textarea
-                className="form-textarea"
-                style={{ minHeight: 80 }}
-                value={aiPrompt}
-                onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="Describe the email you want AI to generate..."
-              />
-              <button
-                className="btn btn-secondary"
-                style={{ marginTop: 8 }}
-                onClick={handleGenerateWithAI}
-                disabled={isGenerating}
-              >
-                {isGenerating ? "Generating..." : "🤖 Generate with AI"}
-              </button>
-            </div>
-          )}
-
-          <div className="form-group">
-            <label className="form-label">Subject</label>
-            <input
-              className="form-input"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Email subject"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Email Body</label>
-            <textarea
-              className="form-textarea"
-              value={emailBody}
-              onChange={(e) => setEmailBody(e.target.value)}
-              placeholder="Write your email content here..."
-            />
-          </div>
-
-          <button
-            className="btn btn-primary"
-            style={{ width: "100%" }}
-            onClick={handleSend}
-            disabled={isSending}
-          >
-            {isSending ? "Sending..." : `📧 Send to ${sendToAll ? users.length : selectedUsers.length} Users`}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

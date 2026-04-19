@@ -60,6 +60,7 @@ function ConfirmModal({
         alignItems: "center",
         justifyContent: "center",
         zIndex: 9999,
+        padding: "20px",
       }}
     >
       <div
@@ -67,9 +68,9 @@ function ConfirmModal({
           background: "#0e1018",
           border: `1px solid ${colors.border}`,
           borderRadius: "16px",
-          padding: "32px",
+          padding: "24px",
           maxWidth: "480px",
-          width: "90%",
+          width: "100%",
           boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5)",
         }}
       >
@@ -99,7 +100,7 @@ function ConfirmModal({
           {message}
         </p>
         <div
-          style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}
+          style={{ display: "flex", gap: "12px", justifyContent: "flex-end", flexWrap: "wrap" }}
         >
           <button
             onClick={onCancel}
@@ -142,6 +143,15 @@ function ConfirmModal({
   );
 }
 
+function getPlanBadge(plan: string | undefined) {
+  if (!plan) return { label: "No Plan", class: "plan-none" };
+  const planLower = plan.toLowerCase();
+  if (planLower === "starter") return { label: "Starter", class: "plan-starter" };
+  if (planLower === "professional") return { label: "Professional", class: "plan-pro" };
+  if (planLower === "business") return { label: "Business", class: "plan-business" };
+  return { label: plan, class: "plan-none" };
+}
+
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("all");
@@ -149,7 +159,6 @@ export default function AdminUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Modal state
   const [modal, setModal] = useState<{
     isOpen: boolean;
     type: "delete" | "suspend" | "activate";
@@ -247,7 +256,6 @@ export default function AdminUsers() {
       closeModal();
     } catch (error: any) {
       console.error("Action failed:", error.message);
-      // Keep modal open on error, just close loading state
       setActionLoading(null);
     } finally {
       setActionLoading(null);
@@ -296,7 +304,13 @@ export default function AdminUsers() {
           border-radius: 8px;
           color: #ffffff;
           font-size: 14px;
-          width: 280px;
+          width: 100%;
+          max-width: 280px;
+        }
+        .filter-btns {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
         }
         .filter-btn {
           padding: 8px 16px;
@@ -320,6 +334,7 @@ export default function AdminUsers() {
           border: 1px solid rgba(255,255,255,0.07);
           border-radius: 12px;
           overflow: hidden;
+          display: none;
         }
         .users-table th {
           text-align: left;
@@ -336,6 +351,56 @@ export default function AdminUsers() {
           font-size: 14px;
           color: #dde1e9;
         }
+        .user-cards {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .user-card {
+          background: #0e1018;
+          border: 1px solid rgba(255,255,255,0.07);
+          border-radius: 12px;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+        .user-card-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+        .user-card-info {
+          flex: 1;
+        }
+        .user-card-name {
+          font-weight: 600;
+          color: #fff;
+          font-size: 15px;
+        }
+        .user-card-email {
+          color: #8b95a5;
+          font-size: 13px;
+        }
+        .user-card-details {
+          display: flex;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+        .user-card-detail {
+          font-size: 12px;
+          color: #5a6373;
+        }
+        .user-card-detail span {
+          color: #dde1e9;
+        }
+        .user-card-actions {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          padding-top: 8px;
+          border-top: 1px solid rgba(255,255,255,0.05);
+        }
         .status-badge {
           display: inline-block;
           padding: 4px 10px;
@@ -351,13 +416,35 @@ export default function AdminUsers() {
           background: rgba(239, 68, 68, 0.1);
           color: #ef4444;
         }
+        .plan-badge {
+          display: inline-block;
+          padding: 4px 10px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 600;
+        }
+        .plan-starter {
+          background: rgba(99, 102, 241, 0.1);
+          color: #6366f1;
+        }
+        .plan-pro {
+          background: rgba(139, 92, 246, 0.1);
+          color: #8b5cf6;
+        }
+        .plan-business {
+          background: rgba(16, 185, 129, 0.1);
+          color: #10b981;
+        }
+        .plan-none {
+          background: rgba(107, 114, 128, 0.1);
+          color: #9ca3af;
+        }
         .action-btn {
-          padding: 6px 12px;
+          padding: 8px 14px;
           border-radius: 6px;
           font-size: 12px;
           cursor: pointer;
           border: none;
-          margin-right: 6px;
           transition: all 0.2s;
         }
         .btn-suspend {
@@ -386,6 +473,22 @@ export default function AdminUsers() {
           opacity: 0.5;
           cursor: not-allowed;
         }
+        @media (max-width: 768px) {
+          .users-table {
+            display: none !important;
+          }
+          .user-cards {
+            display: flex !important;
+          }
+        }
+        @media (min-width: 769px) {
+          .users-table {
+            display: table !important;
+          }
+          .user-cards {
+            display: none !important;
+          }
+        }
       `}</style>
 
       <div className="users-header">
@@ -396,7 +499,7 @@ export default function AdminUsers() {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="filter-btns">
           <button
             className={`filter-btn ${filter === "all" ? "active" : ""}`}
             onClick={() => setFilter("all")}
@@ -423,91 +526,178 @@ export default function AdminUsers() {
           Loading...
         </div>
       ) : (
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Email</th>
-              <th>Joined</th>
-              <th>Last Login</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user: any) => (
-              <tr key={user._id}>
-                <td>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                    }}
-                  >
+        <>
+          <table className="users-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Joined</th>
+                <th>Last Login</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.map((user: any) => {
+                const planInfo = getPlanBadge(user.subscription?.plan);
+                return (
+                  <tr key={user._id}>
+                    <td>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "12px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: "50%",
+                            background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontWeight: 600,
+                            fontSize: "14px",
+                            color: "#fff",
+                          }}
+                        >
+                          {(user.name || user.email).charAt(0).toUpperCase()}
+                        </div>
+                        <span style={{ fontWeight: 500 }}>
+                          {user.name || "User"}
+                        </span>
+                      </div>
+                    </td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className={`plan-badge ${planInfo.class}`}>
+                        {planInfo.label}
+                      </span>
+                    </td>
+                    <td>{new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>
+                      {user.lastLogin
+                        ? new Date(user.lastLogin).toLocaleDateString()
+                        : "Never"}
+                    </td>
+                    <td>
+                      <span
+                        className={`status-badge ${user.isSuspended ? "status-suspended" : "status-active"}`}
+                      >
+                        {user.isSuspended ? "Suspended" : "Active"}
+                      </span>
+                    </td>
+                    <td>
+                      {user.isSuspended ? (
+                        <button
+                          className="action-btn btn-activate"
+                          onClick={() => handleActivate(user._id, user.email)}
+                          disabled={actionLoading === user._id}
+                        >
+                          {actionLoading === user._id ? "..." : "Activate"}
+                        </button>
+                      ) : (
+                        <button
+                          className="action-btn btn-suspend"
+                          onClick={() => handleSuspend(user._id, user.email)}
+                          disabled={actionLoading === user._id}
+                        >
+                          {actionLoading === user._id ? "..." : "Suspend"}
+                        </button>
+                      )}
+                      <button
+                        className="action-btn btn-delete"
+                        onClick={() => handleDelete(user._id, user.email)}
+                        disabled={actionLoading === user._id}
+                      >
+                        {actionLoading === user._id ? "..." : "Delete"}
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          <div className="user-cards">
+            {filteredUsers.map((user: any) => {
+              const planInfo = getPlanBadge(user.subscription?.plan);
+              return (
+                <div key={user._id} className="user-card">
+                  <div className="user-card-header">
                     <div
                       style={{
-                        width: 32,
-                        height: 32,
+                        width: 40,
+                        height: 40,
                         borderRadius: "50%",
                         background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontWeight: 600,
+                        fontSize: "16px",
+                        color: "#fff",
                       }}
                     >
                       {(user.name || user.email).charAt(0).toUpperCase()}
                     </div>
-                    <span style={{ fontWeight: 500 }}>
-                      {user.name || "User"}
+                    <div className="user-card-info">
+                      <div className="user-card-name">{user.name || "User"}</div>
+                      <div className="user-card-email">{user.email}</div>
+                    </div>
+                    <span
+                      className={`status-badge ${user.isSuspended ? "status-suspended" : "status-active"}`}
+                    >
+                      {user.isSuspended ? "Suspended" : "Active"}
                     </span>
                   </div>
-                </td>
-                <td>{user.email}</td>
-                <td>{new Date(user.createdAt).toLocaleDateString()}</td>
-                <td>
-                  {user.lastLogin
-                    ? new Date(user.lastLogin).toLocaleDateString()
-                    : "Never"}
-                </td>
-                <td>
-                  <span
-                    className={`status-badge ${user.isSuspended ? "status-suspended" : "status-active"}`}
-                  >
-                    {user.isSuspended ? "Suspended" : "Active"}
-                  </span>
-                </td>
-                <td>
-                  {user.isSuspended ? (
+                  <div className="user-card-details">
+                    <div className="user-card-detail">
+                      Plan: <span className={`plan-badge ${planInfo.class}`}>{planInfo.label}</span>
+                    </div>
+                    <div className="user-card-detail">
+                      Joined: <span>{new Date(user.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="user-card-detail">
+                      Last Login: <span>{user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : "Never"}</span>
+                    </div>
+                  </div>
+                  <div className="user-card-actions">
+                    {user.isSuspended ? (
+                      <button
+                        className="action-btn btn-activate"
+                        onClick={() => handleActivate(user._id, user.email)}
+                        disabled={actionLoading === user._id}
+                      >
+                        {actionLoading === user._id ? "..." : "Activate"}
+                      </button>
+                    ) : (
+                      <button
+                        className="action-btn btn-suspend"
+                        onClick={() => handleSuspend(user._id, user.email)}
+                        disabled={actionLoading === user._id}
+                      >
+                        {actionLoading === user._id ? "..." : "Suspend"}
+                      </button>
+                    )}
                     <button
-                      className="action-btn btn-activate"
-                      onClick={() => handleActivate(user._id, user.email)}
+                      className="action-btn btn-delete"
+                      onClick={() => handleDelete(user._id, user.email)}
                       disabled={actionLoading === user._id}
                     >
-                      {actionLoading === user._id ? "..." : "Activate"}
+                      {actionLoading === user._id ? "..." : "Delete"}
                     </button>
-                  ) : (
-                    <button
-                      className="action-btn btn-suspend"
-                      onClick={() => handleSuspend(user._id, user.email)}
-                      disabled={actionLoading === user._id}
-                    >
-                      {actionLoading === user._id ? "..." : "Suspend"}
-                    </button>
-                  )}
-                  <button
-                    className="action-btn btn-delete"
-                    onClick={() => handleDelete(user._id, user.email)}
-                    disabled={actionLoading === user._id}
-                  >
-                    {actionLoading === user._id ? "..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
       )}
 
       {filteredUsers.length === 0 && (

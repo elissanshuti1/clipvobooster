@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import clientPromise from '@/lib/mongodb';
+import { ObjectId } from 'mongodb';
 
-// GET - Get all conversations (admin)
 export async function GET(req: Request) {
   try {
-    // Verify admin
+    const url = new URL(req.url);
+    const conversationId = url.searchParams.get('conversationId');
+
     const cookie = (req as any).headers.get('cookie') || '';
     const m = cookie.split(';').map(s => s.trim()).find(s => s.startsWith('admin_token='));
     const adminToken = m ? m.split('=')[1] : null;
@@ -24,8 +26,17 @@ export async function GET(req: Request) {
     const client = await clientPromise;
     const db = client.db('clipvobooster');
     const conversations = db.collection('conversations');
+    const messages = db.collection('messages');
 
-    // Get all conversations sorted by last message
+    if (conversationId) {
+      const conversationMessages = await messages
+        .find({ conversationId: conversationId })
+        .sort({ createdAt: 1 })
+        .toArray();
+
+      return NextResponse.json({ messages: conversationMessages });
+    }
+
     const allConversations = await conversations
       .find({})
       .sort({ lastMessageAt: -1 })

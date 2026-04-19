@@ -13,6 +13,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [admin, setAdmin] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,6 +36,10 @@ export default function AdminLayout({
 
     checkAuth();
   }, [router]);
+
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -94,21 +99,58 @@ export default function AdminLayout({
           position: fixed;
           height: 100vh;
           overflow-y: auto;
+          z-index: 1000;
+          transform: translateX(-100%);
+          transition: transform 0.3s ease;
+        }
+        .admin-sidebar.open {
+          transform: translateX(0);
+        }
+        .admin-sidebar-overlay {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0,0,0,0.7);
+          z-index: 999;
+        }
+        .admin-sidebar-overlay.show {
+          display: block;
         }
         .admin-main {
-          margin-left: 260px;
+          margin-left: 0;
           min-height: 100vh;
         }
         .admin-header {
           background: var(--bg1);
           border-bottom: 1px solid var(--line);
-          padding: 20px 32px;
+          padding: 16px 20px;
           display: flex;
           justify-content: space-between;
           align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+        }
+        .hamburger {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          cursor: pointer;
+          padding: 8px;
+          background: none;
+          border: none;
+        }
+        .hamburger span {
+          width: 24px;
+          height: 2px;
+          background: var(--white);
+          transition: 0.3s;
         }
         .admin-logo {
-          font-size: 20px;
+          font-size: 18px;
           font-weight: 700;
           color: var(--white);
         }
@@ -164,26 +206,38 @@ export default function AdminLayout({
           cursor: pointer;
           font-size: 13px;
           transition: all 0.2s;
+          width: calc(100% - 40px);
+          margin: 0 20px 20px;
         }
         .logout-btn:hover {
           background: var(--bg3);
           color: var(--white);
         }
         @media (max-width: 768px) {
-          .admin-sidebar {
-            width: 100%;
-            height: auto;
-            position: relative;
+          .hamburger {
+            display: flex;
           }
           .admin-main {
-            margin-left: 0;
+            padding-top: 0;
+          }
+        }
+        @media (min-width: 769px) {
+          .admin-sidebar {
+            transform: translateX(0) !important;
+          }
+          .admin-main {
+            margin-left: 260px;
+          }
+          .admin-header {
+            padding: 20px 32px;
           }
         }
       `}</style>
 
-      {/* Sidebar */}
-      <div className="admin-sidebar">
-        <div style={{ padding: "24px 20px" }}>
+      <div className={`admin-sidebar-overlay ${sidebarOpen ? 'show' : ''}`} onClick={() => setSidebarOpen(false)} />
+
+      <div className="admin-sidebar" style={{ paddingTop: '60px' }}>
+        <div style={{ padding: "0 20px 24px" }}>
           <div className="admin-logo">🚀 ClipVo Admin</div>
         </div>
 
@@ -193,6 +247,7 @@ export default function AdminLayout({
             key={item.href}
             href={item.href}
             className={`nav-item ${pathname === item.href ? "active" : ""}`}
+            onClick={() => setSidebarOpen(false)}
           >
             <span>{item.icon}</span>
             <span>{item.label}</span>
@@ -202,46 +257,45 @@ export default function AdminLayout({
         <div className="nav-section">Account</div>
         <button
           onClick={handleLogout}
-          className="nav-item"
-          style={{
-            width: "100%",
-            textAlign: "left",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-          }}
+          className="logout-btn"
         >
-          <span>🚪</span>
-          <span>Logout</span>
+          <span>🚪</span> Logout
         </button>
       </div>
 
-      {/* Main Content */}
       <div className="admin-main">
         <div className="admin-header">
-          <div>
-            <h1
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                color: "var(--white)",
-                margin: 0,
-              }}
-            >
-              {navItems.find((n) => n.href === pathname)?.label || "Admin"}
-            </h1>
-            <p
-              style={{
-                fontSize: "13px",
-                color: "var(--muted)",
-                margin: "4px 0 0 0",
-              }}
-            >
-              Manage your ClipVoBooster platform
-            </p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button className="hamburger" onClick={() => setSidebarOpen(!sidebarOpen)}>
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+            <div>
+              <h1
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  color: "var(--white)",
+                  margin: 0,
+                }}
+              >
+                {navItems.find((n) => n.href === pathname)?.label || "Admin"}
+              </h1>
+              <p
+                style={{
+                  fontSize: "12px",
+                  color: "var(--muted)",
+                  margin: "4px 0 0 0",
+                  display: 'none'
+                }}
+              >
+                Manage your ClipVoBooster platform
+              </p>
+            </div>
           </div>
           <div className="admin-user">
-            <div style={{ textAlign: "right" }}>
+            <div style={{ textAlign: "right" }} className="admin-user-info">
               <div
                 style={{
                   fontSize: "13px",
@@ -261,7 +315,7 @@ export default function AdminLayout({
           </div>
         </div>
 
-        <div style={{ padding: "32px" }}>{children}</div>
+        <div style={{ padding: "20px" }}>{children}</div>
       </div>
     </div>
   );

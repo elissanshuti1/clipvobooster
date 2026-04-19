@@ -32,7 +32,11 @@ export async function GET(req: Request) {
       createdAt: u.createdAt,
       lastLogin: u.lastLogin,
       isSuspended: u.isSuspended || false,
-      subscription: u.subscription
+      subscription: {
+        plan: u.subscription?.plan || null,
+        status: u.subscription?.status || null,
+        subscriptionId: u.subscription?.subscriptionId || null
+      }
     })));
 
   } catch (error: any) {
