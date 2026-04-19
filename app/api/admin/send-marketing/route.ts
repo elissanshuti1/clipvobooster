@@ -20,7 +20,27 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { subject, body: emailBody, ctaText, type, sendToAll, userIds, targetPlan } = body;
+    let { subject, body: emailBody, ctaText, type, sendToAll, userIds, targetPlan } = body;
+
+    // Safety: parse subject/body if they come as JSON string
+    if (typeof subject === 'string') {
+      try {
+        const parsed = JSON.parse(subject);
+        if (typeof parsed === 'object') {
+          subject = parsed.subject || subject;
+        }
+      } catch {}
+    }
+    if (typeof emailBody === 'string') {
+      try {
+        const parsed = JSON.parse(emailBody);
+        if (typeof parsed === 'object' && parsed.body) {
+          emailBody = parsed.body;
+          subject = parsed.subject || subject;
+          ctaText = parsed.cta || ctaText;
+        }
+      } catch {}
+    }
 
     const client = await clientPromise;
     const db = client.db('clipvobooster');
@@ -74,52 +94,52 @@ export async function POST(req: Request) {
         .replace(/{name}/g, recipient.name || 'there')
         .replace(/{email}/g, recipient.email);
 
-      const htmlContent = `
+      // Clean the body text
+    const cleanBody = personalizedBody
+      .replace(/^{[^}]*}/g, '')  // Remove any leading JSON
+      .replace(/}$/g, '')
+      .trim();
+
+    // Convert plain newlines to HTML
+    const bodyHtml = cleanBody.split('\n').map(line => line.trim()).filter(Boolean).map(line => `<p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #333333;">${line}</p>`).join('');
+
+    const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: #f5f5f5;">
+<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background: #f0f0f0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: #f0f0f0;">
     <tr>
       <td align="center" style="padding: 20px;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 500px; background: #ffffff; border-radius: 8px; overflow: hidden;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 4px;">
           <tr>
-            <td style="padding: 24px 28px; border-bottom: 1px solid #e5e5e5;">
-              <p style="margin: 0; font-size: 15px; font-weight: 600; color: #333333;">ClipVoBooster</p>
+            <td style="padding: 16px 24px; border-bottom: 1px solid #f0f0f0;">
+              <span style="font-size: 16px; font-weight: bold; color: #222222;">ClipVoBooster</span>
             </td>
           </tr>
           <tr>
-            <td style="padding: 28px 28px 24px;">
-              <p style="margin: 0 0 16px 0; font-size: 15px; color: #333333; line-height: 1.6;">
-                Hi ${recipient.name || 'there'},
-              </p>
-              <div style="font-size: 15px; color: #444444; line-height: 1.7; white-space: pre-wrap;">
-${personalizedBody}
+            <td style="padding: 24px;">
+              <div style="font-size: 14px; color: #333333; line-height: 1.6;">
+${bodyHtml}
               </div>
             </td>
           </tr>
           <tr>
-            <td style="padding: 0 28px 24px;">
-              <table border="0" cellspacing="0" cellpadding="0">
-                <tr>
-                  <td style="border-radius: 6px; background: #333333;">
-                    <a href="${clickUrl}" style="display: inline-block; padding: 12px 24px; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 500;">
-                      ${ctaText || 'View'}
-                    </a>
-                  </td>
-                </tr>
-              </table>
+            <td style="padding: 0 24px 24px;">
+              <a href="${clickUrl}" style="display: inline-block; padding: 10px 20px; background: #222222; color: #ffffff; text-decoration: none; font-size: 14px; border-radius: 4px;">
+                ${ctaText || 'View'}
+              </a>
             </td>
           </tr>
           <tr>
-            <td style="padding: 20px 28px; background: #f9f9f9; border-top: 1px solid #e5e5e5;">
-              <p style="margin: 0; font-size: 12px; color: #888888; line-height: 1.5;">
+            <td style="padding: 16px 24px; background: #fafafa; border-top: 1px solid #f0f0f0;">
+              <p style="margin: 0; font-size: 11px; color: #888888;">
                 You received this email because you're a ClipVoBooster user.<br>
-                <a href="${appUrl}" style="color: #666666; text-decoration: underline;">Visit website</a> &nbsp;|&nbsp; 
-                <a href="${appUrl}/unsubscribe" style="color: #666666; text-decoration: underline;">Unsubscribe</a>
+                <a href="${appUrl}" style="color: #555555;">Visit website</a> &nbsp;|&nbsp; 
+                <a href="${appUrl}/unsubscribe" style="color: #555555;">Unsubscribe</a>
               </p>
             </td>
           </tr>

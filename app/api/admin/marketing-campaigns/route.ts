@@ -25,17 +25,16 @@ export async function GET(req: Request) {
     const allCampaigns = await campaigns.find({}).sort({ createdAt: -1 }).limit(50).toArray();
     
     const campaignsWithStats = await Promise.all(allCampaigns.map(async (campaign: any) => {
-      const campaignId = campaign._id.toString();
+      const campaignId = campaign.campaignId || campaign._id.toString();
       
       const trackingStats = await tracking.findOne({ campaignId });
       
       return {
         ...campaign,
         _id: campaignId,
-        opens: trackingStats?.opens || 0,
-        clicks: trackingStats?.clicks || 0,
-        openedEmails: trackingStats?.openedEmails || [],
-        clickedEmails: trackingStats?.clickedEmails || []
+        sentCount: campaign.sentCount || campaign.recipientCount || 0,
+        opens: trackingStats?.opens || campaign.opens || 0,
+        clicks: trackingStats?.clicks || campaign.clicks || 0
       };
     }));
 

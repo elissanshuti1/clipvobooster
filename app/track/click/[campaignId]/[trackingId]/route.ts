@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
 
 export async function GET(req: Request, { params }: { params: Promise<{ campaignId: string; trackingId: string }> }) {
   try {
@@ -12,22 +11,20 @@ export async function GET(req: Request, { params }: { params: Promise<{ campaign
     const db = client.db('clipvobooster');
     const tracking = db.collection('admin_email_tracking');
 
-    try {
-      await tracking.updateOne(
-        { campaignId, trackingId },
-        { 
-          $inc: { clicks: 1 },
-          $set: { lastClickedAt: new Date() },
-          $addToSet: { clickedEmails: trackingId }
-        },
-        { upsert: true }
-      );
-    } catch (e) {
-      console.error('Tracking error:', e);
-    }
+    // Update the clicks count for this campaign
+    await tracking.updateOne(
+      { campaignId },
+      { 
+        $inc: { clicks: 1 },
+        $set: { lastClickedAt: new Date() }
+      }
+    );
+
+    console.log('Click tracked:', campaignId, trackingId);
 
     return NextResponse.redirect(target);
   } catch (error) {
+    console.error('Click tracking error:', error);
     return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL || 'https://clipvo.site');
   }
 }

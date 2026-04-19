@@ -8,7 +8,7 @@ export async function GET(req: Request) {
     const trackingId = url.searchParams.get('t');
 
     if (!campaignId || !trackingId) {
-      return new NextResponse(Buffer.from('', 'utf-8'), {
+      return new NextResponse(Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64'), {
         headers: { 'Content-Type': 'image/gif' },
       });
     }
@@ -17,17 +17,16 @@ export async function GET(req: Request) {
     const db = client.db('clipvobooster');
     const tracking = db.collection('admin_email_tracking');
 
-    try {
-      await tracking.updateOne(
-        { campaignId, 'recipients.trackingId': trackingId },
-        { 
-          $inc: { opens: 1 },
-          $addToSet: { 'recipients.$.opened': true }
-        }
-      );
-    } catch (e) {
-      // Silently fail
-    }
+    // Update opens count for the campaign
+    await tracking.updateOne(
+      { campaignId },
+      { 
+        $inc: { opens: 1 },
+        $set: { lastOpenedAt: new Date() }
+      }
+    );
+
+    console.log('Open tracked:', campaignId, trackingId);
 
     const pixel = Buffer.from(
       'R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
@@ -41,7 +40,8 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) {
-    return new NextResponse(Buffer.from('', 'utf-8'), {
+    console.error('Open tracking error:', error);
+    return new NextResponse(Buffer.from('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7', 'base64'), {
       headers: { 'Content-Type': 'image/gif' },
     });
   }
